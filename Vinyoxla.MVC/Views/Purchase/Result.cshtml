@@ -1,0 +1,20 @@
+﻿@model bool
+
+<main id="successmain">
+    <div class="container">
+        <div class="row all">
+            @if (Model)
+            {
+                <p>
+                    Sizin Ödənişiniz qəbul olundu. <br> Aldiğınız Reporta baxmaq üçün <a asp-controller="Account" asp-action="Login">daxil olun</a>
+                </p>
+            }
+            else
+            {
+                <p style="color: red">
+                    Sizin Ödənişiniz qəbul olunmadı. Kart məlumatlarınz səhvdir.<br> <a asp-controller="Home" asp-action="Index">Bir daha cəhd edin.</a>
+                </p>
+            }
+        </div>
+    </div>
+</main>
