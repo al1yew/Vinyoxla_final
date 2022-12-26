@@ -55,7 +55,7 @@ namespace Vinyoxla.MVC
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.ExceptionHandling();
+            app.ExceptionHandling();
 
             //app.UseSession();
 
