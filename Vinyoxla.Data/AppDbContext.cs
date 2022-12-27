@@ -23,5 +23,7 @@ namespace Vinyoxla.Data
         }
 
         public DbSet<VinCode> VinCodes { get; set; }
+        public DbSet<AppUserToVincode> AppUserToVincodes { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
     }
 }

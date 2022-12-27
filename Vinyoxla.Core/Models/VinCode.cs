@@ -7,13 +7,14 @@ namespace Vinyoxla.Core.Models
     public class VinCode : BaseModel
     {
         public string Vin { get; set; }
-        public int FileName { get; set; }
+        public string FileName { get; set; }
         public bool IsCarfax { get; set; }
         public bool IsAutoCheck { get; set; }
+        public bool IsFromAPI { get; set; }
+
 
 
         //relations
-        public AppUser AppUser { get; set; }
-        public string AppUserId { get; set; }
+        public List<AppUserToVincode> AppUserToVincodes { get; set; }
     }
 }

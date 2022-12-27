@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Vinyoxla.Data;
 using Vinyoxla.Service.Exceptions;
 using Vinyoxla.Service.ViewModels.PurchaseVMs;
+using Vinyoxla.MVC.Extensions;
 
 namespace Vinyoxla.MVC
 {
@@ -38,12 +39,16 @@ namespace Vinyoxla.MVC
             //services.AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<PurchaseVM>());
             //poguglit kak pralno zat fluent valid v startape shto b on vozvrashal mne message errora
 
+            //services.IdentityBuilder();
+
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
             services.AddAutoMapper(options =>
             {
                 options.AddProfile(new MappingProfile());
             });
+
+            services.ServicesBuilder();
 
             services.AddHttpContextAccessor();
         }
@@ -56,8 +61,6 @@ namespace Vinyoxla.MVC
             }
 
             //app.ExceptionHandling();
-
-            //app.UseSession();
 
             app.UseRouting();
 

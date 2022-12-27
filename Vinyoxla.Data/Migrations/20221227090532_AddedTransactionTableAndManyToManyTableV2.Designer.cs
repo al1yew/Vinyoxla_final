@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vinyoxla.Data;
 
 namespace Vinyoxla.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221227090532_AddedTransactionTableAndManyToManyTableV2")]
+    partial class AddedTransactionTableAndManyToManyTableV2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,7 +228,10 @@ namespace Vinyoxla.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AppUserId")
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AppUserId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("VinCodeId")
@@ -234,7 +239,7 @@ namespace Vinyoxla.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("AppUserId1");
 
                     b.HasIndex("VinCodeId");
 
@@ -248,7 +253,10 @@ namespace Vinyoxla.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AppUserId")
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AppUserId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Code")
@@ -264,7 +272,7 @@ namespace Vinyoxla.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("AppUserId1");
 
                     b.ToTable("Transactions");
                 });
@@ -358,7 +366,7 @@ namespace Vinyoxla.Data.Migrations
                 {
                     b.HasOne("Vinyoxla.Core.Models.AppUser", "AppUser")
                         .WithMany("AppUserToVincodes")
-                        .HasForeignKey("AppUserId");
+                        .HasForeignKey("AppUserId1");
 
                     b.HasOne("Vinyoxla.Core.Models.VinCode", "VinCode")
                         .WithMany("AppUserToVincodes")
@@ -371,7 +379,7 @@ namespace Vinyoxla.Data.Migrations
                 {
                     b.HasOne("Vinyoxla.Core.Models.AppUser", "AppUser")
                         .WithMany("Transactions")
-                        .HasForeignKey("AppUserId");
+                        .HasForeignKey("AppUserId1");
                 });
 #pragma warning restore 612, 618
         }

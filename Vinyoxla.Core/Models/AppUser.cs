@@ -10,6 +10,7 @@ namespace Vinyoxla.Core.Models
         public int Balance { get; set; }
 
         //relations
-        public List<VinCode> VinCodes { get; set; }
+        public List<AppUserToVincode> AppUserToVincodes { get; set; }
+        public List<Transaction> Transactions { get; set; }
     }
 }

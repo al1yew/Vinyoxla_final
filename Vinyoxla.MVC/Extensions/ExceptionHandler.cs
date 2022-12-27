@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Vinyoxla.Service.Exceptions;
 
-namespace Vinyoxla.Service.Exceptions
+namespace Vinyoxla.MVC.Extensions
 {
     public static class ExceptionHandler
     {
@@ -20,21 +21,21 @@ namespace Vinyoxla.Service.Exceptions
                     int statuscode = 500;
                     string errormsg = "Internal Server Error!";
 
-                    //if (feature.Error is NotFoundException)
-                    //{
-                    //    statuscode = 404;
-                    //    errormsg = feature.Error.Message;
-                    //}
-                    //else if (feature.Error is RecordDublicateException)
-                    //{
-                    //    statuscode = 409;
-                    //    errormsg = feature.Error.Message;
-                    //}
-                    //else if (feature.Error is BadRequestException)
-                    //{
-                    //    statuscode = 400;
-                    //    errormsg = feature.Error.Message;
-                    //}
+                    if (feature.Error is NotFoundException)
+                    {
+                        statuscode = 404;
+                        errormsg = feature.Error.Message;
+                    }
+                    else if (feature.Error is RecordDublicateException)
+                    {
+                        statuscode = 409;
+                        errormsg = feature.Error.Message;
+                    }
+                    else if (feature.Error is BadRequestException)
+                    {
+                        statuscode = 400;
+                        errormsg = feature.Error.Message;
+                    }
 
                     context.Response.StatusCode = statuscode;
                     await context.Response.WriteAsync(errormsg);
