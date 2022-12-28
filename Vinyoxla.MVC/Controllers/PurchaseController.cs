@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Vinyoxla.Service.Interfaces;
 using Vinyoxla.Service.ViewModels.PurchaseVMs;
@@ -23,19 +24,22 @@ namespace Vinyoxla.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Purchase(CardVM cardVM)
         {
-            string response = await _purchaseService.GetReport(cardVM.Vin, cardVM.Type);
+            ResultVM resultVM = await _purchaseService.GetReport(cardVM.Vin);
 
-            if (response == null)
-            {
-                return View("Result", false);
-            }
+            //if (resultVM == null)
+            //{
+            //    return View("Result", false);
+            //} nado kakuyu to proverku tut ustroit
+
             //snachala nado kupit, i esli smogli kupit, toqda uje prinat platu usera i vidat emu report
+            //sdelat iframe i loader
+
             if (!await _purchaseService.UserPurchase(cardVM))
             {
                 return View("Result", false);
             }
 
-            return View("Report", response);
+            return View("Report", resultVM);
         }
     }
 }

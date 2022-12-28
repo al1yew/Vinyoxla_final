@@ -8,9 +8,7 @@ namespace Vinyoxla.Core.Models
     {
         public string Vin { get; set; }
         public string FileName { get; set; }
-        public bool IsCarfax { get; set; }
-        public bool IsAutoCheck { get; set; }
-        public bool IsFromAPI { get; set; }
+        public int PurchasedTimes { get; set; }
 
 
 

@@ -8,7 +8,7 @@ namespace Vinyoxla.MVC.Controllers
 {
     public class ImageController : Controller
     {
-        public IActionResult Index(string vincode)
+        public IActionResult Index(string vin)
         {
             return View();
         }

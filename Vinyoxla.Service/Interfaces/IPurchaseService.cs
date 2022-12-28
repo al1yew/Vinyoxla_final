@@ -12,6 +12,6 @@ namespace Vinyoxla.Service.Interfaces
 
         Task<bool> UserPurchase(CardVM cardVM);
 
-        Task<string> GetReport(string vinCode, int reportType);
+        Task<ResultVM> GetReport(string vinCode);
     }
 }

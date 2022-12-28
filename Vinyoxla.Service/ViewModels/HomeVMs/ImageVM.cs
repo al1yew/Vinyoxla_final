@@ -4,11 +4,11 @@ using System.Text;
 
 namespace Vinyoxla.Service.ViewModels.HomeVMs
 {
-    public class AutoCheckVM
+    public class ImageVM
     {
-        public int Records { get; set; }
-        public string Vehicle { get; set; }
+        public int AuctionCount { get; set; }
+        public int ImageCount { get; set; }
         public string Vin { get; set; }
-        public int Year { get; set; }
+        public string Vehicle { get; set; }
     }
 }

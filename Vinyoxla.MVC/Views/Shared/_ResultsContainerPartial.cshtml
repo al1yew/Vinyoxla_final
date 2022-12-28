@@ -4,15 +4,8 @@
     @await Html.PartialAsync("_CarfaxResultPartial", Model.Carfax)
 </div>
 
-<div class="col-lg-5-8 col-12 autocheckContainer resultContainer" id="autocheckContainer">
-    @await Html.PartialAsync("_AutocheckResultPartial", Model.Autocheck)
-</div>
-
-<div class="col-lg-12 col-12 photosApiResult" id="photosApiResult">
-    <span class="first">
-        Avtomobil @Model.AuctionCount hərracda iştirak edib <br>Avtomobilin @Model.PhotoCount şəkili mövcuddur.
-    </span>
-    <a asp-controller="Image" asp-action="Index" asp-route-vincode="@Model.Carfax.Vin">Baxmaq</a>
+<div class="col-lg-5-8 col-12 photosApiResult resultContainer" id="photosApiResult">
+    @await Html.PartialAsync("_ImageResultPartial", Model.ImageVM)
 </div>
 
 <div class="col-lg-5-8 col-12 reklam">

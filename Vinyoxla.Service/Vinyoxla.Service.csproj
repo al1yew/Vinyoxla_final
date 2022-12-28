@@ -20,4 +20,8 @@
     <PackageReference Include="System.IO" Version="4.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Vinyoxla.Core\Vinyoxla.Core.csproj" />
+  </ItemGroup>
+
 </Project>

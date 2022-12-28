@@ -13,7 +13,6 @@ namespace Vinyoxla.Service.ViewModels.PurchaseVMs
         public Nullable<int> CVV { get; set; }
         public string PhoneNumber { get; set; }
         public string Vin { get; set; }
-        public int Type { get; set; }
 
     }
 }

@@ -6,7 +6,8 @@ namespace Vinyoxla.Service.ViewModels.PurchaseVMs
 {
     public class ResultVM
     {
-        public string Type { get; set; }
         public string Vin { get; set; }
+        public string FileName { get; set; }
+        public string HTML { get; set; }
     }
 }

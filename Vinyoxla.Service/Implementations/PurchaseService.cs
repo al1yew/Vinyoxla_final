@@ -8,6 +8,8 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Vinyoxla.Core;
+using Vinyoxla.Core.Models;
 using Vinyoxla.Service.Interfaces;
 using Vinyoxla.Service.ViewModels.PurchaseVMs;
 
@@ -17,10 +19,12 @@ namespace Vinyoxla.Service.Implementations
     {
         private readonly IWebHostEnvironment _env;
         private IConfiguration Configuration { get; }
-        public PurchaseService(IWebHostEnvironment env, IConfiguration configuration)
+        private readonly IUnitOfWork _unitOfWork;
+        public PurchaseService(IWebHostEnvironment env, IConfiguration configuration, IUnitOfWork unitOfWork)
         {
             _env = env;
             Configuration = configuration;
+            _unitOfWork = unitOfWork;
         }
 
         public PurchaseVM GetViewModel(SelectedReportVM selectedReportVM)
@@ -30,7 +34,6 @@ namespace Vinyoxla.Service.Implementations
                 SelectedReportVM = selectedReportVM,
                 CardVM = new CardVM()
                 {
-                    Type = selectedReportVM.Type,
                     Vin = selectedReportVM.Vin
                 }
             };
@@ -38,11 +41,42 @@ namespace Vinyoxla.Service.Implementations
             return purchaseVM;
         }
 
-        public async Task<string> GetReport(string vinCode, int reportType)
+        public async Task<ResultVM> GetReport(string vinCode)
         {
-            string type = reportType == 1 ? "carfax" : "autocheck";
+            //pathimizi yaratdig, combine etdik.
+            string path = Path.Combine(_env.WebRootPath);
 
-            string url = $"https://api.allreports.tools/wp-json/v1/get_report_by_wholesaler/{vinCode}/{Configuration.GetSection("Api_Key:MyKey").Value}/{type}/en";
+            string[] folders = { "assets", "files", $"{vinCode}" };
+
+            foreach (string folder in folders)
+            {
+                path = Path.Combine(path, folder);
+            }
+
+            //alinan pdf bizde varsa onu qaytaririg
+            if (await _unitOfWork.VinCodeRepository.IsExistAsync(x => x.Vin == vinCode.ToUpperInvariant()))
+            {
+                VinCode vin = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vinCode);
+
+                string reportHTML = "";
+
+                path = Path.Combine(path, vin.FileName);
+
+                reportHTML = await System.IO.File.ReadAllTextAsync(path);
+
+                vin.PurchasedTimes = vin.PurchasedTimes + 1;
+                await _unitOfWork.CommitAsync();
+
+                return new ResultVM()
+                {
+                    FileName = vin.FileName,
+                    HTML = reportHTML,
+                    Vin = vinCode
+                };
+            }
+
+            //alinan pdf bizde yoxdusa, alirig
+            string url = $"https://api.allreports.tools/wp-json/v1/get_report_by_wholesaler/{vinCode}/{Configuration.GetSection("Api_Key:MyKey").Value}/carfax/en";
 
             HttpResponseMessage response = null;
 
@@ -65,15 +99,6 @@ namespace Vinyoxla.Service.Implementations
 
                 string fileName = vinCode + "_" + DateTime.Now.ToString("yyyy-MM-dd") + ".html";
 
-                string path = Path.Combine(_env.WebRootPath);
-
-                string[] folders = { "assets", "files", $"{vinCode}", $"{type}" };
-
-                foreach (string folder in folders)
-                {
-                    path = Path.Combine(path, folder);
-                }
-
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
@@ -81,12 +106,25 @@ namespace Vinyoxla.Service.Implementations
 
                 path = Path.Combine(path, fileName);
 
-                System.IO.File.WriteAllText(path, responseHTML);
+                await System.IO.File.WriteAllTextAsync(path, responseHTML);
 
-                //soxranenie v papku tormozit vse, ili nayti druqoy metod soxraneniya, ili je
-                //uje ispolzovat iframe
+                VinCode vin = new VinCode()
+                {
+                    Vin = vinCode,
+                    FileName = fileName,
+                    CreatedAt = DateTime.UtcNow.AddHours(4),
+                    PurchasedTimes = 1
+                };
 
-                return responseHTML;
+                await _unitOfWork.VinCodeRepository.AddAsync(vin);
+                await _unitOfWork.CommitAsync();
+
+                return new ResultVM()
+                {
+                    Vin = vinCode,
+                    FileName = fileName,
+                    HTML = responseHTML
+                };
             }
 
             return null;

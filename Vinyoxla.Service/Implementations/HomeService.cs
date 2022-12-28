@@ -30,9 +30,14 @@ namespace Vinyoxla.Service.Implementations
             #endregion
 
             #region Images
-
-            homeVM.PhotoCount = 34;
-            homeVM.AuctionCount = 3;
+            //request image api
+            homeVM.ImageVM = new ImageVM()
+            {
+                AuctionCount = 2,
+                ImageCount = 33,
+                Vehicle = homeVM.Carfax.Vehicle,
+                Vin = homeVM.Carfax.Vin
+            };
 
             #endregion
 
