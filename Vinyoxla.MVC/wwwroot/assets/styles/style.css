@@ -3354,7 +3354,7 @@ input::-webkit-inner-spin-button {
   position: relative;
 }
 
-#reportmain .downloadreport {
+#reportmain .klassdlacssdownloadreport {
   position: fixed;
   right: 4%;
   bottom: 2%;
@@ -3368,7 +3368,7 @@ input::-webkit-inner-spin-button {
   cursor: pointer;
 }
 
-#reportmain .downloadreport:hover {
+#reportmain .klassdlacssdownloadreport:hover {
   background-color: blue;
   -webkit-box-shadow: 0px 0px 5px 1px darkblue;
           box-shadow: 0px 0px 5px 1px darkblue;
@@ -3395,16 +3395,16 @@ input::-webkit-inner-spin-button {
 }
 
 @media (max-width: 576px) {
-  #reportmain .downloadreport {
+  #reportmain .klassdlacssdownloadreport {
     right: 1% !important;
     bottom: 2% !important;
-    padding: 5px !important;
+    padding: 15px !important;
     font-size: 14px !important;
   }
   #reportmain .returntoindex {
     left: 1% !important;
     bottom: 2% !important;
-    padding: 5px !important;
+    padding: 15px !important;
     font-size: 14px !important;
   }
 }

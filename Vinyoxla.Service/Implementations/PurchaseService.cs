@@ -67,12 +67,14 @@ namespace Vinyoxla.Service.Implementations
                 vin.PurchasedTimes = vin.PurchasedTimes + 1;
                 await _unitOfWork.CommitAsync();
 
-                return new ResultVM()
+                ResultVM resultVM = new ResultVM()
                 {
                     FileName = vin.FileName,
                     HTML = reportHTML,
                     Vin = vinCode
                 };
+
+                return resultVM;
             }
 
             //alinan pdf bizde yoxdusa, alirig
@@ -119,12 +121,14 @@ namespace Vinyoxla.Service.Implementations
                 await _unitOfWork.VinCodeRepository.AddAsync(vin);
                 await _unitOfWork.CommitAsync();
 
-                return new ResultVM()
+                ResultVM resultVM = new ResultVM()
                 {
                     Vin = vinCode,
                     FileName = fileName,
                     HTML = responseHTML
                 };
+
+                return resultVM;
             }
 
             return null;

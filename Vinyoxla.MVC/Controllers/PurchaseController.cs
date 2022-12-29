@@ -26,10 +26,10 @@ namespace Vinyoxla.MVC.Controllers
         {
             ResultVM resultVM = await _purchaseService.GetReport(cardVM.Vin);
 
-            //if (resultVM == null)
-            //{
-            //    return View("Result", false);
-            //} nado kakuyu to proverku tut ustroit
+            if (resultVM.FileName == null || resultVM.HTML == null || resultVM.Vin == null || resultVM == null)
+            {
+                return View("Result", false);
+            }
 
             //snachala nado kupit, i esli smogli kupit, toqda uje prinat platu usera i vidat emu report
             //sdelat iframe i loader

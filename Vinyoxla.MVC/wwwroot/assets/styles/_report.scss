@@ -4,7 +4,7 @@
     margin: 0;
     position: relative;
 
-    .downloadreport {
+    .klassdlacssdownloadreport {
         position: fixed;
         right: 4%;
         bottom: 2%;
@@ -44,17 +44,17 @@
 @media(max-width: 576px) {
     #reportmain {
 
-        .downloadreport {
+        .klassdlacssdownloadreport {
             right: 1% !important;
             bottom: 2% !important;
-            padding: 5px !important;
+            padding: 15px !important;
             font-size: 14px !important;
         }
 
         .returntoindex {
             left: 1% !important;
             bottom: 2% !important;
-            padding: 5px !important;
+            padding: 15px !important;
             font-size: 14px !important;
         }
     }

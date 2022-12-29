@@ -23,8 +23,8 @@
     <main id="reportmain">
         @Html.Raw(Model.HTML)
 
-        <span class="downloadreport"
-              data-url="~/assets/files/@Model.Vin/@Model.FileName">Yükləmək</span>
+        <a href="~/assets/files/@Model.Vin/@Model.FileName"
+           download attributes-list class="klassdlacssdownloadreport">Yükləmək</a>
 
         <a asp-controller="Home" asp-action="Index" class="returntoindex">Əsas Səhifə</a>
     </main>

@@ -667,34 +667,6 @@ $(document).ready(function () {
 
     // -------------------------- images page
 
-    // -------------------------- 
-
-    // -------------------------- report page
-
-    //#region download report
-
-    $(document).on('click', '.downloadreport', function (e) {
-        let url = $(this).data('url')
-
-        fetch(url, {
-            mode: 'cors',
-        })
-            .then(response => response.blob())
-            .then(blob => {
-                let blobUrl = window.URL.createObjectURL(blob);
-                let a = document.createElement('a');
-                a.download = url.replace(/^.*[\\\/]/, '');
-                a.href = blobUrl;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            })
-    })
-
-    //#endregion download report
-
-    // -------------------------- report page
-
 });
 
 //WAUDG74F25N111998
