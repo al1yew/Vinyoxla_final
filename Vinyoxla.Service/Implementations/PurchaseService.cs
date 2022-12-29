@@ -99,7 +99,9 @@ namespace Vinyoxla.Service.Implementations
 
                 string responseHTML = Encoding.UTF8.GetString(report);
 
-                string fileName = vinCode + "_" + DateTime.Now.ToString("yyyy-MM-dd") + ".html";
+                Guid guid = Guid.NewGuid();
+
+                string fileName = vinCode + "_" + guid + ".html";
 
                 if (!Directory.Exists(path))
                 {

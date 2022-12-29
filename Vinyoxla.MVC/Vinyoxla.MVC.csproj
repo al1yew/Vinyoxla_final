@@ -26,4 +26,8 @@
     <ProjectReference Include="..\Vinyoxla.Service\Vinyoxla.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\assets\files\" />
+  </ItemGroup>
+
 </Project>
