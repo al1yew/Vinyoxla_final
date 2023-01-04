@@ -39,7 +39,7 @@ namespace Vinyoxla.MVC
             //services.AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<PurchaseVM>());
             //poguglit kak pralno zat fluent valid v startape shto b on vozvrashal mne message errora
 
-            //services.IdentityBuilder();
+            services.IdentityBuilder();
 
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
@@ -66,9 +66,9 @@ namespace Vinyoxla.MVC
 
             app.UseStaticFiles();
 
-            //app.UseAuthentication();
+            app.UseAuthentication();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

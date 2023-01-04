@@ -157,55 +157,70 @@ $(document).ready(function () {
     //#region login input submit
 
     $(document).on('submit', '#loginform', function (e) {
-        e.preventDefault();
         const formData = new FormData(e.target);
 
-        let phoneno = formData.get('phoneno');
-        let code = formData.get('code');
+        //iki variant var, kod olanda ve olmayanda
 
-        if (phoneno.length == 9 && code.length == 4) {
-            console.log({ phoneno, code })
+        let phoneno = formData.get('PhoneNumber');
+        let code = formData.get('Code');
 
-            //fetch to the action of controller where we send sms
+        if (!(phoneno.startsWith("50") ||
+            phoneno.startsWith("10") ||
+            phoneno.startsWith("51") ||
+            phoneno.startsWith("70") ||
+            phoneno.startsWith("77") ||
+            phoneno.startsWith("99") ||
+            phoneno.startsWith("55"))) {
+            e.preventDefault();
+            toastr.error('Nömrə səhvdir.');
+            return;
         }
-    })
 
-    //open code input on ENTER press and on button click 
+        if (phoneno.length != 9) {
+            e.preventDefault();
+            toastr.error('Məlumatlar səhvdir.');
+            return;
+        }
 
-    $(document).on('click', '#sendcode', function () {
-        if ($('#phoneno').val().length == 9) {
-            $('#sendcode').addClass('d-none');
-            $('#kodgelennensonra').removeClass('d-none');
+        if ($('#kodgelennensonra').find('#code').length != 1) {
+            e.preventDefault();
+
+            $('.preloaderdiv').removeClass('d-none')
+            $('#sendcode').html("Daxil ol");
             $('#phoneno').prop('readonly', 'true');
-            $('#code').focus();
-        }
-    })
 
-    $(document).on('keypress', function (e) {
-        if (window.location.href.indexOf('login') != -1) {
-            if (e.keyCode == 13) {
-                if ($('#phoneno').val().length == 9) {
-                    $('#sendcode').addClass('d-none');
-                    $('#kodgelennensonra').removeClass('d-none');
-                    $('#phoneno').prop('readonly', 'true');
-                    $('#code').focus();
-                }
+            let obj = {
+                phoneNumber: $('#phoneno').val()
             }
+
+            axios.post("/Account/SendCode", obj)
+                .then(function (res) {
+                    $('.preloaderdiv').addClass('d-none')
+                    $('#kodgelennensonra').append(res.data)
+                    $('#code').focus();
+                })
+                .catch(function (err) {
+                    $('.preloaderdiv').addClass('d-none')
+                    toastr.error('Daxil edilən məlumatlar səhvdir!')
+                    $('#sendcode').html("Kodu göndər");
+                    $('#phoneno').prop('readonly', 'false');
+                    $('#phoneno').focus();
+                    return;
+                })
+            return;
+        }
+
+        $('.preloaderdiv').addClass('d-none')
+
+        if (code.length != 4) {
+
+            e.preventDefault();
+            toastr.error('Məlumatlar səhvdir.');
+            return;
         }
     })
 
     //#endregion login input submit
-
-    //#region login input prevent entering of nonnumeric
-
-    $(document).on('input', '#phoneno, #code, #phonenumber', function (e) {
-
-        if (!/^[0-9]+$/.test($(this).val())) {
-            $(this).val($(this).val().slice(0, -1))
-        }
-    })
-
-    //#endregion login input prevent entering of nonnumeric
 
     // -------------------------- login page
 
@@ -666,6 +681,22 @@ $(document).ready(function () {
     //#endregion slider in images page
 
     // -------------------------- images page
+
+    // -------------------------- 
+
+    // -------------------------- report page
+
+    //#region print button
+
+    $(document).on('click', '#printbtn', function () {
+
+        window.print();
+    });
+
+    //#endregion print button
+
+    // -------------------------- report page
+
 
 });
 

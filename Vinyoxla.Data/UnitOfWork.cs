@@ -13,6 +13,7 @@ namespace Vinyoxla.Data
         private readonly AppUserRepository _appUserRepository;
         private readonly VinCodeRepository _vinCodeRepository;
         private readonly AppUserToVincodeRepository _appUserToVincodeRepository;
+        private readonly TransactionRepository _transactionRepository;
         private readonly AppDbContext _context;
 
         public UnitOfWork(AppDbContext context)
@@ -23,6 +24,7 @@ namespace Vinyoxla.Data
         public IAppUserRepository AppUserRepository => _appUserRepository != null ? _appUserRepository : new AppUserRepository(_context);
         public IVinCodeRepository VinCodeRepository => _vinCodeRepository != null ? _vinCodeRepository : new VinCodeRepository(_context);
         public IAppUserToVincodeRepository AppUserToVincodeRepository => _appUserToVincodeRepository != null ? _appUserToVincodeRepository : new AppUserToVincodeRepository(_context);
+        public ITransactionRepository TransactionRepository => _transactionRepository != null ? _transactionRepository : new TransactionRepository(_context);
 
 
         public int Commit()

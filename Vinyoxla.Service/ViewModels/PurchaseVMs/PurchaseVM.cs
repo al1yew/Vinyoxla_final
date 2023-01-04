@@ -6,7 +6,7 @@ namespace Vinyoxla.Service.ViewModels.PurchaseVMs
 {
     public class PurchaseVM
     {
-        public CardVM CardVM { get; set; }
+        public OrderVM OrderVM { get; set; }
         public SelectedReportVM SelectedReportVM { get; set; }
     }
 }

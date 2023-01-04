@@ -17,6 +17,7 @@ namespace Vinyoxla.MVC.Extensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IPurchaseService, PurchaseService>();
+            services.AddScoped<IAccountService, AccountService>();
         }
     }
 }

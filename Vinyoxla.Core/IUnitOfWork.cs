@@ -11,6 +11,7 @@ namespace Vinyoxla.Core
         IAppUserRepository AppUserRepository { get; }
         IVinCodeRepository VinCodeRepository { get; }
         IAppUserToVincodeRepository AppUserToVincodeRepository { get; }
+        ITransactionRepository TransactionRepository { get; }
         Task<int> CommitAsync();
         int Commit();
     }

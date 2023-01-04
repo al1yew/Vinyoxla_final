@@ -46,9 +46,21 @@
                     </a>
                 </div>
                 <div class="col-lg-4 col-8-5">
-                    <a asp-controller="Account" asp-action="Login" class="">
-                        Daxil ol
-                    </a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Account" asp-action="Logout" class="">
+                            Çıxış
+                        </a>
+                        <a asp-controller="Account" asp-action="Profile" class="">
+                            Hesabım
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="">
+                            Daxil ol
+                        </a>
+                    }
                     <a asp-controller="About" asp-action="Index" class="">
                         Haqqımızda
                     </a>

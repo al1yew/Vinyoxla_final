@@ -1,31 +1,59 @@
-﻿
+﻿@model LoginVM
 
-    <main id="loginmain">
-        <div class="container">
-            <div class="row all">
-                <form class="col-lg-6 col-12 loginform" id="loginform">
-                    <p class="col-lg-12 col-12 loginp">Zəhmət olmasa məlumatları doldurun.</p>
+<style type="text/css">
 
-                    <label for="phoneno" class="col-lg-12 col-12">Telefon nömrəniz:</label>
-                    <div class="inputkeeper col-lg-12 col-12">
-                        <span class=" kodstrani">+994</span>
-                        <input inputmode="numeric" numeric autocomplete="off" name="phoneno" placeholder="50 500 50 50"
-                               type="text" required maxlength="9" minlength="9" class="phoneno col-lg-9 col-9"
-                               id="phoneno">
-                    </div>
+    #validation {
+        width: 100%;
+    }
 
-                    <button class="btn" type="button" id="sendcode">Kodu göndər</button>
+    .validation-summary-errors {
+        width: 100%;
+    }
 
-                    <div class="col-lg-12 col-12 d-none" id="kodgelennensonra">
-                        <label for="code" class="col-lg-12 col-12">Göndərilən kod:</label>
-                        <div class="inputkeeper col-lg-12 col-12">
-                            <input inputmode="numeric" autocomplete="off" name="code" placeholder="1234" type="text"
-                                   maxlength="4" minlength="4" class="code col-lg-12 col-12" id="code">
-                        </div>
+    #validation ul {
+        list-style: none;
+        text-align: center;
+        width: 100%;
+        font-size: 16px;
+        color: red;
+        margin: 0;
+        padding: 0;
+        margin-bottom: 10px;
+    }
 
-                        <button class="btn" type="submit">Daxil ol</button>
-                    </div>
-                </form>
-            </div>
+    .validation-summary-errors ul {
+        list-style: none;
+        width: 100%;
+        text-align: center;
+        font-size: 16px;
+        color: red;
+        margin: 0;
+        padding: 0;
+        margin-bottom: 10px;
+    }
+</style>
+
+<main id="loginmain">
+    <div class="container">
+        <div class="row all">
+            <form class="col-lg-6 col-12 loginform" id="loginform" enctype="multipart/form-data" method="post">
+                <p class="col-lg-12 col-12 loginp">Zəhmət olmasa məlumatları doldurun.</p>
+                <div id="validation" asp-validation-summary="ModelOnly"></div>
+
+                <label for="phoneno" class="col-lg-12 col-12">Telefon nömrəniz:</label>
+                <div class="inputkeeper col-lg-12 col-12">
+                    <span class=" kodstrani">+994</span>
+                    <input asp-for="PhoneNumber" inputmode="numeric" numeric autocomplete="off" placeholder="50 500 50 50"
+                           type="text" required maxlength="9" minlength="9" class="phoneno col-lg-9 col-9"
+                           id="phoneno">
+                </div>
+
+                <div class="col-lg-12 col-12" id="kodgelennensonra">
+
+                </div>
+
+                <button class="btn" type="submit" form="loginform" id="sendcode">Kodu göndər</button>
+            </form>
         </div>
-    </main>
+    </div>
+</main>

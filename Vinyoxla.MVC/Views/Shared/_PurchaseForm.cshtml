@@ -1,4 +1,4 @@
-﻿@model CardVM
+﻿@model OrderVM
 
 <form method="post" enctype="multipart/form-data" asp-controller="Purchase" asp-action="Purchase" id="purchaseForm" class="col-lg-6 col-12">
     <div class="col-lg-9 col-9 above">
@@ -48,12 +48,12 @@
     <input style="display: none" class="d-none" asp-for="Vin" />
 
     <div class="col-lg-12 col-12 buttonandtelkeeper">
-        <div class="inputkeeper col-lg-5-8 col-12">
+        <div class="inputkeeper @(User.Identity.IsAuthenticated ? "d-none" : "col-lg-5-8") col-12">
             <span class=" kodstrani">+994</span>
             <input inputmode="numeric" numeric autocomplete="off" asp-for="PhoneNumber"
                    placeholder="50 500 50 50" type="text" required maxlength="9" minlength="9"
                    class="phonenumber col-lg-9 col-9" id="phonenumber">
         </div>
-        <button type="submit" id="purchaseformbutton" class="btn col-lg-6 col-12">Almaq</button>
+        <button type="submit" id="purchaseformbutton" class="btn @(User.Identity.IsAuthenticated ? "col-lg-12" : "col-lg-6") col-12">Almaq</button>
     </div>
 </form>

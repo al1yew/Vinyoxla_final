@@ -16,30 +16,94 @@ namespace Vinyoxla.MVC.Controllers
             _purchaseService = purchaseService;
         }
 
-        public IActionResult Index(SelectedReportVM selectedReportVM)
+        public async Task<IActionResult> Index(SelectedReportVM selectedReportVM)
         {
-            return View(_purchaseService.GetViewModel(selectedReportVM));
+            if (User.Identity.IsAuthenticated)
+            {
+                string phoneno = await _purchaseService.GetUserPhoneNumber();
+
+                if (!await _purchaseService.UserHasReport(selectedReportVM.Vin, phoneno))
+                {
+                    if (await _purchaseService.GetUserBalance() < 5)
+                    {
+                        return View(await _purchaseService.GetViewModelForOrderPage(selectedReportVM));
+                    }
+                    else
+                    {
+                        if (await _purchaseService.SubstractFromBalance(selectedReportVM.Vin))
+                        {
+                            return RedirectToAction("Report", new { vinCode = selectedReportVM.Vin, phoneno });
+                        }
+                        else
+                        {
+                            return View("Result", false);
+                        }
+                    }
+                }
+                else
+                {
+                    string fileName = await _purchaseService.GetReportFileName(selectedReportVM.Vin);
+
+                    return RedirectToAction("ViewReport", new { fileName });
+                }
+            }
+            else
+            {
+                return View(await _purchaseService.GetViewModelForOrderPage(selectedReportVM));
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Purchase(CardVM cardVM)
+        public async Task<IActionResult> Purchase(OrderVM orderVM)
         {
-            ResultVM resultVM = await _purchaseService.GetReport(cardVM.Vin);
+            if (User.Identity.IsAuthenticated)
+            {
+                if (await _purchaseService.UserPurchase(orderVM))
+                {
+                    return RedirectToAction("Report", new { vinCode = orderVM.Vin, phoneno = orderVM.PhoneNumber });
+                }
+                else
+                {
+                    return View("Result", false);
+                }
+            }
+            else
+            {
+                if (!await _purchaseService.UserHasReport(orderVM.Vin, orderVM.PhoneNumber))
+                {
+                    if (await _purchaseService.UserPurchase(orderVM))
+                    {
+                        return RedirectToAction("Report", new { vinCode = orderVM.Vin, phoneno = orderVM.PhoneNumber });
+                    }
+                    else
+                    {
+                        return View("Result", false);
+                    }
+                }
+                else
+                {
+                    string fileName = await _purchaseService.GetReportFileName(orderVM.Vin);
 
-            if (resultVM.FileName == null || resultVM.HTML == null || resultVM.Vin == null || resultVM == null)
+                    return RedirectToAction("ViewReport", new { fileName });
+                }
+            }
+        }
+
+        public async Task<IActionResult> Report(string vinCode, string phoneno)
+        {
+            string fileName = await _purchaseService.GetReport(vinCode, phoneno);
+
+            if (fileName == null)
             {
                 return View("Result", false);
             }
 
-            //snachala nado kupit, i esli smogli kupit, toqda uje prinat platu usera i vidat emu report
-            //sdelat iframe i loader
+            return RedirectToAction("ViewReport", new { fileName });
+        }
 
-            if (!await _purchaseService.UserPurchase(cardVM))
-            {
-                return View("Result", false);
-            }
-
-            return View("Report", resultVM);
+        public async Task<IActionResult> ViewReport(string fileName)
+        {
+            return View(await _purchaseService.GetUsersReport(fileName));
         }
     }
 }

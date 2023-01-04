@@ -8,10 +8,22 @@ namespace Vinyoxla.Service.Interfaces
 {
     public interface IPurchaseService
     {
-        PurchaseVM GetViewModel(SelectedReportVM selectedReportVM);
+        Task<PurchaseVM> GetViewModelForOrderPage(SelectedReportVM selectedReportVM);
 
-        Task<bool> UserPurchase(CardVM cardVM);
+        Task<bool> UserPurchase(OrderVM orderVM);
 
-        Task<ResultVM> GetReport(string vinCode);
+        Task<string> GetReport(string vinCode, string phoneno);
+
+        Task<int> GetUserBalance();
+
+        Task<string> GetUserPhoneNumber();
+
+        Task<bool> SubstractFromBalance(string vin);
+
+        Task<bool> UserHasReport(string vin, string phoneno);
+
+        Task<ResultVM> GetUsersReport(string vinCode);
+
+        Task<string> GetReportFileName(string vin);
     }
 }

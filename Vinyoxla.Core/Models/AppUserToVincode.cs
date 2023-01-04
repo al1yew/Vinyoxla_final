@@ -4,11 +4,8 @@ using System.Text;
 
 namespace Vinyoxla.Core.Models
 {
-    public class AppUserToVincode
+    public class AppUserToVincode : BaseModel
     {
-        public int Id { get; set; }
-
-        //relations
         public AppUser AppUser { get; set; }
         public string AppUserId { get; set; }
         public VinCode VinCode { get; set; }

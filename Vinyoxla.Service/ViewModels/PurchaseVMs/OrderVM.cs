@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Vinyoxla.Service.ViewModels.PurchaseVMs
 {
-    public class CardVM
+    public class OrderVM
     {
         public string CardHolder { get; set; }
         public string CardNo { get; set; }

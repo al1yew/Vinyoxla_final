@@ -8,6 +8,7 @@ namespace Vinyoxla.Core.Models
     public class AppUser : IdentityUser
     {
         public int Balance { get; set; }
+        public bool IsAdmin { get; set; }
 
         //relations
         public List<AppUserToVincode> AppUserToVincodes { get; set; }
