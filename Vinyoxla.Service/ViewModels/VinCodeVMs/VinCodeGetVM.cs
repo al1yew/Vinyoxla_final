@@ -5,7 +5,7 @@ using Vinyoxla.Service.ViewModels.AppUserToVincodeVMs;
 
 namespace Vinyoxla.Service.ViewModels.VinCodeVMs
 {
-    public class VinCodeVM
+    public class VinCodeGetVM
     {
         public int Id { get; set; }
         public string Vin { get; set; }

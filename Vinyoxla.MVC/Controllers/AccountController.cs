@@ -56,9 +56,7 @@ namespace Vinyoxla.MVC.Controllers
 
         public async Task<IActionResult> Profile()
         {
-            AppUserVM appUser = await _accountService.Profile();
-
-            return View(appUser);
+            return View(await _accountService.Profile());
         }
 
         public IActionResult TopUp()

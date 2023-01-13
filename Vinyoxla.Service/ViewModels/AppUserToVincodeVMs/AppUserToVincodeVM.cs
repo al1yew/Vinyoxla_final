@@ -13,7 +13,7 @@ namespace Vinyoxla.Service.ViewModels.AppUserToVincodeVMs
         //relations
         public AppUserVM AppUser { get; set; }
         public string AppUserId { get; set; }
-        public VinCodeVM VinCode { get; set; }
+        public VinCodeGetVM VinCode { get; set; }
         public int VinCodeId { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
     }

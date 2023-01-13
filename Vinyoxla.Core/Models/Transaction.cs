@@ -7,7 +7,11 @@ namespace Vinyoxla.Core.Models
     public class Transaction : BaseModel
     {
         public string Code { get; set; }
-        public bool IsConfirmed { get; set; }
+        public bool PaymentIsSuccessful { get; set; }
+        public bool IsTopUp { get; set; }
+        public int Amount { get; set; }
+        public bool IsFromBalance { get; set; }
+
 
         //relation
         public AppUser AppUser { get; set; }

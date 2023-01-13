@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Vinyoxla.Core;
 using Vinyoxla.Core.Repositories;
 using Vinyoxla.Data.Repositories;
@@ -21,10 +18,10 @@ namespace Vinyoxla.Data
             _context = context;
         }
 
-        public IAppUserRepository AppUserRepository => _appUserRepository != null ? _appUserRepository : new AppUserRepository(_context);
-        public IVinCodeRepository VinCodeRepository => _vinCodeRepository != null ? _vinCodeRepository : new VinCodeRepository(_context);
-        public IAppUserToVincodeRepository AppUserToVincodeRepository => _appUserToVincodeRepository != null ? _appUserToVincodeRepository : new AppUserToVincodeRepository(_context);
-        public ITransactionRepository TransactionRepository => _transactionRepository != null ? _transactionRepository : new TransactionRepository(_context);
+        public IAppUserRepository AppUserRepository => _appUserRepository ?? new AppUserRepository(_context);
+        public IVinCodeRepository VinCodeRepository => _vinCodeRepository ?? new VinCodeRepository(_context);
+        public IAppUserToVincodeRepository AppUserToVincodeRepository => _appUserToVincodeRepository ?? new AppUserToVincodeRepository(_context);
+        public ITransactionRepository TransactionRepository => _transactionRepository ?? new TransactionRepository(_context);
 
 
         public int Commit()

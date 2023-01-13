@@ -30,7 +30,7 @@ namespace Vinyoxla.Service.Mappings
 
             #region VinCode
 
-            CreateMap<VinCode, VinCodeVM>()
+            CreateMap<VinCode, VinCodeGetVM>()
                 .ForPath(des => des.AppUserToVincodes, src => src.MapFrom(x => x.AppUserToVincodes));
 
             #endregion

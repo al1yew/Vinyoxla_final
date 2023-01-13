@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Vinyoxla.Service.ViewModels.PurchaseVMs;
 
 namespace Vinyoxla.Service.Interfaces
@@ -12,18 +9,22 @@ namespace Vinyoxla.Service.Interfaces
 
         Task<bool> UserPurchase(OrderVM orderVM);
 
-        Task<string> GetReport(string vinCode, string phoneno);
+        Task<string> GetReport(string vinCode, string phoneno, bool isFromBalance);
+
+        Task<bool> ReportIsExpired(string vin, string phoneno);
+
+        Task<bool> ReplaceExpiredReport(string vin, string phoneno);
+
+        Task<string> UserHasReportAndItIsAvailable(string vin, string phoneno);
+
+        Task<bool> BuyReportAgain(string fileName);
+
+        Task<bool> RefundDueToApiError(string phoneno, string vinCode);
+
+        Task<bool> SubstractFromBalance();
 
         Task<int> GetUserBalance();
 
         Task<string> GetUserPhoneNumber();
-
-        Task<bool> SubstractFromBalance(string vin);
-
-        Task<bool> UserHasReport(string vin, string phoneno);
-
-        Task<ResultVM> GetUsersReport(string vinCode);
-
-        Task<string> GetReportFileName(string vin);
     }
 }
