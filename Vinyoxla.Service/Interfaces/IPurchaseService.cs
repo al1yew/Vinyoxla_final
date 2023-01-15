@@ -1,30 +1,34 @@
 ﻿using System.Threading.Tasks;
+using Vinyoxla.Core.Models;
 using Vinyoxla.Service.ViewModels.PurchaseVMs;
+using Vinyoxla.Service.ViewModels.VinCodeVMs;
 
 namespace Vinyoxla.Service.Interfaces
 {
     public interface IPurchaseService
     {
-        Task<PurchaseVM> GetViewModelForOrderPage(SelectedReportVM selectedReportVM);
+        Task<string> CheckEverything(string phone, string vin);
+
+        Task<bool> UserHasReport(string phone, string vin);
+
+        Task<bool> FileExists(string vin);
+
+        Task<bool> TryToFixAbsence(string vin, string fileName);
 
         Task<bool> UserPurchase(OrderVM orderVM);
 
-        Task<string> GetReport(string vinCode, string phoneno, bool isFromBalance);
+        Task<PurchaseVM> GetViewModelForOrderPage(SelectedReportVM selectedReportVM);
 
-        Task<bool> ReportIsExpired(string vin, string phoneno);
+        Task<string> ReplaceOldReport(string phone, string vin, bool isFromBalance);
 
-        Task<bool> ReplaceExpiredReport(string vin, string phoneno);
+        Task<string> GetReport(string phone, string vin, bool isFromBalance);
 
-        Task<string> UserHasReportAndItIsAvailable(string vin, string phoneno);
-
-        Task<bool> BuyReportAgain(string fileName);
-
-        Task<bool> RefundDueToApiError(string phoneno, string vinCode);
-
-        Task<bool> SubstractFromBalance();
+        Task SubstractFromBalance();
 
         Task<int> GetUserBalance();
 
         Task<string> GetUserPhoneNumber();
+
+        Task Refund(string phone);
     }
 }

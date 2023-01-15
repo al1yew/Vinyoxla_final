@@ -27,6 +27,22 @@
 	  <Compile Remove="Migrations\20230108182426_UpdatedTransaction.Designer.cs" />
 	  <Compile Remove="Migrations\20230109194058_updatedRelationTableAndTransactionTable.cs" />
 	  <Compile Remove="Migrations\20230109194058_updatedRelationTableAndTransactionTable.Designer.cs" />
+	  <Compile Remove="Migrations\20230109194128_UpdatedRelationTableAndTransactionTable.cs" />
+	  <Compile Remove="Migrations\20230109194128_UpdatedRelationTableAndTransactionTable.Designer.cs" />
+	  <Compile Remove="Migrations\20230115132933_AddedEventTableAndUpdatedSomeTables.cs" />
+	  <Compile Remove="Migrations\20230115132933_AddedEventTableAndUpdatedSomeTables.Designer.cs" />
+	  <Compile Remove="Migrations\20230115133210_AddedEventTableAndUpdatedSomeTables.cs" />
+	  <Compile Remove="Migrations\20230115133210_AddedEventTableAndUpdatedSomeTables.Designer.cs" />
+	  <Compile Remove="Migrations\20230115135249_AddedEventTableAndUpdatedSomeTables.cs" />
+	  <Compile Remove="Migrations\20230115135249_AddedEventTableAndUpdatedSomeTables.Designer.cs" />
+	  <Compile Remove="Migrations\20230115140302_AddedEventTableAndUpdatedSomeTables.cs" />
+	  <Compile Remove="Migrations\20230115140302_AddedEventTableAndUpdatedSomeTables.Designer.cs" />
+	  <Compile Remove="Migrations\20230115152445_AddedEventTableAndUpdatedSomeTables.cs" />
+	  <Compile Remove="Migrations\20230115152445_AddedEventTableAndUpdatedSomeTables.Designer.cs" />
+	  <Compile Remove="Migrations\20230115152733_AddedEventTableAndUpdatedSomeTables.cs" />
+	  <Compile Remove="Migrations\20230115152733_AddedEventTableAndUpdatedSomeTables.Designer.cs" />
+	  <Compile Remove="Migrations\20230115154452_AddedEventTableAndUpdatedSomeTables.cs" />
+	  <Compile Remove="Migrations\20230115154452_AddedEventTableAndUpdatedSomeTables.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

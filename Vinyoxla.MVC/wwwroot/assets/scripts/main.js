@@ -307,7 +307,7 @@ $(document).ready(function () {
 
     //#region prevent numeric in purchase page
 
-    $(document).on('input', '#cardno, #year, #month, #cvv', function (e) {
+    $(document).on('input', '#cardno, #year, #month, #cvv, #phonenumber', function (e) {
         if (!/^[0-9]+$/.test($(this).val())) {
             $(this).val($(this).val().slice(0, -1))
         }

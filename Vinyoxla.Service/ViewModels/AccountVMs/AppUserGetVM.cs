@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Vinyoxla.Service.ViewModels.AppUserToVincodeVMs;
+using Vinyoxla.Service.ViewModels.EventVMs;
+using Vinyoxla.Service.ViewModels.TransactionVMs;
 
 namespace Vinyoxla.Service.ViewModels.AccountVMs
 {
-    public class AppUserVM
+    public class AppUserGetVM
     {
         public string Id { get; set; }
         public string PhoneNumber { get; set; }
@@ -17,5 +17,7 @@ namespace Vinyoxla.Service.ViewModels.AccountVMs
 
         //relations
         public List<AppUserToVincodeVM> AppUserToVincodes { get; set; }
+        public List<TransactionGetVM> Transactions { get; set; }
+        public List<EventGetVM> Events { get; set; }
     }
 }

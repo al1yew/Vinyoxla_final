@@ -102,10 +102,8 @@ namespace Vinyoxla.Service.Implementations
 
             List<string> errors = new List<string>();
 
-            //esas odur ki kod duz olsun
             if (loginVM.Code == code)
             {
-                //app user yoxdu, yaradirig
                 if (appUser == null)
                 {
                     AppUser newUser = new AppUser()
@@ -135,8 +133,6 @@ namespace Vinyoxla.Service.Implementations
                 }
                 else
                 {
-                    //user var, onu sign in edirik
-
                     appUser.PhoneNumberConfirmed = true;
                     await _userManager.UpdateAsync(appUser);
 
@@ -156,9 +152,9 @@ namespace Vinyoxla.Service.Implementations
             await _signInManager.SignOutAsync();
         }
 
-        public async Task<AppUserVM> Profile()
+        public async Task<AppUserGetVM> Profile()
         {
-            AppUserVM appUser = _mapper.Map<AppUserVM>(await _userManager.Users.Include(x => x.AppUserToVincodes).ThenInclude(x => x.VinCode).FirstOrDefaultAsync(x => x.UserName == _httpContextAccessor.HttpContext.User.Identity.Name));
+            AppUserGetVM appUser = _mapper.Map<AppUserGetVM>(await _userManager.Users.Include(x => x.AppUserToVincodes).ThenInclude(x => x.VinCode).FirstOrDefaultAsync(x => x.UserName == _httpContextAccessor.HttpContext.User.Identity.Name));
 
             if (appUser == null)
             {

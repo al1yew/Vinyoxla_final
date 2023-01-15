@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Vinyoxla.Core.Models;
 using Vinyoxla.Service.ViewModels.AccountVMs;
 using Vinyoxla.Service.ViewModels.AppUserToVincodeVMs;
@@ -15,8 +12,11 @@ namespace Vinyoxla.Service.Mappings
         {
             #region AppUser
 
-            CreateMap<AppUser, AppUserVM>()
-                .ForPath(des => des.AppUserToVincodes, src => src.MapFrom(x => x.AppUserToVincodes));
+            CreateMap<AppUser, AppUserGetVM>()
+                .ForPath(des => des.AppUserToVincodes, src => src.MapFrom(x => x.AppUserToVincodes))
+                .ForPath(des => des.Events, src => src.MapFrom(x => x.Events))
+                .ForPath(des => des.Transactions, src => src.MapFrom(x => x.Transactions));
+
 
             #endregion
 
@@ -31,7 +31,8 @@ namespace Vinyoxla.Service.Mappings
             #region VinCode
 
             CreateMap<VinCode, VinCodeGetVM>()
-                .ForPath(des => des.AppUserToVincodes, src => src.MapFrom(x => x.AppUserToVincodes));
+                .ForPath(des => des.AppUserToVincodes, src => src.MapFrom(x => x.AppUserToVincodes))
+                .ForPath(des => des.Events, src => src.MapFrom(x => x.Events));
 
             #endregion
 

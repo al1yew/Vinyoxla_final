@@ -235,7 +235,41 @@ namespace Vinyoxla.Data.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("VinCodeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("VinCodeId");
+
+                    b.ToTable("AppUserToVincodes");
+                });
+
+            modelBuilder.Entity("Vinyoxla.Core.Models.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("DidRefundToBalance")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ErrorWhileRenew")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ErrorWhileReplace")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("FileExists")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsApiError")
@@ -250,6 +284,9 @@ namespace Vinyoxla.Data.Migrations
                     b.Property<bool>("IsRenewedDueToExpire")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("VinCodeId")
                         .HasColumnType("int");
 
@@ -259,7 +296,30 @@ namespace Vinyoxla.Data.Migrations
 
                     b.HasIndex("VinCodeId");
 
-                    b.ToTable("AppUserToVincodes");
+                    b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("Vinyoxla.Core.Models.EventMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("EventMessages");
                 });
 
             modelBuilder.Entity("Vinyoxla.Core.Models.Transaction", b =>
@@ -387,6 +447,28 @@ namespace Vinyoxla.Data.Migrations
                     b.HasOne("Vinyoxla.Core.Models.VinCode", "VinCode")
                         .WithMany("AppUserToVincodes")
                         .HasForeignKey("VinCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vinyoxla.Core.Models.Event", b =>
+                {
+                    b.HasOne("Vinyoxla.Core.Models.AppUser", "AppUser")
+                        .WithMany("Events")
+                        .HasForeignKey("AppUserId");
+
+                    b.HasOne("Vinyoxla.Core.Models.VinCode", "VinCode")
+                        .WithMany("Events")
+                        .HasForeignKey("VinCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vinyoxla.Core.Models.EventMessage", b =>
+                {
+                    b.HasOne("Vinyoxla.Core.Models.Event", "Event")
+                        .WithMany("EventMessages")
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

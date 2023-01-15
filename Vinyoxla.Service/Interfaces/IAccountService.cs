@@ -16,6 +16,6 @@ namespace Vinyoxla.Service.Interfaces
 
         Task Logout();
 
-        Task<AppUserVM> Profile();
+        Task<AppUserGetVM> Profile();
     }
 }

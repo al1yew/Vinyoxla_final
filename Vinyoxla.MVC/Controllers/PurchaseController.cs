@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Vinyoxla.Service.Interfaces;
 using Vinyoxla.Service.ViewModels.PurchaseVMs;
+using Vinyoxla.Service.ViewModels.VinCodeVMs;
 
 namespace Vinyoxla.MVC.Controllers
 {
@@ -18,76 +19,58 @@ namespace Vinyoxla.MVC.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                string phoneno = await _purchaseService.GetUserPhoneNumber();
-                string fileName = await _purchaseService.UserHasReportAndItIsAvailable(selectedReportVM.Vin, phoneno);
+                string phone = await _purchaseService.GetUserPhoneNumber();
                 int userBalance = await _purchaseService.GetUserBalance();
-                TempData["phoneno"] = phoneno;
+                TempData["phoneno"] = phone;
 
-                //est li relation
+                string result = await _purchaseService.CheckEverything(phone, selectedReportVM.Vin);
 
-                if (fileName == null)
+                if (result == "0")
                 {
-                    if (userBalance < 4)
+                    return RedirectToAction("Error", new { errno = 0 });
+                }
+                else if (result == "1")
+                {
+                    if (userBalance >= 4)
                     {
-                        return View(await _purchaseService.GetViewModelForOrderPage(selectedReportVM));
-                    }
-                    else
-                    {
-                        if (await _purchaseService.SubstractFromBalance())
-                        {
-                            return RedirectToAction("GetReport", new { vinCode = selectedReportVM.Vin, phoneno, isFromBalance = true });
-                        }
-                        else
+                        await _purchaseService.SubstractFromBalance();
+
+                        string fileName = await _purchaseService.ReplaceOldReport(phone, selectedReportVM.Vin, true);
+
+                        if (fileName == null)
                         {
                             return RedirectToAction("Error", new { errno = 1 });
                         }
-                    }
-                }
-                else if (fileName == "error")
-                {
-                    if (!await _purchaseService.RefundDueToApiError(phoneno, selectedReportVM.Vin))
-                    {
-                        return RedirectToAction("Error", new { errno = 5 });
-                    }
 
-                    return RedirectToAction("Error", new { errno = 2 });
-                    //tut bilo sporno delat refund ili net, no ya sdelal v hasreport metode !isAPiReport, teper on ne smojet 500 raz refund delat
-                }
-
-                //esli relation est, proverim starost, esli star, zaplatit babok, kupim i vernem, a esli error, vernem denqi i error 2
-
-                if (await _purchaseService.ReportIsExpired(selectedReportVM.Vin, phoneno))
-                {
-                    if (userBalance < 4)
-                    {
-                        return View(await _purchaseService.GetViewModelForOrderPage(selectedReportVM));
+                        return RedirectToAction("Index", "Report", new { fileName });
                     }
                     else
                     {
-                        if (await _purchaseService.SubstractFromBalance())
-                        {
-                            if (await _purchaseService.ReplaceExpiredReport(selectedReportVM.Vin, phoneno))
-                            {
-                                return RedirectToAction("Index", "Report", new { fileName });
-                            }
-                            else
-                            {
-                                if (!await _purchaseService.RefundDueToApiError(phoneno, selectedReportVM.Vin))
-                                {
-                                    return RedirectToAction("Error", new { errno = 5 });
-                                }
-
-                                return RedirectToAction("Error", new { errno = 2 });
-                            }
-                        }
-                        else
-                        {
-                            return RedirectToAction("Error", new { errno = 1 });
-                        }
+                        return View(await _purchaseService.GetViewModelForOrderPage(selectedReportVM));
                     }
                 }
-                //esli relation est i ne stariy, tupo pokaju report useru
-                return RedirectToAction("Index", "Report", new { fileName });
+                else if (result == "2")
+                {
+                    if (userBalance >= 4)
+                    {
+                        await _purchaseService.SubstractFromBalance();
+
+                        string fileName = await _purchaseService.GetReport(phone, selectedReportVM.Vin, true);
+
+                        if (fileName == null)
+                        {
+                            return RedirectToAction("Error", new { errno = 2 });
+                        }
+
+                        return RedirectToAction("Index", "Report", new { fileName });
+                    }
+                    else
+                    {
+                        return View(await _purchaseService.GetViewModelForOrderPage(selectedReportVM));
+                    }
+                }
+
+                return RedirectToAction("Index", "Report", new { fileName = result });
             }
             else
             {
@@ -101,83 +84,52 @@ namespace Vinyoxla.MVC.Controllers
             TempData["phoneno"] = orderVM.PhoneNumber;
 
             if (User.Identity.IsAuthenticated)
-            {
+            {//on pridet tolko esli relationa net ili je report stariy
                 if (await _purchaseService.UserPurchase(orderVM))
                 {
                     return RedirectToAction("GetReport", new { vinCode = orderVM.Vin, phoneno = orderVM.PhoneNumber, isFromBalance = false });
                 }
                 else
                 {
-                    return RedirectToAction("Error", new { errno = 1 });
+                    return RedirectToAction("Error", new { errno = 10 });
                 }
             }
             else
             {
-                string fileName = await _purchaseService.UserHasReportAndItIsAvailable(orderVM.Vin, orderVM.PhoneNumber);
-
-                //est li relation
-
-                if (fileName == null)
+                if (await _purchaseService.UserPurchase(orderVM))
                 {
-                    if (await _purchaseService.UserPurchase(orderVM))
-                    {
-                        return RedirectToAction("GetReport", new { vinCode = orderVM.Vin, phoneno = orderVM.PhoneNumber, isFromBalance = false });
-                    }
-                    else
-                    {
-                        return RedirectToAction("Error", new { errno = 1 });
-                    }
-                }
-                else if (fileName == "error")
-                {
-                    if (!await _purchaseService.RefundDueToApiError(orderVM.PhoneNumber, orderVM.Vin))
-                    {
-                        return RedirectToAction("Error", new { errno = 5 });
-                    }
+                    string result = await _purchaseService.CheckEverything(orderVM.PhoneNumber, orderVM.Vin);
 
-                    return RedirectToAction("Error", new { errno = 2 });
-                }
-
-                //esli est relation, ne star li on, esli star, kuplu noviy, esli error api, vernu denqi i error 2
-
-                if (await _purchaseService.ReportIsExpired(orderVM.Vin, orderVM.PhoneNumber))
-                {
-                    if (await _purchaseService.ReplaceExpiredReport(orderVM.Vin, orderVM.PhoneNumber))
+                    if (result == "0")
                     {
+                        return RedirectToAction("Error", new { errno = 0 });
+                    }
+                    else if (result == "1")
+                    {
+                        string fileName = await _purchaseService.ReplaceOldReport(orderVM.PhoneNumber, orderVM.Vin, false);
+
+                        if (fileName == null)
+                        {
+                            return RedirectToAction("Error", new { errno = 1 });
+                        }
+
                         return RedirectToAction("Index", "Report", new { fileName });
                     }
                     else
                     {
-                        if (!await _purchaseService.RefundDueToApiError(orderVM.PhoneNumber, orderVM.Vin))
+                        string fileName = await _purchaseService.GetReport(orderVM.PhoneNumber, orderVM.Vin, false);
+
+                        if (fileName == null)
                         {
-                            return RedirectToAction("Error", new { errno = 5 });
+                            return RedirectToAction("Error", new { errno = 2 });
                         }
 
-                        return RedirectToAction("Error", new { errno = 2 });
+                        return RedirectToAction("Index", "Report", new { fileName });
                     }
                 }
 
-                //esli relation est i ne stariy, uje tupo vernu report
-
-                return RedirectToAction("Index", "Report", new { fileName });
+                return RedirectToAction("Error", new { errno = 10 });
             }
-        }
-
-        public async Task<IActionResult> GetReport(string vinCode, string phoneno, bool isFromBalance)
-        {
-            string fileName = await _purchaseService.GetReport(vinCode, phoneno, isFromBalance);
-
-            if (fileName == null)
-            {
-                if (!await _purchaseService.RefundDueToApiError(phoneno, vinCode))
-                {
-                    return RedirectToAction("Error", new { errno = 4 });
-                }
-                // burda polubomu refund olmalidi cunki bura elebele adam gelmir, pul odeyen gelir ancaq
-                return RedirectToAction("Error", new { errno = 2 });
-            }
-
-            return RedirectToAction("Index", "Report", new { fileName });
         }
 
         public async Task<IActionResult> Error(int errno)
@@ -186,4 +138,5 @@ namespace Vinyoxla.MVC.Controllers
         }
     }
 }
+
 //rusum az esli elektrik < 3 let, idxal = 0
