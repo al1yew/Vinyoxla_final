@@ -51,8 +51,8 @@ namespace Vinyoxla.Data.Migrations
                     IsRenewedDueToAbsence = table.Column<bool>(nullable: false),
                     ErrorWhileRenew = table.Column<bool>(nullable: false),
                     ErrorWhileReplace = table.Column<bool>(nullable: false),
-                    AppUserId = table.Column<string>(nullable: true),
-                    VinCodeId = table.Column<int>(nullable: false)
+                    Vin = table.Column<string>(nullable: true),
+                    AppUserId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -63,12 +63,6 @@ namespace Vinyoxla.Data.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Events_VinCodes_VinCodeId",
-                        column: x => x.VinCodeId,
-                        principalTable: "VinCodes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -101,11 +95,6 @@ namespace Vinyoxla.Data.Migrations
                 name: "IX_Events_AppUserId",
                 table: "Events",
                 column: "AppUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Events_VinCodeId",
-                table: "Events",
-                column: "VinCodeId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

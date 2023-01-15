@@ -36,7 +36,7 @@
                     Error 2. <br> Hörmətli istifadəçi.
                     <br> Serverdə xəta baş verdi.
                     <br> Ödədiyiniz 4 ₼ balansınıza köçürüldü.
-                    <br> Bizimlə hər zaman əlaqə saxlaya bilərsiniz.
+                    <br> Bizimlə hər zaman əlaqə <br> saxlaya bilərsiniz.
                     <br>  <a href="tel:+994515555557">+994 51 555 55 57</a>
                     <br> və ya
                     <br>  <a target="_blank" href="https://wa.me/+994515555557"><i style="font-size: 30px; color: green; " class="fa-brands fa-whatsapp"></i></a>
@@ -46,47 +46,6 @@
             {
                 <p style="color: red">
                     Sizin Ödənişiniz qəbul olunmadı. Kart məlumatlarınız səhvdir.<br>  <a asp-controller="Home" asp-action="Index">Bir daha cəhd edin.</a>
-                </p>
-            }
-
-
-
-
-
-            @if (Model == 1)
-            {
-                <p style="color: red">
-                    Error 1. <br> Sizin Ödənişiniz qəbul olunmadı. Kart məlumatlarınız səhvdir.<br> <a asp-controller="Home" asp-action="Index">Bir daha cəhd edin.</a>
-                </p>
-            }
-            else if (Model == 2)
-            {
-                <p style="color: red">
-                    Error 2. <br> Serverdə xəta baş verdi.<br> Odədiyiniz 4 ₼ balansınıza köçürüldü. <br>  Bizimlə hər zaman əlaqə saxlaya bilərsiniz <br>  <a href="tel:+994515555557">+994 51 555 55 57</a>  <br> və ya <br>  <a target="_blank" href="https://wa.me/+994515555557"><i style="font-size: 30px; color: green; " class="fa-brands fa-whatsapp"></i></a>
-                </p>
-            }
-            else if (Model == 3)
-            {
-                <p style="color: red">
-                    Error 3. <br> Faylda səhv var və ya fayl tapılmadı. <br> Siz artıq bu report üçün pulunuzu geri almısınız. <br> Zəhmət olmasa bizimlə əlaqə saxlayın.<br>  <a href="tel:+994515555557">+994 51 555 55 57</a>  <br> və ya <br>  <a target="_blank" href="https://wa.me/+994515555557"><i style="font-size: 30px; color: green; " class="fa-brands fa-whatsapp"></i></a>
-                </p>
-            }
-            else if (Model == 4)
-            {
-                <p style="color: red">
-                    Error 4. <br> Serverdə xəta baş verdi.<br> Odədiyiniz 4 ₼ balansınıza köçürülə bilmədi. <br> Zəhmət olmasa bizimlə əlaqə saxlayın. <br>  <a href="tel:+994515555557">+994 51 555 55 57</a>  <br> və ya <br>  <a target="_blank" href="https://wa.me/+994515555557"><i style="font-size: 30px; color: green; " class="fa-brands fa-whatsapp"></i></a>
-                </p>
-            }
-            else if (Model == 5)
-            {
-                <p style="color: red">
-                    Error 5. <br> Serverdə xəta baş verdi.<br> Həmin reportun köhnə versiyası sizin hesabda mövcuddur, amma tapılmadı. <br> Odədiyiniz 4 ₼ balansınıza köçürüldü. <br> Bizimlə hər zaman əlaqə saxlaya bilərsiniz. <br>  <a href="tel:+994515555557">+994 51 555 55 57</a>  <br> və ya <br>  <a target="_blank" href="https://wa.me/+994515555557"><i style="font-size: 30px; color: green; " class="fa-brands fa-whatsapp"></i></a>
-                </p>
-            }
-            else if (Model == 6)
-            {
-                <p style="color: red">
-                    Error 6. <br> Serverdə xəta baş verdi.<br> Həmin report indicə yaradıldı, amma gətirəndə tapılmadı. <br> Odədiyiniz 4 ₼ balansınıza köçürülə bilmədi. <br> Zəhmət olmasa bizimlə əlaqə saxlayın. <br>  <a href="tel:+994515555557">+994 51 555 55 57</a>  <br> və ya <br>  <a target="_blank" href="https://wa.me/+994515555557"><i style="font-size: 30px; color: green; " class="fa-brands fa-whatsapp"></i></a>
                 </p>
             }
         </div>

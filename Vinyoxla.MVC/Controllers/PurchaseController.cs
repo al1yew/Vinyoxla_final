@@ -81,8 +81,6 @@ namespace Vinyoxla.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Purchase(OrderVM orderVM)
         {
-            TempData["phoneno"] = orderVM.PhoneNumber;
-
             if (User.Identity.IsAuthenticated)
             {//on pridet tolko esli relationa net ili je report stariy
                 if (await _purchaseService.UserPurchase(orderVM))

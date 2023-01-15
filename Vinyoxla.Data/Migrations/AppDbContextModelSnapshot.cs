@@ -287,14 +287,12 @@ namespace Vinyoxla.Data.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("VinCodeId")
-                        .HasColumnType("int");
+                    b.Property<string>("Vin")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
-
-                    b.HasIndex("VinCodeId");
 
                     b.ToTable("Events");
                 });
@@ -456,12 +454,6 @@ namespace Vinyoxla.Data.Migrations
                     b.HasOne("Vinyoxla.Core.Models.AppUser", "AppUser")
                         .WithMany("Events")
                         .HasForeignKey("AppUserId");
-
-                    b.HasOne("Vinyoxla.Core.Models.VinCode", "VinCode")
-                        .WithMany("Events")
-                        .HasForeignKey("VinCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Vinyoxla.Core.Models.EventMessage", b =>

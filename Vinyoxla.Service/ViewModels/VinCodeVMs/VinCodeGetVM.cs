@@ -15,7 +15,6 @@ namespace Vinyoxla.Service.ViewModels.VinCodeVMs
 
 
         //relations
-        public List<EventGetVM> Events { get; set; }
         public List<AppUserToVincodeVM> AppUserToVincodes { get; set; }
     }
 }

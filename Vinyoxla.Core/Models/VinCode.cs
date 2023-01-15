@@ -14,6 +14,5 @@ namespace Vinyoxla.Core.Models
 
         //relations
         public List<AppUserToVincode> AppUserToVincodes { get; set; }
-        public List<Event> Events { get; set; }
     }
 }

@@ -16,12 +16,11 @@ namespace Vinyoxla.Core.Models
         public bool ErrorWhileRenew { get; set; }
         public bool ErrorWhileReplace { get; set; }
 
+        public string Vin { get; set; }
+
         //relation
         public AppUser AppUser { get; set; }
         public string AppUserId { get; set; }
-        public VinCode VinCode { get; set; }
-        public int VinCodeId { get; set; }
-
 
         public List<EventMessage> EventMessages { get; set; }
     }

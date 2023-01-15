@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -125,12 +126,12 @@ namespace Vinyoxla.Service.Implementations
         {
             VinCode dbVin = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vin.Trim().ToUpperInvariant());
 
-            Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == dbVin.Vin);
-
             if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
                 if (dbVin != null)
                 {
+                    Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == dbVin.Vin);
+
                     if (await UserHasReport(phone, vin))
                     {
                         if (!((DateTime.Now - dbVin.CreatedAt.Value).TotalDays >= 7))
@@ -245,6 +246,8 @@ namespace Vinyoxla.Service.Implementations
             {
                 if (dbVin != null)
                 {
+                    Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == dbVin.Vin);
+
                     if (await UserHasReport(phone, vin))
                     {
                         if (!((DateTime.Now - dbVin.CreatedAt.Value).TotalDays >= 7))
@@ -393,7 +396,7 @@ namespace Vinyoxla.Service.Implementations
         {
             VinCode vinCode = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vin.Trim().ToUpperInvariant());
 
-            Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == vinCode.Vin);
+            Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == vinCode.Vin);
 
             AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == "+994" + phone);
 
@@ -530,14 +533,16 @@ namespace Vinyoxla.Service.Implementations
                             IsFromApi = false,
                             IsRenewedDueToAbsence = false,
                             IsRenewedDueToExpire = false,
-                            VinCode = dbVin,
+                            Vin = dbVin.Vin,
+                            EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            }
                         };
-
-                        userEvent.EventMessages.Add(new EventMessage()
-                        {
-                            Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.",
-                            CreatedAt = DateTime.UtcNow.AddHours(4)
-                        });
 
                         #endregion
 
@@ -568,15 +573,17 @@ namespace Vinyoxla.Service.Implementations
                                 IsFromApi = true,
                                 IsRenewedDueToAbsence = true,
                                 IsRenewedDueToExpire = false,
-                                VinCode = dbVin,
+                                Vin = dbVin.Vin,
+                                EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
+                                        "Pul odeyib deye yari yolda goymadig, getdik aldig reportu",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                }
                             };
-
-                            userEvent.EventMessages.Add(new EventMessage()
-                            {
-                                Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
-                                "Pul odeyib deye yari yolda goymadig, getdik aldig reportu",
-                                CreatedAt = DateTime.UtcNow.AddHours(4)
-                            });
 
                             #endregion
 
@@ -607,16 +614,18 @@ namespace Vinyoxla.Service.Implementations
                                 IsFromApi = true,
                                 IsRenewedDueToAbsence = false,
                                 IsRenewedDueToExpire = false,
-                                VinCode = dbVin,
+                                Vin = dbVin.Vin,
+                                EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
+                                        "amma biz o reportu yenisi ile evez ede bilmedi, api error verdi. " +
+                                        "Ona gore event yarandi, relation ise yox. Pulunu da qaytardig",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                }
                             };
-
-                            userEvent.EventMessages.Add(new EventMessage()
-                            {
-                                Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
-                                "amma biz o reportu yenisi ile evez ede bilmedi, api error verdi. " +
-                                "Ona gore event yarandi, relation ise yox. Pulunu da qaytardig",
-                                CreatedAt = DateTime.UtcNow.AddHours(4)
-                            });
 
                             #endregion
 
@@ -647,15 +656,17 @@ namespace Vinyoxla.Service.Implementations
                             IsFromApi = true,
                             IsRenewedDueToAbsence = false,
                             IsRenewedDueToExpire = true,
-                            VinCode = dbVin,
+                            Vin = dbVin.Vin,
+                            EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
+                                    "Yari yolda qoymayag deye getdik reportu yeniledik, pul odeyib axi.",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            }
                         };
-
-                        userEvent.EventMessages.Add(new EventMessage()
-                        {
-                            Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
-                            "Yari yolda qoymayag deye getdik reportu yeniledik, pul odeyib axi.",
-                            CreatedAt = DateTime.UtcNow.AddHours(4)
-                        });
 
                         #endregion
 
@@ -684,15 +695,17 @@ namespace Vinyoxla.Service.Implementations
                             IsFromApi = true,
                             IsRenewedDueToAbsence = false,
                             IsRenewedDueToExpire = false,
-                            VinCode = dbVin,
+                            Vin = dbVin.Vin,
+                            EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
+                                    "Yeniliye bilmedik, ona gore pulun gaytardig, dedik birazdan yene yoxla.",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            }
                         };
-
-                        userEvent.EventMessages.Add(new EventMessage()
-                        {
-                            Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
-                            "Yeniliye bilmedik, ona gore pulun gaytardig, dedik birazdan yene yoxla.",
-                            CreatedAt = DateTime.UtcNow.AddHours(4)
-                        });
 
                         #endregion
 
@@ -709,20 +722,22 @@ namespace Vinyoxla.Service.Implementations
 
                 string fileName = vin + "_" + guid + ".html";
 
+                VinCode newVin = new VinCode()
+                {
+                    Vin = vin,
+                    FileName = fileName,
+                    CreatedAt = DateTime.UtcNow.AddHours(4),
+                    PurchasedTimes = 1
+                };
+
                 AppUserToVincode appUserToVincode = new AppUserToVincode()
                 {
                     AppUser = appUser ?? newUser,
-                    VinCode = new VinCode()
-                    {
-                        Vin = vin,
-                        FileName = fileName,
-                        CreatedAt = DateTime.UtcNow.AddHours(4),
-                        PurchasedTimes = 1
-                    },
+                    VinCode = newVin,
                     CreatedAt = DateTime.UtcNow.AddHours(4),
                 };
 
-                if (await BuyReport(dbVin.Vin, dbVin.FileName))
+                if (await BuyReport(vin, fileName))
                 {
                     #region Event handle
 
@@ -738,14 +753,16 @@ namespace Vinyoxla.Service.Implementations
                         IsFromApi = true,
                         IsRenewedDueToAbsence = false,
                         IsRenewedDueToExpire = false,
-                        VinCode = dbVin,
+                        Vin = vin,
+                        EventMessages = new List<EventMessage>()
+                        {
+                            new EventMessage()
+                            {
+                                Message = "report yox idi, yaratdig yenisini, relation gurdug",
+                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                            }
+                        }
                     };
-
-                    userEvent.EventMessages.Add(new EventMessage()
-                    {
-                        Message = "report yox idi, yaratdig yenisini, relation gurdug",
-                        CreatedAt = DateTime.UtcNow.AddHours(4)
-                    });
 
                     #endregion
 
@@ -774,17 +791,20 @@ namespace Vinyoxla.Service.Implementations
                         IsFromApi = true,
                         IsRenewedDueToAbsence = false,
                         IsRenewedDueToExpire = false,
-                        VinCode = dbVin,
+                        Vin = vin,
+                        EventMessages = new List<EventMessage>()
+                        {
+                            new EventMessage()
+                            {
+                                Message = "User yeni report almag istedi, ala bilmedi, cunki api error verdi. Pulun qaytardig",
+                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                            }
+                        }
                     };
-
-                    userEvent.EventMessages.Add(new EventMessage()
-                    {
-                        Message = "User yeni report almag istedi, ala bilmedi, cunki api error verdi. Pulun qaytardig",
-                        CreatedAt = DateTime.UtcNow.AddHours(4)
-                    });
 
                     #endregion
 
+                    await _unitOfWork.TransactionRepository.AddAsync(transaction);
                     await _unitOfWork.EventRepository.AddAsync(userEvent);
                     await _unitOfWork.CommitAsync();
 
@@ -811,13 +831,6 @@ namespace Vinyoxla.Service.Implementations
                 path = Path.Combine(path, folder);
             }
 
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            path = Path.Combine(path, fileName);
-
             #endregion
 
             #region pokupka
@@ -837,6 +850,13 @@ namespace Vinyoxla.Service.Implementations
 
             if (response.IsSuccessStatusCode)
             {
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                path = Path.Combine(path, fileName);
+
                 #region convertaciya
 
                 string convertedResponse = await response.Content.ReadAsStringAsync();
