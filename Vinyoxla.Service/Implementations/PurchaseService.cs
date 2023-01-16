@@ -130,18 +130,20 @@ namespace Vinyoxla.Service.Implementations
             {
                 if (dbVin != null)
                 {
-                    Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == dbVin.Vin);
-
-                    if (await UserHasReport(phone, vin))
+                    if (await _unitOfWork.AppUserToVincodeRepository.IsExistAsync(x => x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == vin.Trim().ToUpperInvariant()))
                     {
+                        Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == dbVin.Vin, "EventMessages");
+
                         if (!((DateTime.Now - dbVin.CreatedAt.Value).TotalDays >= 7))
                         {
                             if (await FileExists(dbVin.FileName))
                             {
+                                await Refund(phone);
+
                                 #region Event handle
 
                                 userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                                userEvent.DidRefundToBalance = false;
+                                userEvent.DidRefundToBalance = true;
 
                                 userEvent.IsApiError = false;
                                 userEvent.FileExists = true;
@@ -154,7 +156,7 @@ namespace Vinyoxla.Service.Implementations
                                 userEvent.EventMessages.Add(new EventMessage()
                                 {
                                     Message = "User oz vinkodunu yeniden axtardi, tapdi, yeniden baxir. " +
-                                    "Oz kabinetinnen de baxa bilerdi, amma nebilim e, burdan axtardi...",
+                                    "Oz kabinetinnen de baxa bilerdi, amma nebilim e, burdan axtardi, pulu yene odedi deye eyni sheye gore, qaytardim",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 });
 
@@ -168,10 +170,12 @@ namespace Vinyoxla.Service.Implementations
                             {
                                 if (await TryToFixAbsence(dbVin.Vin, dbVin.FileName))
                                 {
+                                    await Refund(phone);
+
                                     #region Event handle
 
                                     userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                                    userEvent.DidRefundToBalance = false;
+                                    userEvent.DidRefundToBalance = true;
 
                                     userEvent.IsApiError = false;
                                     userEvent.FileExists = true;
@@ -184,7 +188,7 @@ namespace Vinyoxla.Service.Implementations
                                     userEvent.EventMessages.Add(new EventMessage()
                                     {
                                         Message = "User oz vinkodunu yeniden axtardi, fayl tapilmadi. " +
-                                        "Mecburam yeniden alim onu, cunki pul odemishdi. Aldim, qaytardim",
+                                        "Mecburam yeniden alim onu, cunki pul odemishdi. Aldim, qaytardim, ve ikinci defe odediyi pulu qaytardim",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     });
 
@@ -198,6 +202,7 @@ namespace Vinyoxla.Service.Implementations
                                 }
                                 else
                                 {
+                                    await Refund(phone);
                                     await Refund(phone);
 
                                     AppUserToVincode appUserToVincode = await _unitOfWork.AppUserToVincodeRepository.GetAsync(x =>
@@ -221,7 +226,8 @@ namespace Vinyoxla.Service.Implementations
                                     userEvent.EventMessages.Add(new EventMessage()
                                     {
                                         Message = "Userin vinkodunu gaytarmag isteyende gorduk ki " +
-                                        "report folderde yoxa cixib. Ona gore pulun qaytariram, relationu silirem, uzr isteyirem",
+                                        "report folderde yoxa cixib. Ona gore pulun qaytariram, ozude dvoynoy refund 8 manat (birinci defe ve indiki defe ucun), " +
+                                        "bu vinkod daha onun deyil. Negeder alir alsin error verenecen relation olamayacag",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     });
 
@@ -246,18 +252,20 @@ namespace Vinyoxla.Service.Implementations
             {
                 if (dbVin != null)
                 {
-                    Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == dbVin.Vin);
-
-                    if (await UserHasReport(phone, vin))
+                    if (await _unitOfWork.AppUserToVincodeRepository.IsExistAsync(x => x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == vin.Trim().ToUpperInvariant()))
                     {
+                        Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == dbVin.Vin, "EventMessages");
+
                         if (!((DateTime.Now - dbVin.CreatedAt.Value).TotalDays >= 7))
                         {
                             if (await FileExists(dbVin.FileName))
                             {
+                                await Refund(phone);
+
                                 #region Event handle
 
                                 userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                                userEvent.DidRefundToBalance = false;
+                                userEvent.DidRefundToBalance = true;
 
                                 userEvent.IsApiError = false;
                                 userEvent.FileExists = true;
@@ -270,7 +278,7 @@ namespace Vinyoxla.Service.Implementations
                                 userEvent.EventMessages.Add(new EventMessage()
                                 {
                                     Message = "User oz vinkodunu yeniden axtardi, tapdi, yeniden baxir. " +
-                                    "Oz kabinetinnen de baxa bilerdi, amma nebilim e, burdan axtardi...",
+                                    "Oz kabinetinnen de baxa bilerdi, amma nebilim e, burdan axtardi, pulu yene odedi deye eyni sheye gore, qaytardim",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 });
 
@@ -284,10 +292,12 @@ namespace Vinyoxla.Service.Implementations
                             {
                                 if (await TryToFixAbsence(dbVin.Vin, dbVin.FileName))
                                 {
+                                    await Refund(phone);
+
                                     #region Event handle
 
                                     userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                                    userEvent.DidRefundToBalance = false;
+                                    userEvent.DidRefundToBalance = true;
 
                                     userEvent.IsApiError = false;
                                     userEvent.FileExists = true;
@@ -300,7 +310,7 @@ namespace Vinyoxla.Service.Implementations
                                     userEvent.EventMessages.Add(new EventMessage()
                                     {
                                         Message = "User oz vinkodunu yeniden axtardi, fayl tapilmadi. " +
-                                        "Mecburam yeniden alim onu, cunki pul odemishdi. Aldim, qaytardim",
+                                        "Mecburam yeniden alim onu, cunki pul odemishdi. Aldim, qaytardim, ve ikinci defe odediyi pulu qaytardim",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     });
 
@@ -314,6 +324,7 @@ namespace Vinyoxla.Service.Implementations
                                 }
                                 else
                                 {
+                                    await Refund(phone);
                                     await Refund(phone);
 
                                     AppUserToVincode appUserToVincode = await _unitOfWork.AppUserToVincodeRepository.GetAsync(x =>
@@ -337,7 +348,8 @@ namespace Vinyoxla.Service.Implementations
                                     userEvent.EventMessages.Add(new EventMessage()
                                     {
                                         Message = "Userin vinkodunu gaytarmag isteyende gorduk ki " +
-                                        "report folderde yoxa cixib. Ona gore pulun qaytariram, relationu silirem, uzr isteyirem",
+                                        "report folderde yoxa cixib. Ona gore pulun qaytariram, ozude dvoynoy refund 8 manat (birinci defe ve indiki defe ucun), " +
+                                        "bu vinkod daha onun deyil. Negeder alir alsin error verenecen relation olamayacag",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     });
 
@@ -360,30 +372,22 @@ namespace Vinyoxla.Service.Implementations
             }
         }
 
-        public async Task<bool> UserHasReport(string phone, string vin)
+        public async Task<bool> FileExists(string fileName)
         {
-            AppUserToVincode appUserToVincode = await _unitOfWork.AppUserToVincodeRepository.GetAsync(x =>
-            x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == vin.Trim().ToUpperInvariant(), "VinCode");
-
-            return appUserToVincode != null ? true : false;
-        }
-
-        public async Task<bool> FileExists(string vin)
-        {
-            VinCode vinCode = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vin.Trim().ToUpperInvariant());
+            string vinCode = fileName.Substring(0, 17);
 
             #region path
 
             string path = Path.Combine(_env.WebRootPath);
 
-            string[] folders = { "assets", "files", $"{vin}" };
+            string[] folders = { "assets", "files", $"{vinCode}" };
 
             foreach (string folder in folders)
             {
                 path = Path.Combine(path, folder);
             }
 
-            path = Path.Combine(path, vinCode.FileName);
+            path = Path.Combine(path, fileName);
 
             #endregion
 
@@ -396,32 +400,77 @@ namespace Vinyoxla.Service.Implementations
         {
             VinCode vinCode = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vin.Trim().ToUpperInvariant());
 
-            Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == vinCode.Vin);
+            Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == vinCode.Vin, "EventMessages");
 
             AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == "+994" + phone);
+
+            AppUser newUser = new AppUser()
+            {
+                UserName = "+994" + phone,
+                PhoneNumber = "+994" + phone,
+                PhoneNumberConfirmed = false,
+                Balance = 0,
+                IsAdmin = false
+            };
+
+            if (appUser == null)
+            {
+                await _userManager.CreateAsync(newUser);
+                await _userManager.AddToRoleAsync(newUser, "Member");
+            }
 
             if (await BuyReport(vinCode.Vin, vinCode.FileName))
             {
                 #region Event handle
 
-                userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                userEvent.DidRefundToBalance = false;
-
-                userEvent.IsApiError = false;
-                userEvent.FileExists = true;
-                userEvent.IsFromApi = true;
-                userEvent.IsRenewedDueToExpire = true;
-                userEvent.IsRenewedDueToAbsence = false;
-                userEvent.ErrorWhileRenew = false;
-                userEvent.ErrorWhileReplace = false;
-
-                userEvent.EventMessages.Add(new EventMessage()
+                if (userEvent == null)
                 {
-                    Message = "User onda olan vinkodu yeniden alir, reportun 7si cixib, ona gore tezeden alirig",
-                    CreatedAt = DateTime.UtcNow.AddHours(4)
-                });
+                    Event newUserEvent = new Event()
+                    {
+                        AppUser = appUser ?? newUser,
+                        CreatedAt = DateTime.UtcNow.AddHours(4),
+                        DidRefundToBalance = false,
+                        ErrorWhileRenew = false,
+                        ErrorWhileReplace = false,
+                        FileExists = true,
+                        IsApiError = false,
+                        IsFromApi = true,
+                        IsRenewedDueToAbsence = false,
+                        IsRenewedDueToExpire = true,
+                        Vin = vin,
+                        EventMessages = new List<EventMessage>()
+                        {
+                             new EventMessage()
+                             {
+                                 Message = "User onda olan vinkodu yeniden alir, reportun 7si cixib, ona gore tezeden alirig",
+                                 CreatedAt = DateTime.UtcNow.AddHours(4)
+                             }
+                        }
+                    };
+
+                    await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                }
+                else
+                {
+                    userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                    userEvent.DidRefundToBalance = false;
+                    userEvent.IsApiError = false;
+                    userEvent.FileExists = true;
+                    userEvent.IsFromApi = true;
+                    userEvent.IsRenewedDueToExpire = true;
+                    userEvent.IsRenewedDueToAbsence = false;
+                    userEvent.ErrorWhileRenew = false;
+                    userEvent.ErrorWhileReplace = false;
+                    userEvent.EventMessages.Add(new EventMessage()
+                    {
+                        Message = "User onda olan vinkodu yeniden alir, reportun 7si cixib, ona gore tezeden alirig",
+                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                    });
+                }
 
                 #endregion
+
+                #region Transaction
 
                 Transaction transaction = new Transaction()
                 {
@@ -436,6 +485,8 @@ namespace Vinyoxla.Service.Implementations
 
                 await _unitOfWork.TransactionRepository.AddAsync(transaction);
 
+                #endregion
+
                 vinCode.CreatedAt = DateTime.UtcNow.AddHours(4);
 
                 await _unitOfWork.CommitAsync();
@@ -447,27 +498,56 @@ namespace Vinyoxla.Service.Implementations
 
             #region Event handle
 
-            userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-            userEvent.DidRefundToBalance = true;
-
-            userEvent.IsApiError = true;
-            userEvent.FileExists = true;
-            userEvent.IsFromApi = true;
-            userEvent.IsRenewedDueToExpire = false;
-            userEvent.IsRenewedDueToAbsence = false;
-            userEvent.ErrorWhileRenew = true;
-            userEvent.ErrorWhileReplace = false;
-
-            userEvent.EventMessages.Add(new EventMessage()
+            if (userEvent == null)
             {
-                Message = "User kohne reportunu yenilemek istedi, api error verdi, ona gore refund edirik cunki odenish edib indice. " +
-                "Kohne report var amma assets de. Axtarsin, alsin, error olsa refundunu alsin, negeder isteyir.",
-                CreatedAt = DateTime.UtcNow.AddHours(4)
-            });
+                Event newUserEvent = new Event()
+                {
+                    AppUser = appUser ?? newUser,
+                    CreatedAt = DateTime.UtcNow.AddHours(4),
+                    IsFromApi = true,
+                    IsApiError = true,
+                    DidRefundToBalance = true,
+                    ErrorWhileRenew = true,
+                    ErrorWhileReplace = false,
+                    FileExists = true,
+                    IsRenewedDueToAbsence = false,
+                    IsRenewedDueToExpire = false,
+                    Vin = vin,
+                    EventMessages = new List<EventMessage>()
+                        {
+                             new EventMessage()
+                             {
+                                 Message = "User kohne reportunu yenilemek istedi, api error verdi, ona gore refund edirik cunki odenish edib indice. " +
+                                 "Kohne report var amma assets de. Axtarsin, alsin, error olsa refundunu alsin, negeder isteyir.",
+                                 CreatedAt = DateTime.UtcNow.AddHours(4)
+                             }
+                        }
+                };
 
-            await _unitOfWork.CommitAsync();
+                await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+            }
+            else
+            {
+                userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                userEvent.DidRefundToBalance = true;
+                userEvent.IsApiError = true;
+                userEvent.FileExists = true;
+                userEvent.IsFromApi = true;
+                userEvent.IsRenewedDueToExpire = false;
+                userEvent.IsRenewedDueToAbsence = false;
+                userEvent.ErrorWhileRenew = true;
+                userEvent.ErrorWhileReplace = false;
+                userEvent.EventMessages.Add(new EventMessage()
+                {
+                    Message = "User kohne reportunu yenilemek istedi, api error verdi, ona gore refund edirik cunki odenish edib indice. " +
+                    "Kohne report var amma assets de. Axtarsin, alsin, error olsa refundunu alsin, negeder isteyir.",
+                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                });
+            }
 
             #endregion
+
+            await _unitOfWork.CommitAsync();
 
             return null;
         }
@@ -477,6 +557,8 @@ namespace Vinyoxla.Service.Implementations
             VinCode dbVin = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vin.ToUpperInvariant().Trim());
 
             AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == "+994" + phone);
+
+            Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == vin.Trim().ToUpperInvariant(), "EventMessages");
 
             AppUser newUser = new AppUser()
             {
@@ -521,34 +603,60 @@ namespace Vinyoxla.Service.Implementations
 
                         #region Event handle
 
-                        Event userEvent = new Event()
+                        if (userEvent == null)
                         {
-                            AppUser = appUser ?? newUser,
-                            CreatedAt = DateTime.UtcNow.AddHours(4),
-                            DidRefundToBalance = false,
-                            ErrorWhileRenew = false,
-                            ErrorWhileReplace = false,
-                            FileExists = true,
-                            IsApiError = false,
-                            IsFromApi = false,
-                            IsRenewedDueToAbsence = false,
-                            IsRenewedDueToExpire = false,
-                            Vin = dbVin.Vin,
-                            EventMessages = new List<EventMessage>()
+                            Event newUserEvent = new Event()
+                            {
+                                AppUser = appUser ?? newUser,
+                                CreatedAt = DateTime.UtcNow.AddHours(4),
+                                DidRefundToBalance = false,
+                                ErrorWhileRenew = false,
+                                ErrorWhileReplace = false,
+                                FileExists = true,
+                                IsApiError = false,
+                                IsFromApi = false,
+                                IsRenewedDueToAbsence = false,
+                                IsRenewedDueToExpire = false,
+                                Vin = dbVin.Vin,
+                                EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                }
+                            };
+
+                            await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                        }
+                        else
+                        {
+                            userEvent.AppUser = appUser ?? newUser;
+                            userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                            userEvent.DidRefundToBalance = false;
+                            userEvent.ErrorWhileRenew = false;
+                            userEvent.ErrorWhileReplace = false;
+                            userEvent.FileExists = true;
+                            userEvent.IsApiError = false;
+                            userEvent.IsFromApi = false;
+                            userEvent.IsRenewedDueToAbsence = false;
+                            userEvent.IsRenewedDueToExpire = false;
+                            userEvent.Vin = dbVin.Vin;
+                            userEvent.EventMessages = new List<EventMessage>()
                             {
                                 new EventMessage()
                                 {
                                     Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 }
-                            }
-                        };
+                            };
+                        }
 
                         #endregion
 
                         await _unitOfWork.TransactionRepository.AddAsync(transaction);
                         await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
-                        await _unitOfWork.EventRepository.AddAsync(userEvent);
                         await _unitOfWork.CommitAsync();
 
                         return dbVin.FileName;
@@ -558,23 +666,52 @@ namespace Vinyoxla.Service.Implementations
                         if (await TryToFixAbsence(dbVin.Vin, dbVin.FileName))
                         {
                             dbVin.PurchasedTimes++;
+                            dbVin.CreatedAt = DateTime.UtcNow.AddHours(4);
 
                             #region Event handle
 
-                            Event userEvent = new Event()
+                            if (userEvent == null)
                             {
-                                AppUser = appUser ?? newUser,
-                                CreatedAt = DateTime.UtcNow.AddHours(4),
-                                DidRefundToBalance = false,
-                                ErrorWhileRenew = false,
-                                ErrorWhileReplace = false,
-                                FileExists = true,
-                                IsApiError = false,
-                                IsFromApi = true,
-                                IsRenewedDueToAbsence = true,
-                                IsRenewedDueToExpire = false,
-                                Vin = dbVin.Vin,
-                                EventMessages = new List<EventMessage>()
+                                Event newUserEvent = new Event()
+                                {
+                                    AppUser = appUser ?? newUser,
+                                    CreatedAt = DateTime.UtcNow.AddHours(4),
+                                    DidRefundToBalance = false,
+                                    ErrorWhileRenew = false,
+                                    ErrorWhileReplace = false,
+                                    FileExists = true,
+                                    IsApiError = false,
+                                    IsFromApi = true,
+                                    IsRenewedDueToAbsence = true,
+                                    IsRenewedDueToExpire = false,
+                                    Vin = dbVin.Vin,
+                                    EventMessages = new List<EventMessage>()
+                                    {
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
+                                            "Pul odeyib deye yari yolda goymadig, getdik aldig reportu",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
+                                    }
+                                };
+
+                                await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                            }
+                            else
+                            {
+                                userEvent.AppUser = appUser ?? newUser;
+                                userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                                userEvent.DidRefundToBalance = false;
+                                userEvent.ErrorWhileRenew = false;
+                                userEvent.ErrorWhileReplace = false;
+                                userEvent.FileExists = true;
+                                userEvent.IsApiError = false;
+                                userEvent.IsFromApi = true;
+                                userEvent.IsRenewedDueToAbsence = true;
+                                userEvent.IsRenewedDueToExpire = false;
+                                userEvent.Vin = dbVin.Vin;
+                                userEvent.EventMessages = new List<EventMessage>()
                                 {
                                     new EventMessage()
                                     {
@@ -582,16 +719,13 @@ namespace Vinyoxla.Service.Implementations
                                         "Pul odeyib deye yari yolda goymadig, getdik aldig reportu",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     }
-                                }
-                            };
+                                };
+                            }
 
                             #endregion
 
-                            dbVin.CreatedAt = DateTime.UtcNow.AddHours(4);
-
                             await _unitOfWork.TransactionRepository.AddAsync(transaction);
                             await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
-                            await _unitOfWork.EventRepository.AddAsync(userEvent);
                             await _unitOfWork.CommitAsync();
 
                             return dbVin.FileName;
@@ -602,20 +736,49 @@ namespace Vinyoxla.Service.Implementations
 
                             #region Event handle
 
-                            Event userEvent = new Event()
+                            if (userEvent == null)
                             {
-                                AppUser = appUser ?? newUser,
-                                CreatedAt = DateTime.UtcNow.AddHours(4),
-                                DidRefundToBalance = true,
-                                ErrorWhileRenew = false,
-                                ErrorWhileReplace = true,
-                                FileExists = false,
-                                IsApiError = true,
-                                IsFromApi = true,
-                                IsRenewedDueToAbsence = false,
-                                IsRenewedDueToExpire = false,
-                                Vin = dbVin.Vin,
-                                EventMessages = new List<EventMessage>()
+                                Event newUserEvent = new Event()
+                                {
+                                    AppUser = appUser ?? newUser,
+                                    CreatedAt = DateTime.UtcNow.AddHours(4),
+                                    DidRefundToBalance = true,
+                                    ErrorWhileRenew = false,
+                                    ErrorWhileReplace = true,
+                                    FileExists = false,
+                                    IsApiError = true,
+                                    IsFromApi = true,
+                                    IsRenewedDueToAbsence = false,
+                                    IsRenewedDueToExpire = false,
+                                    Vin = dbVin.Vin,
+                                    EventMessages = new List<EventMessage>()
+                                    {
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
+                                            "amma biz o reportu yenisi ile evez ede bilmedi, api error verdi. " +
+                                            "Ona gore event yarandi, relation ise yox. Pulunu da qaytardig",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
+                                    }
+                                };
+
+                                await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                            }
+                            else
+                            {
+                                userEvent.AppUser = appUser ?? newUser;
+                                userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                                userEvent.DidRefundToBalance = true;
+                                userEvent.ErrorWhileRenew = false;
+                                userEvent.ErrorWhileReplace = true;
+                                userEvent.FileExists = false;
+                                userEvent.IsApiError = true;
+                                userEvent.IsFromApi = true;
+                                userEvent.IsRenewedDueToAbsence = false;
+                                userEvent.IsRenewedDueToExpire = false;
+                                userEvent.Vin = dbVin.Vin;
+                                userEvent.EventMessages = new List<EventMessage>()
                                 {
                                     new EventMessage()
                                     {
@@ -624,12 +787,12 @@ namespace Vinyoxla.Service.Implementations
                                         "Ona gore event yarandi, relation ise yox. Pulunu da qaytardig",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     }
-                                }
-                            };
+                                };
+                            }
 
                             #endregion
 
-                            await _unitOfWork.EventRepository.AddAsync(userEvent);
+                            await _unitOfWork.TransactionRepository.AddAsync(transaction);
                             await _unitOfWork.CommitAsync();
 
                             return null;
@@ -641,23 +804,52 @@ namespace Vinyoxla.Service.Implementations
                     if (await BuyReport(dbVin.Vin, dbVin.FileName))
                     {
                         dbVin.PurchasedTimes++;
+                        dbVin.CreatedAt = DateTime.UtcNow.AddHours(4);
 
                         #region Event handle
 
-                        Event userEvent = new Event()
+                        if (userEvent == null)
                         {
-                            AppUser = appUser ?? newUser,
-                            CreatedAt = DateTime.UtcNow.AddHours(4),
-                            DidRefundToBalance = false,
-                            ErrorWhileRenew = false,
-                            ErrorWhileReplace = false,
-                            FileExists = true,
-                            IsApiError = false,
-                            IsFromApi = true,
-                            IsRenewedDueToAbsence = false,
-                            IsRenewedDueToExpire = true,
-                            Vin = dbVin.Vin,
-                            EventMessages = new List<EventMessage>()
+                            Event newUserEvent = new Event()
+                            {
+                                AppUser = appUser ?? newUser,
+                                CreatedAt = DateTime.UtcNow.AddHours(4),
+                                DidRefundToBalance = false,
+                                ErrorWhileRenew = false,
+                                ErrorWhileReplace = false,
+                                FileExists = true,
+                                IsApiError = false,
+                                IsFromApi = true,
+                                IsRenewedDueToAbsence = false,
+                                IsRenewedDueToExpire = true,
+                                Vin = dbVin.Vin,
+                                EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
+                                        "Yari yolda qoymayag deye getdik reportu yeniledik, pul odeyib axi.",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                }
+                            };
+
+                            await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                        }
+                        else
+                        {
+                            userEvent.AppUser = appUser ?? newUser;
+                            userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                            userEvent.DidRefundToBalance = false;
+                            userEvent.ErrorWhileRenew = false;
+                            userEvent.ErrorWhileReplace = false;
+                            userEvent.FileExists = true;
+                            userEvent.IsApiError = false;
+                            userEvent.IsFromApi = true;
+                            userEvent.IsRenewedDueToAbsence = false;
+                            userEvent.IsRenewedDueToExpire = true;
+                            userEvent.Vin = dbVin.Vin;
+                            userEvent.EventMessages = new List<EventMessage>()
                             {
                                 new EventMessage()
                                 {
@@ -665,14 +857,13 @@ namespace Vinyoxla.Service.Implementations
                                     "Yari yolda qoymayag deye getdik reportu yeniledik, pul odeyib axi.",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 }
-                            }
-                        };
+                            };
+                        }
 
                         #endregion
 
                         await _unitOfWork.TransactionRepository.AddAsync(transaction);
                         await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
-                        await _unitOfWork.EventRepository.AddAsync(userEvent);
                         await _unitOfWork.CommitAsync();
 
                         return dbVin.FileName;
@@ -683,20 +874,48 @@ namespace Vinyoxla.Service.Implementations
 
                         #region Event handle
 
-                        Event userEvent = new Event()
+                        if (userEvent == null)
                         {
-                            AppUser = appUser ?? newUser,
-                            CreatedAt = DateTime.UtcNow.AddHours(4),
-                            DidRefundToBalance = true,
-                            ErrorWhileRenew = true,
-                            ErrorWhileReplace = false,
-                            FileExists = true,
-                            IsApiError = true,
-                            IsFromApi = true,
-                            IsRenewedDueToAbsence = false,
-                            IsRenewedDueToExpire = false,
-                            Vin = dbVin.Vin,
-                            EventMessages = new List<EventMessage>()
+                            Event newUserEvent = new Event()
+                            {
+                                AppUser = appUser ?? newUser,
+                                CreatedAt = DateTime.UtcNow.AddHours(4),
+                                DidRefundToBalance = true,
+                                ErrorWhileRenew = true,
+                                ErrorWhileReplace = false,
+                                FileExists = true,
+                                IsApiError = true,
+                                IsFromApi = true,
+                                IsRenewedDueToAbsence = false,
+                                IsRenewedDueToExpire = false,
+                                Vin = dbVin.Vin,
+                                EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
+                                        "Yeniliye bilmedik, ona gore pulun gaytardig.",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                }
+                            };
+
+                            await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                        }
+                        else
+                        {
+                            userEvent.AppUser = appUser ?? newUser;
+                            userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                            userEvent.DidRefundToBalance = true;
+                            userEvent.ErrorWhileRenew = true;
+                            userEvent.ErrorWhileReplace = false;
+                            userEvent.FileExists = true;
+                            userEvent.IsApiError = true;
+                            userEvent.IsFromApi = true;
+                            userEvent.IsRenewedDueToAbsence = false;
+                            userEvent.IsRenewedDueToExpire = false;
+                            userEvent.Vin = dbVin.Vin;
+                            userEvent.EventMessages = new List<EventMessage>()
                             {
                                 new EventMessage()
                                 {
@@ -704,12 +923,12 @@ namespace Vinyoxla.Service.Implementations
                                     "Yeniliye bilmedik, ona gore pulun gaytardig, dedik birazdan yene yoxla.",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 }
-                            }
-                        };
+                            };
+                        }
 
                         #endregion
 
-                        await _unitOfWork.EventRepository.AddAsync(userEvent);
+                        await _unitOfWork.TransactionRepository.AddAsync(transaction);
                         await _unitOfWork.CommitAsync();
 
                         return null;
@@ -741,34 +960,60 @@ namespace Vinyoxla.Service.Implementations
                 {
                     #region Event handle
 
-                    Event userEvent = new Event()
+                    if (userEvent == null)
                     {
-                        AppUser = appUser ?? newUser,
-                        CreatedAt = DateTime.UtcNow.AddHours(4),
-                        DidRefundToBalance = false,
-                        ErrorWhileRenew = false,
-                        ErrorWhileReplace = false,
-                        FileExists = true,
-                        IsApiError = false,
-                        IsFromApi = true,
-                        IsRenewedDueToAbsence = false,
-                        IsRenewedDueToExpire = false,
-                        Vin = vin,
-                        EventMessages = new List<EventMessage>()
+                        Event newUserEvent = new Event()
+                        {
+                            AppUser = appUser ?? newUser,
+                            CreatedAt = DateTime.UtcNow.AddHours(4),
+                            DidRefundToBalance = false,
+                            ErrorWhileRenew = false,
+                            ErrorWhileReplace = false,
+                            FileExists = true,
+                            IsApiError = false,
+                            IsFromApi = true,
+                            IsRenewedDueToAbsence = false,
+                            IsRenewedDueToExpire = false,
+                            Vin = vin,
+                            EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "report yox idi, yaratdig yenisini, relation gurdug",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            }
+                        };
+
+                        await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                    }
+                    else
+                    {
+                        userEvent.AppUser = appUser ?? newUser;
+                        userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                        userEvent.DidRefundToBalance = false;
+                        userEvent.ErrorWhileRenew = false;
+                        userEvent.ErrorWhileReplace = false;
+                        userEvent.FileExists = true;
+                        userEvent.IsApiError = false;
+                        userEvent.IsFromApi = true;
+                        userEvent.IsRenewedDueToAbsence = false;
+                        userEvent.IsRenewedDueToExpire = false;
+                        userEvent.Vin = vin;
+                        userEvent.EventMessages = new List<EventMessage>()
                         {
                             new EventMessage()
                             {
                                 Message = "report yox idi, yaratdig yenisini, relation gurdug",
                                 CreatedAt = DateTime.UtcNow.AddHours(4)
                             }
-                        }
-                    };
+                        };
+                    }
 
                     #endregion
 
                     await _unitOfWork.TransactionRepository.AddAsync(transaction);
                     await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
-                    await _unitOfWork.EventRepository.AddAsync(userEvent);
                     await _unitOfWork.CommitAsync();
 
                     return fileName;
@@ -779,33 +1024,59 @@ namespace Vinyoxla.Service.Implementations
 
                     #region Event handle
 
-                    Event userEvent = new Event()
+                    if (userEvent == null)
                     {
-                        AppUser = appUser ?? newUser,
-                        CreatedAt = DateTime.UtcNow.AddHours(4),
-                        DidRefundToBalance = true,
-                        ErrorWhileRenew = false,
-                        ErrorWhileReplace = false,
-                        FileExists = false,
-                        IsApiError = true,
-                        IsFromApi = true,
-                        IsRenewedDueToAbsence = false,
-                        IsRenewedDueToExpire = false,
-                        Vin = vin,
-                        EventMessages = new List<EventMessage>()
+                        Event newUserEvent = new Event()
+                        {
+                            AppUser = appUser ?? newUser,
+                            CreatedAt = DateTime.UtcNow.AddHours(4),
+                            DidRefundToBalance = true,
+                            ErrorWhileRenew = false,
+                            ErrorWhileReplace = false,
+                            FileExists = false,
+                            IsApiError = true,
+                            IsFromApi = true,
+                            IsRenewedDueToAbsence = false,
+                            IsRenewedDueToExpire = false,
+                            Vin = vin,
+                            EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "User yeni report almag istedi, ala bilmedi, cunki api error verdi. Pulun qaytardig",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            }
+                        };
+
+                        await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                    }
+                    else
+                    {
+                        userEvent.AppUser = appUser ?? newUser;
+                        userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                        userEvent.DidRefundToBalance = true;
+                        userEvent.ErrorWhileRenew = false;
+                        userEvent.ErrorWhileReplace = false;
+                        userEvent.FileExists = false;
+                        userEvent.IsApiError = true;
+                        userEvent.IsFromApi = true;
+                        userEvent.IsRenewedDueToAbsence = false;
+                        userEvent.IsRenewedDueToExpire = false;
+                        userEvent.Vin = vin;
+                        userEvent.EventMessages = new List<EventMessage>()
                         {
                             new EventMessage()
                             {
                                 Message = "User yeni report almag istedi, ala bilmedi, cunki api error verdi. Pulun qaytardig",
                                 CreatedAt = DateTime.UtcNow.AddHours(4)
                             }
-                        }
-                    };
+                        };
+                    }
 
                     #endregion
 
                     await _unitOfWork.TransactionRepository.AddAsync(transaction);
-                    await _unitOfWork.EventRepository.AddAsync(userEvent);
                     await _unitOfWork.CommitAsync();
 
                     return null;

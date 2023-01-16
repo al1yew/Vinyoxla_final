@@ -9,9 +9,7 @@ namespace Vinyoxla.Service.Interfaces
     {
         Task<string> CheckEverything(string phone, string vin);
 
-        Task<bool> UserHasReport(string phone, string vin);
-
-        Task<bool> FileExists(string vin);
+        Task<bool> FileExists(string fileName);
 
         Task<bool> TryToFixAbsence(string vin, string fileName);
 

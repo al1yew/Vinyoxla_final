@@ -113,7 +113,7 @@ namespace Vinyoxla.MVC.Controllers
 
                         return RedirectToAction("Index", "Report", new { fileName });
                     }
-                    else
+                    else if (result == "2")
                     {
                         string fileName = await _purchaseService.GetReport(orderVM.PhoneNumber, orderVM.Vin, false);
 
@@ -124,6 +124,8 @@ namespace Vinyoxla.MVC.Controllers
 
                         return RedirectToAction("Index", "Report", new { fileName });
                     }
+
+                    return RedirectToAction("Index", "Report", new { fileName = result });
                 }
 
                 return RedirectToAction("Error", new { errno = 10 });
