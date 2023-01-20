@@ -1,0 +1,52 @@
+﻿@model PaginationList<AppUserToVincodeVM>
+
+@{
+    int no = Model.ItemsCount * (Model.Page - 1);
+}
+
+<table class="table table-striped col-lg-12 col-12" id="">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Tarix</th>
+            <th scope="col">Vin Kod</th>
+            <th scope="col">Report</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            no++;
+            <tr>
+                <td scope="row">@no</td>
+                <td>@item.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td>@item.VinCode.Vin</td>
+                <td>
+                    <a asp-controller="Report" asp-action="Index" asp-route-fileName="@item.VinCode.FileName">Baxmaq</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="row justify-content-center w-100 align-items-center d-flex mt-2">
+    <ul class="pagination d-flex justify-content-center align-content-center" id="paginationuser">
+        @if (Model.HasPrev)
+        {
+            <li class="page-item" data-page="1"><a class="page-link" data-page="1">@("<<")</a></li>
+
+            <li class="page-item" data-page="@(Model.Page-1)"><a class="page-link" data-page="@(Model.Page-1)">@("<")</a></li>
+        }
+        @for (int i = 1; i <= Model.PageCount; i++)
+        {
+            <li class="page-item @(Model.Page == i ? "active":"")" data-page="@i">
+                <a class="page-link" data-page="@i">@i</a>
+            </li>
+        }
+        @if (Model.HasNext)
+        {
+            <li class="page-item" data-page="@(Model.Page+1)"><a class="page-link" data-page="@(Model.Page+1)">@(">")</a></li>
+            <li class="page-item" data-page="@Model.PageCount"><a class="page-link" data-page="@Model.PageCount">@(">>")</a></li>
+        }
+    </ul>
+</div>

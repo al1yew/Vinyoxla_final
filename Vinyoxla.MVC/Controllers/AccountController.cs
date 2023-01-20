@@ -23,13 +23,11 @@ namespace Vinyoxla.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> SendCode([FromBody] LoginVM loginVM)
         {
-            //yoxlayirig
             if (!await _accountService.CheckLogin(loginVM))
             {
                 return StatusCode(404);
             }
 
-            //kodu gonderirik
             int response = await _accountService.SendCode(loginVM.PhoneNumber);
 
             if (response == 0)
@@ -70,6 +68,25 @@ namespace Vinyoxla.MVC.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        public async Task<IActionResult> Sort([FromQuery] string vin, int page, int sortbydate, int showcount)
+        {
+            return PartialView("_AccountReportsPartial", await _accountService.Sort(page, vin, sortbydate, showcount));
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         #region Created Roles

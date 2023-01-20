@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,7 +13,9 @@ using System.Threading.Tasks;
 using Vinyoxla.Core;
 using Vinyoxla.Core.Models;
 using Vinyoxla.Service.Interfaces;
+using Vinyoxla.Service.ViewModels;
 using Vinyoxla.Service.ViewModels.AccountVMs;
+using Vinyoxla.Service.ViewModels.AppUserToVincodeVMs;
 
 namespace Vinyoxla.Service.Implementations
 {
@@ -152,16 +152,46 @@ namespace Vinyoxla.Service.Implementations
             await _signInManager.SignOutAsync();
         }
 
-        public async Task<AppUserGetVM> Profile()
+        public async Task<AccountVM> Profile()
         {
             AppUserGetVM appUser = _mapper.Map<AppUserGetVM>(await _userManager.Users.Include(x => x.AppUserToVincodes).ThenInclude(x => x.VinCode).FirstOrDefaultAsync(x => x.UserName == _httpContextAccessor.HttpContext.User.Identity.Name));
 
-            if (appUser == null)
+            List<AppUserToVincodeVM> appUserToVincodes = _mapper.Map<List<AppUserToVincodeVM>>(await _unitOfWork.AppUserToVincodeRepository.GetAllByExAsync(x =>
+            x.AppUserId == appUser.Id, "AppUser", "VinCode"));
+
+            IQueryable<AppUserToVincodeVM> query = appUserToVincodes.AsQueryable();
+
+            query = query.OrderBy(x => x.CreatedAt);
+
+            AccountVM accountVM = new AccountVM()
             {
-                return null;
+                AppUserToVincodes = PaginationList<AppUserToVincodeVM>.Create(query, 1, 10),
+                Balance = appUser.Balance
+            };
+
+            return accountVM;
+        }
+
+        public async Task<PaginationList<AppUserToVincodeVM>> Sort(int page, string vin, int sortbydate, int showcount)
+        {
+            AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == _httpContextAccessor.HttpContext.User.Identity.Name);
+
+            List<AppUserToVincodeVM> appUserToVincodes = _mapper.Map<List<AppUserToVincodeVM>>(await _unitOfWork.AppUserToVincodeRepository.GetAllByExAsync(x =>
+            x.AppUserId == appUser.Id, "AppUser", "VinCode"));
+
+            IQueryable<AppUserToVincodeVM> query = appUserToVincodes.AsQueryable();
+
+            if (vin != null)
+            {
+                query = query.Where(x => x.VinCode.Vin.Contains(vin.Trim().ToUpperInvariant())).OrderBy(x => x.CreatedAt);
             }
 
-            return appUser;
+            if (sortbydate == 2)
+            {
+                query = query.OrderByDescending(x => x.CreatedAt);
+            }
+
+            return PaginationList<AppUserToVincodeVM>.Create(query, page == 0 ? 1 : page, showcount == 0 ? 1 : showcount);
         }
     }
 }

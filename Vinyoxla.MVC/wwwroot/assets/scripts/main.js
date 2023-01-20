@@ -412,11 +412,81 @@ $(document).ready(function () {
 
     $(document).on('input', '#search', function () {
         let value = $(this).val();
-
-        console.log(value);
     });
 
     //#endregion search input
+
+    //#region sort backend
+
+    if (localStorage.getItem('sort') == null) {
+
+        localStorage.setItem('sort', JSON.stringify([]));
+
+        let obj = {
+            vin: $('#search').val(),
+            showcount: $('#showcount').find(":selected").val(),
+            sortbydate: $('#sortbydate').find(":selected").val(),
+            page: 1
+        }
+
+        localStorage.setItem('sort', JSON.stringify(obj));
+    }
+
+    if (window.location.href.indexOf("Profile") < 0) {
+        localStorage.clear();
+    }
+
+    $(document).on('keyup', '#search', function () {
+
+        let sort = JSON.parse(localStorage.getItem('sort'));
+
+        sort.vin = $(this).val();
+
+        localStorage.setItem('sort', JSON.stringify(sort));
+
+        MakeRequest(sort)
+    });
+
+    $(document).on('change', '#sortbydate, #showcount', function () {
+
+        let sort = JSON.parse(localStorage.getItem('sort'));
+
+        sort.showcount = $('#showcount').find(":selected").val();
+        sort.sortbydate = $('#sortbydate').find(":selected").val();
+
+        localStorage.setItem('sort', JSON.stringify(sort));
+
+        MakeRequest(sort)
+    });
+
+    $(document).on('click', '.page-item', function () {
+
+        let sort = JSON.parse(localStorage.getItem('sort'));
+
+        sort.page = $(this).data("page");
+
+        localStorage.setItem('sort', JSON.stringify(sort));
+
+        MakeRequest(sort)
+    });
+
+    let MakeRequest = ({ vin, page, sortbydate, showcount }) => {
+        axios.get("/Account/Sort", {
+            params: {
+                vin,
+                page,
+                sortbydate,
+                showcount
+            }
+        })
+            .then(function (res) {
+
+                $('#accountvins').html("")
+                $("#accountvins").html(res.data)
+            })
+    }
+
+    //#endregion sort backend
 
     // -------------------------- account page
 

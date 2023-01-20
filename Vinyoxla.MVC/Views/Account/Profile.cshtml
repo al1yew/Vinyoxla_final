@@ -1,8 +1,4 @@
-﻿@model AppUserGetVM
-
-@{
-    int no = 0;
-}
+﻿@model AccountVM
 
 <main id="myaccountmain">
     <div class="container">
@@ -30,49 +26,16 @@
                     </select>
                 </form>
             </div>
+
             @if (Model.AppUserToVincodes.Count > 0)
             {
-                <table class="table table-striped col-lg-12 col-12">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Tarix</th>
-                            <th scope="col">Vin Kod</th>
-                            <th scope="col">Report</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.AppUserToVincodes)
-                        {
-                            no++;
-                            <tr>
-                                <td scope="row">@no</td>
-                                <td>@item.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
-                                <td>@item.VinCode.Vin</td>
-                                <td>
-                                    <a asp-controller="Report" asp-action="Index" asp-route-fileName="@item.VinCode.FileName">Baxmaq</a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-
-                <nav>
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">Geri</a>
-                        </li>
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Növbəti</a>
-                        </li>
-                    </ul>
-                </nav>
+                <div id="accountvins">
+                    @await Html.PartialAsync("_AccountReportsPartial", Model.AppUserToVincodes)
+                </div>
             }
 
         </div>
+
         @if (Model.AppUserToVincodes.Count <= 0)
         {
             <div class="row ifnopurchases mt-5">

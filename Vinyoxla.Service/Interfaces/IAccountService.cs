@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Vinyoxla.Service.ViewModels;
 using Vinyoxla.Service.ViewModels.AccountVMs;
+using Vinyoxla.Service.ViewModels.AppUserToVincodeVMs;
 
 namespace Vinyoxla.Service.Interfaces
 {
@@ -16,6 +16,9 @@ namespace Vinyoxla.Service.Interfaces
 
         Task Logout();
 
-        Task<AppUserGetVM> Profile();
+        Task<AccountVM> Profile();
+
+        Task<PaginationList<AppUserToVincodeVM>> Sort(int page, string vin, int sortbydate, int showcount);
+
     }
 }
