@@ -488,6 +488,17 @@ $(document).ready(function () {
 
     //#endregion sort backend
 
+    //#region balance form
+
+    $(document).on('click', '#animatetopup', function () {
+
+        $(this).addClass('animatetopupbtn');
+        $(this).html("Balans");
+        $('.topupbalanceform').removeClass('animatetopupbtn');
+    });
+
+    //#endregion balance form
+
     // -------------------------- account page
 
     // -------------------------- 

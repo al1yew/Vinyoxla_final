@@ -6,13 +6,20 @@
         <div class="row all">
             <div class="col-lg-12 col-12 userinfo">
                 <span class="balance">Balansınız: <span class="balanceamount">@Model.Balance</span> azn</span>
-                <a asp-controller="Account" asp-action="TopUp">Balansı artirmaq</a>
+                <div class="animationkeeper col-lg-3 col-6">
+                    <span class="col-lg-12 col-12 clickfortopup" id="animatetopup">Balansı artirmaq</span>
+
+                    <form class="col-lg-12 col-12 topupbalanceform animatetopupbtn" asp-controller="Profile" asp-action="TopUp">
+                        <input autocomplete="off" type="text" placeholder="Məbləğ" inputmode="numeric" required>
+                        <button type="submit">Ödəmək</button>
+                    </form>
+                </div>
             </div>
 
             <div class="forsort col-lg-12 col-12">
                 <input autocomplete="off" name="search" maxlength="17" minlength="17" required
                        placeholder="Axtardığınız vin kod:" type="text" class="col-lg-7 col-12 search" id="search">
-                <form action="" class="sortform col-lg-4-5 col-12">
+                <div action="" class="sortform col-lg-4-5 col-12">
                     <select name="showcount" id="showcount" class="showcount col-lg-4 col-4">
                         <option value="10">10</option>
                         <option value="20">20</option>
@@ -24,7 +31,7 @@
                         <option value="1">Əvvəlcə yeni</option>
                         <option value="2">Əvvəlcə köhnə</option>
                     </select>
-                </form>
+                </div>
             </div>
 
             @if (Model.AppUserToVincodes.Count > 0)
