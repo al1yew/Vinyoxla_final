@@ -9,6 +9,7 @@ namespace Vinyoxla.Core.Models
     {
         public int Balance { get; set; }
         public bool IsAdmin { get; set; }
+        public Nullable<DateTime> CreatedAt { get; set; }
 
         //relations
         public List<AppUserToVincode> AppUserToVincodes { get; set; }

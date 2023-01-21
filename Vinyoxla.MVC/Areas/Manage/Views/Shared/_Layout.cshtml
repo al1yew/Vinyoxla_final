@@ -50,9 +50,9 @@
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" asp-area="Manage" asp-controller="Home" asp-action="Index">
+                <a class="nav-link" asp-area="Manage" asp-controller="Relation" asp-action="Index">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Charts</span>
+                    <span>Əlaqələr</span>
                 </a>
             </li>
 
@@ -117,7 +117,7 @@
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                            <a class="dropdown-item" asp-area="Manage" asp-controller="Account" asp-action="Logout">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
                             </a>

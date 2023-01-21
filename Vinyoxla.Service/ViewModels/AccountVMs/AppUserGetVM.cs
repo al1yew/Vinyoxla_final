@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Vinyoxla.Service.ViewModels.AppUserToVincodeVMs;
 using Vinyoxla.Service.ViewModels.EventVMs;
 using Vinyoxla.Service.ViewModels.TransactionVMs;
@@ -13,6 +14,7 @@ namespace Vinyoxla.Service.ViewModels.AccountVMs
         public string UserName { get; set; }
         public int Balance { get; set; }
         public bool IsAdmin { get; set; }
+        public Nullable<DateTime> CreatedAt { get; set; }
 
 
         //relations

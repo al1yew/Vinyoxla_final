@@ -1,17 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Vinyoxla.Service.Interfaces;
 
 namespace Vinyoxla.MVC.Areas.Manage.Controllers
 {
     [Area("Manage")]
+    [Authorize(Roles = "Admin")]
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly IAdminHomeService _adminHomeService;
+
+        public HomeController(IAdminHomeService adminHomeService)
         {
-            return View();
+            _adminHomeService = adminHomeService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            return View(await _adminHomeService.GetData());
         }
     }
 }
