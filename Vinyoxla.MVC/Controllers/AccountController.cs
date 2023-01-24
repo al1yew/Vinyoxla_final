@@ -57,11 +57,6 @@ namespace Vinyoxla.MVC.Controllers
             return View(await _accountService.Profile());
         }
 
-        public IActionResult TopUp()
-        {
-            return View();
-        }
-
         public async Task<IActionResult> Logout()
         {
             await _accountService.Logout();
