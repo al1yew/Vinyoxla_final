@@ -18,6 +18,7 @@ namespace Vinyoxla.MVC.Extensions
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IPurchaseService, PurchaseService>();
             services.AddScoped<IAdminHomeService, AdminHomeService>();
+            services.AddScoped<IAdminRelationService, AdminRelationService>();
             services.AddScoped<IAdminAccountService, AdminAccountService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IReportService, ReportService>();

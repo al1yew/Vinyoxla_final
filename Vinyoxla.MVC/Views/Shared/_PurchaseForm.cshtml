@@ -1,49 +1,6 @@
 ﻿@model OrderVM
 
 <form method="post" enctype="multipart/form-data" asp-controller="Purchase" asp-action="Purchase" id="purchaseForm" class="col-lg-6 col-12">
-    <div class="col-lg-9 col-9 above">
-
-        <input autocomplete="off" type="text" id="cardholder" class="cardholder col-lg-12 col-12"
-               placeholder="Ad Soyad" pattern="[A-Za-z, ]{2,}" asp-for="CardHolder" required>
-
-        <input autocomplete="off" type="text" inputmode="numeric" id="cardno"
-               class="cardno col-lg-12 col-12" placeholder="Kartın nömrəsi" pattern="[0-9]{16}"
-               asp-for="CardNo" maxlength="16" minlength="16" required>
-
-        <p class="validthru col-lg-12 col-12">VALID THRU:</p>
-
-        <div class="col-lg-12 col-12 ikisi">
-            <div class="col-lg-6 col-7 leftside">
-
-                <input autocomplete="off" type="text" id="month" class="month col-lg-5 col-5"
-                       placeholder="MM" pattern="[0-9]{2}" inputmode="numeric" maxlength="2" minlength="2"
-                       asp-for="Month" required>
-
-                <span class="slash">/</span>
-
-                <input autocomplete="off" type="text" id="year" class="year col-lg-5 col-5"
-                       placeholder="YYYY" pattern="[0-9]{4}" inputmode="numeric" maxlength="4"
-                       minlength="4" asp-for="CardYear" required>
-
-            </div>
-
-            <div class="col-lg-5 col-5 rightside">
-                <div class="col-lg-5 col-4-5 cardbox visabox">
-                    <img src="~/assets/images/mastercard-logo-png-transparent-svg-vector-bie-supply-0.png"
-                         class="img-fluid" alt="">
-                </div>
-
-                <div class="col-lg-5 col-4-5 cardbox mastercardbox">
-                    <img class="img-fluid" src="~/assets/images/visa-card-logo-9.png" alt="">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-9 col-9 below">
-        <input autocomplete="off" type="text" id="cvv" class="cvv col-lg-3 col-3" placeholder="CVV"
-               pattern="[0-9]{3}" maxlength="3" inputmode="numeric" minlength="3" asp-for="CVV" required>
-    </div>
 
     <input style="display: none" class="d-none" asp-for="Vin" />
 

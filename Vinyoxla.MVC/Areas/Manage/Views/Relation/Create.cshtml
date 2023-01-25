@@ -1,0 +1,59 @@
+﻿@model AppUserToVincodeCreateVM
+
+<style>
+    .keeperadminphone {
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        padding: 0 10px !important;
+    }
+
+        .keeperadminphone input {
+            border: none;
+            outline: none;
+            padding: 5px;
+            color: black;
+            letter-spacing: 2px;
+        }
+
+        .keeperadminphone span {
+            border-right: 0.5px solid #d1d3e2;
+            padding-right: 5px;
+            color: black;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+    input {
+        color: black !important;
+        font-size: 16px;
+        letter-spacing: 2px;
+        width: 100%
+    }
+</style>
+
+<div class="d-flex row justify-content-center w-100">
+    <div class="col-lg-10 col-12">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form method="post" enctype="multipart/form-data" class="w-100 d-flex flex-wrap justify-content-between align-items-baseline" style="padding-top: 200px;">
+            <div class="flex-wrap d-flex justify-content-between col-lg-5 col-12">
+                <div class="col-lg-12 col-12 form-control align-items-center keeperadminphone">
+                    <span>+994</span>
+                    <input asp-for="PhoneNumber" autocomplete="off" maxlength="9" id="finduser" placeholder="Enter user phone">
+                </div>
+                <span asp-validation-for="PhoneNumber" class="text-danger col-lg-12 col-12 text-center pt-1"></span>
+            </div>
+            <div class="flex-wrap d-flex justify-content-between col-lg-5 col-12 ">
+                <div class="col-lg-12 col-12 align-items-center">
+                    <input autocomplete="off" asp-for="VinCode" maxlength="17" class="form-control" id="findvin" placeholder="Enter vin code">
+                </div>
+                <span asp-validation-for="VinCode" class="text-danger col-lg-12 col-12 text-center pt-1"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+    </div>
+</div>
+
+@section Script{
+    <partial name="_ValidationPartial">
+}

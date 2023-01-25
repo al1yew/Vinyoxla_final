@@ -6,11 +6,6 @@ namespace Vinyoxla.Service.ViewModels.PurchaseVMs
 {
     public class OrderVM
     {
-        public string CardHolder { get; set; }
-        public string CardNo { get; set; }
-        public Nullable<int> Month { get; set; }
-        public Nullable<int> CardYear { get; set; }
-        public Nullable<int> CVV { get; set; }
         public string PhoneNumber { get; set; }
         public string Vin { get; set; }
 

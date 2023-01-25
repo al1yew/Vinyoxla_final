@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Vinyoxla.Service.Interfaces;
 using Vinyoxla.Service.ViewModels.PurchaseVMs;
-using Vinyoxla.Service.ViewModels.VinCodeVMs;
 
 namespace Vinyoxla.MVC.Controllers
 {
@@ -15,7 +14,7 @@ namespace Vinyoxla.MVC.Controllers
             _purchaseService = purchaseService;
         }
 
-        public async Task<IActionResult> Index(SelectedReportVM selectedReportVM)
+        public async Task<IActionResult> PrePurchase(SelectedReportVM selectedReportVM)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -81,54 +80,50 @@ namespace Vinyoxla.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Purchase(OrderVM orderVM)
         {
+            //return StatusCode(200); // make xml request to kapital bank, return status code, assign this code to tempdata
+            //ili je xz, tam je est approveurl, declineurl, vnutri xml. Mogu li ya ix izbejat? esli net, sgenerirovat
+            //url iz route values, v GetReport prinat ne ordervm, a string vin, string phone i brat ix s linka.
+            return RedirectToAction("GetReport", orderVM);
+        }
+
+        public async Task<IActionResult> GetReport(OrderVM orderVM)
+        {
             if (User.Identity.IsAuthenticated)
             {//on pridet tolko esli relationa net ili je report stariy
-                if (await _purchaseService.UserPurchase(orderVM))
-                {
-                    return RedirectToAction("GetReport", new { vinCode = orderVM.Vin, phoneno = orderVM.PhoneNumber, isFromBalance = false });
-                }
-                else
-                {
-                    return RedirectToAction("Error", new { errno = 10 });
-                }
+                return RedirectToAction("GetReport", new { vinCode = orderVM.Vin, phoneno = orderVM.PhoneNumber, isFromBalance = false });
             }
             else
             {
-                if (await _purchaseService.UserPurchase(orderVM))
+                string result = await _purchaseService.CheckEverything(orderVM.PhoneNumber, orderVM.Vin);
+
+                if (result == "0")
                 {
-                    string result = await _purchaseService.CheckEverything(orderVM.PhoneNumber, orderVM.Vin);
+                    return RedirectToAction("Error", new { errno = 0 });
+                }
+                else if (result == "1")
+                {
+                    string fileName = await _purchaseService.ReplaceOldReport(orderVM.PhoneNumber, orderVM.Vin, false);
 
-                    if (result == "0")
+                    if (fileName == null)
                     {
-                        return RedirectToAction("Error", new { errno = 0 });
-                    }
-                    else if (result == "1")
-                    {
-                        string fileName = await _purchaseService.ReplaceOldReport(orderVM.PhoneNumber, orderVM.Vin, false);
-
-                        if (fileName == null)
-                        {
-                            return RedirectToAction("Error", new { errno = 1 });
-                        }
-
-                        return RedirectToAction("Index", "Report", new { fileName });
-                    }
-                    else if (result == "2")
-                    {
-                        string fileName = await _purchaseService.GetReport(orderVM.PhoneNumber, orderVM.Vin, false);
-
-                        if (fileName == null)
-                        {
-                            return RedirectToAction("Error", new { errno = 2 });
-                        }
-
-                        return RedirectToAction("Index", "Report", new { fileName });
+                        return RedirectToAction("Error", new { errno = 1 });
                     }
 
-                    return RedirectToAction("Index", "Report", new { fileName = result });
+                    return RedirectToAction("Index", "Report", new { fileName });
+                }
+                else if (result == "2")
+                {
+                    string fileName = await _purchaseService.GetReport(orderVM.PhoneNumber, orderVM.Vin, false);
+
+                    if (fileName == null)
+                    {
+                        return RedirectToAction("Error", new { errno = 2 });
+                    }
+
+                    return RedirectToAction("Index", "Report", new { fileName });
                 }
 
-                return RedirectToAction("Error", new { errno = 10 });
+                return RedirectToAction("Index", "Report", new { fileName = result });
             }
         }
 

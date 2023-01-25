@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Vinyoxla.Core;
 using Vinyoxla.Core.Models;
@@ -53,77 +52,10 @@ namespace Vinyoxla.Service.Implementations
             return purchaseVM;
         }
 
-        public async Task<bool> UserPurchase(OrderVM orderVM)
-        {
-            if (orderVM.Month > 12)
-            {
-                return false;
-            }
-
-            if (!DateTime.TryParse("01" + "/" + orderVM.Month + "/" + orderVM.CardYear, out DateTime cardDate))
-            {
-                return false;
-            }
-            else
-            {
-                cardDate = DateTime.Parse("01" + "/" + orderVM.Month + "/" + orderVM.CardYear);
-            }
-
-            Regex regexString = new Regex(@"^[a-zA-Z\s]*$");
-
-            if (!regexString.IsMatch(orderVM.CardHolder))
-            {
-                return false;
-            }
-
-            Regex regexNumber = new Regex("^[0-9]+$");
-
-            if (!regexNumber.IsMatch(orderVM.CardYear.ToString()) &&
-                !regexNumber.IsMatch(orderVM.CardNo.ToString()) &&
-                !regexNumber.IsMatch(orderVM.CVV.ToString()) &&
-                !regexNumber.IsMatch(orderVM.Month.ToString()))
-            {
-                return false;
-            }
-
-            if (regexNumber.IsMatch(orderVM.PhoneNumber.ToString()))
-            {
-                if (!(orderVM.PhoneNumber.StartsWith("50") ||
-                    orderVM.PhoneNumber.StartsWith("10") ||
-                    orderVM.PhoneNumber.StartsWith("51") ||
-                    orderVM.PhoneNumber.StartsWith("70") ||
-                    orderVM.PhoneNumber.StartsWith("77") ||
-                    orderVM.PhoneNumber.StartsWith("99") ||
-                    orderVM.PhoneNumber.StartsWith("55")))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-
-            if (!(orderVM.CardNo.StartsWith("2") ||
-                orderVM.CardNo.StartsWith("3") ||
-                orderVM.CardNo.StartsWith("4") ||
-                orderVM.CardNo.StartsWith("5")))
-            {
-                return false;
-            }
-
-            if (cardDate < DateTime.Now)
-            {
-                return false;
-            }
-
-            //bank api
-
-            return true;
-        }
-
         public async Task<string> CheckEverything(string phone, string vin)
         {
+            //postaraysa sverit mojet tut ne nado daje proverat user online ili net, kjc eyni shey yazmisham e
+
             VinCode dbVin = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vin.Trim().ToUpperInvariant());
 
             if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
@@ -410,7 +342,8 @@ namespace Vinyoxla.Service.Implementations
                 PhoneNumber = "+994" + phone,
                 PhoneNumberConfirmed = false,
                 Balance = 0,
-                IsAdmin = false
+                IsAdmin = false,
+                CreatedAt = DateTime.UtcNow.AddHours(4)
             };
 
             if (appUser == null)
@@ -566,7 +499,8 @@ namespace Vinyoxla.Service.Implementations
                 PhoneNumber = "+994" + phone,
                 PhoneNumberConfirmed = false,
                 Balance = 0,
-                IsAdmin = false
+                IsAdmin = false,
+                CreatedAt = DateTime.UtcNow.AddHours(4)
             };
 
             if (appUser == null)
@@ -632,7 +566,6 @@ namespace Vinyoxla.Service.Implementations
                         }
                         else
                         {
-                            userEvent.AppUser = appUser ?? newUser;
                             userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                             userEvent.DidRefundToBalance = false;
                             userEvent.ErrorWhileRenew = false;
@@ -642,7 +575,6 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromApi = false;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = false;
-                            userEvent.Vin = dbVin.Vin;
                             userEvent.EventMessages = new List<EventMessage>()
                             {
                                 new EventMessage()
@@ -700,7 +632,6 @@ namespace Vinyoxla.Service.Implementations
                             }
                             else
                             {
-                                userEvent.AppUser = appUser ?? newUser;
                                 userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                                 userEvent.DidRefundToBalance = false;
                                 userEvent.ErrorWhileRenew = false;
@@ -710,7 +641,6 @@ namespace Vinyoxla.Service.Implementations
                                 userEvent.IsFromApi = true;
                                 userEvent.IsRenewedDueToAbsence = true;
                                 userEvent.IsRenewedDueToExpire = false;
-                                userEvent.Vin = dbVin.Vin;
                                 userEvent.EventMessages = new List<EventMessage>()
                                 {
                                     new EventMessage()
@@ -750,13 +680,12 @@ namespace Vinyoxla.Service.Implementations
                                     IsFromApi = true,
                                     IsRenewedDueToAbsence = false,
                                     IsRenewedDueToExpire = false,
-                                    Vin = dbVin.Vin,
                                     EventMessages = new List<EventMessage>()
                                     {
                                         new EventMessage()
                                         {
                                             Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
-                                            "amma biz o reportu yenisi ile evez ede bilmedi, api error verdi. " +
+                                            "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
                                             "Ona gore event yarandi, relation ise yox. Pulunu da qaytardig",
                                             CreatedAt = DateTime.UtcNow.AddHours(4)
                                         }
@@ -767,7 +696,6 @@ namespace Vinyoxla.Service.Implementations
                             }
                             else
                             {
-                                userEvent.AppUser = appUser ?? newUser;
                                 userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                                 userEvent.DidRefundToBalance = true;
                                 userEvent.ErrorWhileRenew = false;
@@ -777,13 +705,12 @@ namespace Vinyoxla.Service.Implementations
                                 userEvent.IsFromApi = true;
                                 userEvent.IsRenewedDueToAbsence = false;
                                 userEvent.IsRenewedDueToExpire = false;
-                                userEvent.Vin = dbVin.Vin;
                                 userEvent.EventMessages = new List<EventMessage>()
                                 {
                                     new EventMessage()
                                     {
                                         Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
-                                        "amma biz o reportu yenisi ile evez ede bilmedi, api error verdi. " +
+                                        "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
                                         "Ona gore event yarandi, relation ise yox. Pulunu da qaytardig",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     }
@@ -838,7 +765,6 @@ namespace Vinyoxla.Service.Implementations
                         }
                         else
                         {
-                            userEvent.AppUser = appUser ?? newUser;
                             userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                             userEvent.DidRefundToBalance = false;
                             userEvent.ErrorWhileRenew = false;
@@ -848,7 +774,6 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromApi = true;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = true;
-                            userEvent.Vin = dbVin.Vin;
                             userEvent.EventMessages = new List<EventMessage>()
                             {
                                 new EventMessage()
@@ -904,7 +829,6 @@ namespace Vinyoxla.Service.Implementations
                         }
                         else
                         {
-                            userEvent.AppUser = appUser ?? newUser;
                             userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                             userEvent.DidRefundToBalance = true;
                             userEvent.ErrorWhileRenew = true;
@@ -914,7 +838,6 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromApi = true;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = false;
-                            userEvent.Vin = dbVin.Vin;
                             userEvent.EventMessages = new List<EventMessage>()
                             {
                                 new EventMessage()
@@ -989,7 +912,6 @@ namespace Vinyoxla.Service.Implementations
                     }
                     else
                     {
-                        userEvent.AppUser = appUser ?? newUser;
                         userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                         userEvent.DidRefundToBalance = false;
                         userEvent.ErrorWhileRenew = false;
@@ -999,7 +921,6 @@ namespace Vinyoxla.Service.Implementations
                         userEvent.IsFromApi = true;
                         userEvent.IsRenewedDueToAbsence = false;
                         userEvent.IsRenewedDueToExpire = false;
-                        userEvent.Vin = vin;
                         userEvent.EventMessages = new List<EventMessage>()
                         {
                             new EventMessage()
@@ -1053,7 +974,6 @@ namespace Vinyoxla.Service.Implementations
                     }
                     else
                     {
-                        userEvent.AppUser = appUser ?? newUser;
                         userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                         userEvent.DidRefundToBalance = true;
                         userEvent.ErrorWhileRenew = false;
@@ -1063,7 +983,6 @@ namespace Vinyoxla.Service.Implementations
                         userEvent.IsFromApi = true;
                         userEvent.IsRenewedDueToAbsence = false;
                         userEvent.IsRenewedDueToExpire = false;
-                        userEvent.Vin = vin;
                         userEvent.EventMessages = new List<EventMessage>()
                         {
                             new EventMessage()

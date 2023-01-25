@@ -112,7 +112,8 @@ namespace Vinyoxla.Service.Implementations
                         PhoneNumber = "+994" + loginVM.PhoneNumber,
                         PhoneNumberConfirmed = false,
                         Balance = 0,
-                        IsAdmin = false
+                        IsAdmin = false,
+                        CreatedAt = DateTime.UtcNow.AddHours(4)
                     };
 
                     IdentityResult result = await _userManager.CreateAsync(newUser);

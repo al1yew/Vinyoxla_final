@@ -278,6 +278,9 @@ namespace Vinyoxla.Data.Migrations
                     b.Property<bool>("IsApiError")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsFromAdminArea")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsFromApi")
                         .HasColumnType("bit");
 

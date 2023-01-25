@@ -1,0 +1,48 @@
+﻿@model PaginationList<AppUserToVincodeVM>
+
+@{
+    int no = Model.ItemsCount * (Model.Page - 1);
+}
+
+<style>
+    td {
+        letter-spacing: 1.2px;
+        text-align: center;
+    }
+
+    th {
+        text-align: center;
+    }
+</style>
+
+<table class="table table-bordered table-striped tblContent">
+    <thead>
+        <tr>
+            <th class="col-lg-1 col-1 text-wrap">№</th>
+            <th class="col-lg-1 col-1 text-wrap">User Number</th>
+            <th class="col-lg-1 col-1 text-wrap">Vin Code</th>
+            <th class="col-lg-1 col-1 text-wrap">Created At</th>
+            <th class="col-lg-1 col-1 text-wrap">Update</th>
+            <th class="col-lg-1 col-1 text-wrap">Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (AppUserToVincodeVM appUserToVincode in Model)
+        {
+            no++;
+            <tr>
+                <td class="col-lg-1 col-1 text-wrap">@no</td>
+                <td class="col-lg-1 col-1 text-wrap">@appUserToVincode.AppUser.PhoneNumber</td>
+                <td class="col-lg-1 col-1 text-wrap">@appUserToVincode.VinCode.Vin</td>
+                <td class="col-lg-1 col-1 text-wrap">@appUserToVincode.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    <a class="btn btn-warning" asp-area="Manage" asp-controller="Relation" asp-action="Update" asp-route-id="@appUserToVincode.Id">Update</a>
+                </td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    <a class="btn btn-danger deleteBtn" asp-area="Manage" asp-controller="Relation"
+                       asp-action="Delete" asp-route-id="@appUserToVincode.Id" asp-route-select="@ViewBag.Select" asp-route-vin="@ViewBag.Vin" asp-route-phone="@ViewBag.Phone" asp-route-page="@ViewBag.Page">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

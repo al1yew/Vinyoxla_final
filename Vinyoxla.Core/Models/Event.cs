@@ -15,7 +15,7 @@ namespace Vinyoxla.Core.Models
         public bool IsRenewedDueToAbsence { get; set; }
         public bool ErrorWhileRenew { get; set; }
         public bool ErrorWhileReplace { get; set; }
-
+        public bool IsFromAdminArea { get; set; }
         public string Vin { get; set; }
 
         //relation

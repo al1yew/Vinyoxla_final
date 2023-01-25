@@ -10,8 +10,8 @@ using Vinyoxla.Data;
 namespace Vinyoxla.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230121195201_UpdatedAppUser")]
-    partial class UpdatedAppUser
+    [Migration("20230125104343_UpdatedEventTable")]
+    partial class UpdatedEventTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -278,6 +278,9 @@ namespace Vinyoxla.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsApiError")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFromAdminArea")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsFromApi")

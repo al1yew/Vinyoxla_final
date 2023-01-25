@@ -15,6 +15,7 @@ namespace Vinyoxla.Service.ViewModels.EventVMs
         public bool DidRefundToBalance { get; set; }
 
         public bool IsApiError { get; set; }
+        public bool IsFromAdminArea { get; set; }
         public bool FileExists { get; set; }
         public bool IsFromApi { get; set; }
         public bool IsRenewedDueToExpire { get; set; }

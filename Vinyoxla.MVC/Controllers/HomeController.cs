@@ -1,13 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Vinyoxla.Service.Interfaces;
-using Vinyoxla.Service.ViewModels.HomeVMs;
 
 namespace Vinyoxla.MVC.Controllers
 {

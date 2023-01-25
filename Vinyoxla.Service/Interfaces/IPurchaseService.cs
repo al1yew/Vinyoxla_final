@@ -13,8 +13,6 @@ namespace Vinyoxla.Service.Interfaces
 
         Task<bool> TryToFixAbsence(string vin, string fileName);
 
-        Task<bool> UserPurchase(OrderVM orderVM);
-
         Task<PurchaseVM> GetViewModelForOrderPage(SelectedReportVM selectedReportVM);
 
         Task<string> ReplaceOldReport(string phone, string vin, bool isFromBalance);
