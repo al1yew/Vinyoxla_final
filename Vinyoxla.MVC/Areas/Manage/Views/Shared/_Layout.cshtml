@@ -52,14 +52,35 @@
             <li class="nav-item">
                 <a class="nav-link" asp-area="Manage" asp-controller="Relation" asp-action="Index">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Əlaqələr</span>
+                    <span>Relations</span>
                 </a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" asp-area="Manage" asp-controller="Vincode" asp-action="Index">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Vinkodlar</span>
+                    <span>Vincodes</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Manage" asp-controller="User" asp-action="Index">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Manage" asp-controller="Transaction" asp-action="Index">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Transactions</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Manage" asp-controller="Event" asp-action="Index">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Events</span>
                 </a>
             </li>
 
@@ -79,6 +100,8 @@
                     </button>
 
                     <h3 class="m-0 p-0">@ViewBag.WhereWeAre</h3>
+
+                    <a class="ml-auto" asp-area="Manage" asp-controller="User" asp-action="ChangeMyInfo">Update My Account</a>
 
                     <ul class="navbar-nav ml-auto d-flex justify-content-between" style="margin-left: 0">
                         <li class="nav-item dropdown no-arrow">

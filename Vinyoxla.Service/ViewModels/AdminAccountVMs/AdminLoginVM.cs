@@ -4,10 +4,12 @@ namespace Vinyoxla.Service.ViewModels.AdminAccountVMs
 {
     public class AdminLoginVM
     {
-        [Required]
+        [Required(ErrorMessage = "{0} is required!")]
+        [DataType(DataType.Text)]
+        [StringLength(9, MinimumLength = 9, ErrorMessage = "Phone must be 9 characters!")]
         public string Login { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "{0} is required!")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
     }

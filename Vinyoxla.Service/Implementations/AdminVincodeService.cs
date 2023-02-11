@@ -49,7 +49,7 @@ namespace Vinyoxla.Service.Implementations
 
             List<AppUserToVincode> relations = await _unitOfWork.AppUserToVincodeRepository.GetAllByExAsync(x => x.VinCodeId == id);
 
-            List<Event> events = await _unitOfWork.EventRepository.GetAllByExAsync(x => x.Vin == dbVin.Vin);
+            List<Event> events = await _unitOfWork.EventRepository.GetAllByExAsync(x => x.Vin == dbVin.Vin, "EventMessages");
 
             foreach (var relation in relations)
             {
@@ -60,15 +60,27 @@ namespace Vinyoxla.Service.Implementations
 
             foreach (var eventik in events)
             {
-                eventik.EventMessages = new List<EventMessage>()
+                if (eventik.EventMessages.Count > 0)
                 {
-                    new EventMessage()
+                    eventik.EventMessages.Add(new EventMessage()
                     {
                         Message = "Bu vinkodu ozumuz databazadan silmishik, ona gore userlerin relationu silinib, " +
                         "papkadan fayl silinib, papka qalib, Eventler galib.",
                         CreatedAt = DateTime.UtcNow.AddHours(4)
-                    }
-                };
+                    });
+                }
+                else
+                {
+                    eventik.EventMessages = new List<EventMessage>()
+                    {
+                        new EventMessage()
+                        {
+                            Message = "Bu vinkodu ozumuz databazadan silmishik, ona gore userlerin relationu silinib, " +
+                            "papkadan fayl silinib, papka qalib, Eventler galib.",
+                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                        }
+                    };
+                }
             }
 
             await _unitOfWork.CommitAsync();
@@ -88,6 +100,58 @@ namespace Vinyoxla.Service.Implementations
             {
                 File.Delete(path);
             }
+        }
+
+        public async Task<CheckVM> Check()
+        {
+            List<VinCodeGetVM> dbVincodes = _mapper.Map<List<VinCodeGetVM>>
+                (await _unitOfWork.VinCodeRepository.GetAllAsync());
+
+            CheckVM checkVM = new CheckVM()
+            {
+                AbsentCount = 0,
+                AbsentVincodes = new List<VinCodeGetVM>(),
+                OldCount = 0,
+                OldVincodes = new List<VinCodeGetVM>()
+            };
+
+            foreach (VinCodeGetVM dbVin in dbVincodes)
+            {
+                if ((DateTime.Now - dbVin.CreatedAt.Value).TotalDays >= 7)
+                {
+                    checkVM.OldVincodes.Add(dbVin);
+                    checkVM.OldCount++;
+                }
+
+                if (!await FileExists(dbVin.Vin, dbVin.FileName))
+                {
+                    checkVM.AbsentCount++;
+                    checkVM.AbsentVincodes.Add(dbVin);
+                }
+            }
+
+            return checkVM;
+        }
+
+        public async Task<bool> FileExists(string vin, string fileName)
+        {
+            string path = Path.Combine(_env.WebRootPath);
+
+            string[] folders = { "assets", "files", $"{vin}" };
+
+            foreach (string folder in folders)
+            {
+                path = Path.Combine(path, folder);
+            }
+
+            path = Path.Combine(path, fileName);
+
+            if (!File.Exists(path))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

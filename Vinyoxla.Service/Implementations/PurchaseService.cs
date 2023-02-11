@@ -9,11 +9,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Vinyoxla.Core;
 using Vinyoxla.Core.Models;
 using Vinyoxla.Service.Interfaces;
+using Vinyoxla.Service.ViewModels.BankVMs;
 using Vinyoxla.Service.ViewModels.PurchaseVMs;
 
 namespace Vinyoxla.Service.Implementations
@@ -52,28 +56,79 @@ namespace Vinyoxla.Service.Implementations
             return purchaseVM;
         }
 
-        public async Task<string> CheckEverything(string phone, string vin)
+        public async Task<string> CheckEverything(string phone, string vin, bool refund)
         {
-            //postaraysa sverit mojet tut ne nado daje proverat user online ili net, kjc eyni shey yazmisham e
-
             VinCode dbVin = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vin.Trim().ToUpperInvariant());
 
-            if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+            if (dbVin != null)
             {
-                if (dbVin != null)
+                if (await _unitOfWork.AppUserToVincodeRepository.IsExistAsync(x => x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == vin.Trim().ToUpperInvariant()))
                 {
-                    if (await _unitOfWork.AppUserToVincodeRepository.IsExistAsync(x => x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == vin.Trim().ToUpperInvariant()))
-                    {
-                        Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == dbVin.Vin, "EventMessages");
+                    Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == dbVin.Vin, "EventMessages");
 
-                        if (!((DateTime.Now - dbVin.CreatedAt.Value).TotalDays >= 7))
+                    if (!((DateTime.Now - dbVin.CreatedAt.Value).TotalDays >= 7))
+                    {
+                        if (await FileExists(dbVin.FileName))
                         {
-                            if (await FileExists(dbVin.FileName))
+                            if (refund)
                             {
                                 await Refund(phone);
+                            }
 
-                                #region Event handle
+                            #region Event handle
 
+                            if (userEvent == null)
+                            {
+                                #region user
+
+                                AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == "+994" + phone);
+
+                                AppUser newUser = new AppUser()
+                                {
+                                    UserName = "+994" + phone,
+                                    PhoneNumber = "+994" + phone,
+                                    PhoneNumberConfirmed = false,
+                                    Balance = 0,
+                                    IsAdmin = false,
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                };
+
+                                if (appUser == null)
+                                {
+                                    await _userManager.CreateAsync(newUser);
+                                    await _userManager.AddToRoleAsync(newUser, "Member");
+                                }
+
+                                #endregion
+
+                                Event newUserEvent = new Event()
+                                {
+                                    AppUser = appUser ?? newUser,
+                                    CreatedAt = DateTime.UtcNow.AddHours(4),
+                                    DidRefundToBalance = true,
+                                    ErrorWhileRenew = false,
+                                    ErrorWhileReplace = false,
+                                    FileExists = true,
+                                    IsApiError = false,
+                                    IsFromApi = false,
+                                    IsRenewedDueToAbsence = false,
+                                    IsRenewedDueToExpire = false,
+                                    Vin = vin,
+                                    EventMessages = new List<EventMessage>()
+                                    {
+                                         new EventMessage()
+                                         {
+                                             Message = "User oz vinkodunu yeniden axtardi, tapdi, yeniden baxir. " +
+                                             "Oz kabinetinnen de baxa bilerdi, amma nebilim e, burdan axtardi, pulu yene odedi deye eyni sheye gore, qaytardim",
+                                             CreatedAt = DateTime.UtcNow.AddHours(4)
+                                         }
+                                    }
+                                };
+
+                                await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                            }
+                            else
+                            {
                                 userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                                 userEvent.DidRefundToBalance = true;
 
@@ -85,149 +140,96 @@ namespace Vinyoxla.Service.Implementations
                                 userEvent.ErrorWhileRenew = false;
                                 userEvent.ErrorWhileReplace = false;
 
-                                userEvent.EventMessages.Add(new EventMessage()
+                                if (userEvent.EventMessages.Count > 0)
                                 {
-                                    Message = "User oz vinkodunu yeniden axtardi, tapdi, yeniden baxir. " +
-                                    "Oz kabinetinnen de baxa bilerdi, amma nebilim e, burdan axtardi, pulu yene odedi deye eyni sheye gore, qaytardim",
-                                    CreatedAt = DateTime.UtcNow.AddHours(4)
-                                });
-
-                                await _unitOfWork.CommitAsync();
-
-                                #endregion
-
-                                return dbVin.FileName;
-                            }
-                            else
-                            {
-                                if (await TryToFixAbsence(dbVin.Vin, dbVin.FileName))
-                                {
-                                    await Refund(phone);
-
-                                    #region Event handle
-
-                                    userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                                    userEvent.DidRefundToBalance = true;
-
-                                    userEvent.IsApiError = false;
-                                    userEvent.FileExists = true;
-                                    userEvent.IsFromApi = true;
-                                    userEvent.IsRenewedDueToExpire = false;
-                                    userEvent.IsRenewedDueToAbsence = true;
-                                    userEvent.ErrorWhileRenew = false;
-                                    userEvent.ErrorWhileReplace = false;
-
                                     userEvent.EventMessages.Add(new EventMessage()
                                     {
-                                        Message = "User oz vinkodunu yeniden axtardi, fayl tapilmadi. " +
-                                        "Mecburam yeniden alim onu, cunki pul odemishdi. Aldim, qaytardim, ve ikinci defe odediyi pulu qaytardim",
+                                        Message = "User oz vinkodunu yeniden axtardi, tapdi, yeniden baxir. " +
+                                        "Oz kabinetinnen de baxa bilerdi, amma nebilim e, burdan axtardi, pulu yene odedi deye eyni sheye gore, qaytardim",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     });
-
-                                    #endregion
-
-                                    dbVin.CreatedAt = DateTime.UtcNow.AddHours(4);
-
-                                    await _unitOfWork.CommitAsync();
-
-                                    return dbVin.FileName;
                                 }
                                 else
                                 {
-                                    await Refund(phone);
-                                    await Refund(phone);
-
-                                    AppUserToVincode appUserToVincode = await _unitOfWork.AppUserToVincodeRepository.GetAsync(x =>
-                                    x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == dbVin.Vin);
-
-                                    _unitOfWork.AppUserToVincodeRepository.Remove(appUserToVincode);
-
-                                    #region Event handle
-
-                                    userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                                    userEvent.DidRefundToBalance = true;
-
-                                    userEvent.IsApiError = true;
-                                    userEvent.FileExists = false;
-                                    userEvent.IsFromApi = true;
-                                    userEvent.IsRenewedDueToExpire = false;
-                                    userEvent.IsRenewedDueToAbsence = false;
-                                    userEvent.ErrorWhileRenew = false;
-                                    userEvent.ErrorWhileReplace = true;
-
-                                    userEvent.EventMessages.Add(new EventMessage()
+                                    userEvent.EventMessages = new List<EventMessage>()
                                     {
-                                        Message = "Userin vinkodunu gaytarmag isteyende gorduk ki " +
-                                        "report folderde yoxa cixib. Ona gore pulun qaytariram, ozude dvoynoy refund 8 manat (birinci defe ve indiki defe ucun), " +
-                                        "bu vinkod daha onun deyil. Negeder alir alsin error verenecen relation olamayacag",
-                                        CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    });
-
-                                    #endregion
-
-                                    await _unitOfWork.CommitAsync();
-
-                                    return "0";
+                                        new EventMessage()
+                                        {
+                                           Message = "User oz vinkodunu yeniden axtardi, tapdi, yeniden baxir. " +
+                                            "Oz kabinetinnen de baxa bilerdi, amma nebilim e, burdan axtardi, pulu yene odedi deye eyni sheye gore, qaytardim",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
+                                    };
                                 }
                             }
+
+                            #endregion
+
+                            return dbVin.FileName;
                         }
                         else
                         {
-                            return "1";
-                        }
-                    }
-                }
-
-                return "2";
-            }
-            else
-            {
-                if (dbVin != null)
-                {
-                    if (await _unitOfWork.AppUserToVincodeRepository.IsExistAsync(x => x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == vin.Trim().ToUpperInvariant()))
-                    {
-                        Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == dbVin.Vin, "EventMessages");
-
-                        if (!((DateTime.Now - dbVin.CreatedAt.Value).TotalDays >= 7))
-                        {
-                            if (await FileExists(dbVin.FileName))
+                            if (await TryToFixAbsence(dbVin.Vin, dbVin.FileName))
                             {
-                                await Refund(phone);
+                                if (refund)
+                                {
+                                    await Refund(phone);
+                                }
 
                                 #region Event handle
 
-                                userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                                userEvent.DidRefundToBalance = true;
-
-                                userEvent.IsApiError = false;
-                                userEvent.FileExists = true;
-                                userEvent.IsFromApi = false;
-                                userEvent.IsRenewedDueToExpire = false;
-                                userEvent.IsRenewedDueToAbsence = false;
-                                userEvent.ErrorWhileRenew = false;
-                                userEvent.ErrorWhileReplace = false;
-
-                                userEvent.EventMessages.Add(new EventMessage()
+                                if (userEvent == null)
                                 {
-                                    Message = "User oz vinkodunu yeniden axtardi, tapdi, yeniden baxir. " +
-                                    "Oz kabinetinnen de baxa bilerdi, amma nebilim e, burdan axtardi, pulu yene odedi deye eyni sheye gore, qaytardim",
-                                    CreatedAt = DateTime.UtcNow.AddHours(4)
-                                });
+                                    #region user
 
-                                await _unitOfWork.CommitAsync();
+                                    AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == "+994" + phone);
 
-                                #endregion
+                                    AppUser newUser = new AppUser()
+                                    {
+                                        UserName = "+994" + phone,
+                                        PhoneNumber = "+994" + phone,
+                                        PhoneNumberConfirmed = false,
+                                        Balance = 0,
+                                        IsAdmin = false,
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    };
 
-                                return dbVin.FileName;
-                            }
-                            else
-                            {
-                                if (await TryToFixAbsence(dbVin.Vin, dbVin.FileName))
+                                    if (appUser == null)
+                                    {
+                                        await _userManager.CreateAsync(newUser);
+                                        await _userManager.AddToRoleAsync(newUser, "Member");
+                                    }
+
+                                    #endregion
+
+                                    Event newUserEvent = new Event()
+                                    {
+                                        AppUser = appUser ?? newUser,
+                                        CreatedAt = DateTime.UtcNow.AddHours(4),
+                                        DidRefundToBalance = true,
+                                        ErrorWhileRenew = false,
+                                        ErrorWhileReplace = false,
+                                        FileExists = true,
+                                        IsApiError = false,
+                                        IsFromApi = true,
+                                        IsRenewedDueToAbsence = true,
+                                        IsRenewedDueToExpire = false,
+                                        Vin = vin,
+                                        EventMessages = new List<EventMessage>()
+                                        {
+                                             new EventMessage()
+                                             {
+                                                 Message = "User oz vinkodunu yeniden axtardi, fayl tapilmadi. " +
+                                                 "Mecburam yeniden alim onu, cunki pul odemishdi. Aldim, qaytardim, ve ikinci defe odediyi pulu qaytardim",
+                                                 CreatedAt = DateTime.UtcNow.AddHours(4)
+                                             }
+                                        }
+                                    };
+
+                                    await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                                }
+                                else
                                 {
-                                    await Refund(phone);
-
-                                    #region Event handle
-
                                     userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                                     userEvent.DidRefundToBalance = true;
 
@@ -239,33 +241,100 @@ namespace Vinyoxla.Service.Implementations
                                     userEvent.ErrorWhileRenew = false;
                                     userEvent.ErrorWhileReplace = false;
 
-                                    userEvent.EventMessages.Add(new EventMessage()
+                                    if (userEvent.EventMessages.Count > 0)
                                     {
-                                        Message = "User oz vinkodunu yeniden axtardi, fayl tapilmadi. " +
-                                        "Mecburam yeniden alim onu, cunki pul odemishdi. Aldim, qaytardim, ve ikinci defe odediyi pulu qaytardim",
+                                        userEvent.EventMessages.Add(new EventMessage()
+                                        {
+                                            Message = "User oz vinkodunu yeniden axtardi, fayl tapilmadi. " +
+                                            "Mecburam yeniden alim onu, cunki pul odemishdi. Aldim, qaytardim, ve ikinci defe odediyi pulu qaytardim",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        });
+                                    }
+                                    else
+                                    {
+                                        userEvent.EventMessages = new List<EventMessage>()
+                                        {
+                                            new EventMessage()
+                                            {
+                                                Message = "User oz vinkodunu yeniden axtardi, fayl tapilmadi. " +
+                                                "Mecburam yeniden alim onu, cunki pul odemishdi. Aldim, qaytardim, ve ikinci defe odediyi pulu qaytardim",
+                                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                                            }
+                                        };
+                                    }
+                                }
+
+                                #endregion
+
+                                dbVin.CreatedAt = DateTime.UtcNow.AddHours(4);
+
+                                await _unitOfWork.CommitAsync();
+
+                                return dbVin.FileName;
+                            }
+                            else
+                            {
+                                await Refund(phone);
+
+                                AppUserToVincode appUserToVincode = await _unitOfWork.AppUserToVincodeRepository.GetAsync(x =>
+                                x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == dbVin.Vin);
+
+                                _unitOfWork.AppUserToVincodeRepository.Remove(appUserToVincode);
+
+                                #region Event handle
+
+                                if (userEvent == null)
+                                {
+                                    #region user
+
+                                    AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == "+994" + phone);
+
+                                    AppUser newUser = new AppUser()
+                                    {
+                                        UserName = "+994" + phone,
+                                        PhoneNumber = "+994" + phone,
+                                        PhoneNumberConfirmed = false,
+                                        Balance = 0,
+                                        IsAdmin = false,
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    });
+                                    };
+
+                                    if (appUser == null)
+                                    {
+                                        await _userManager.CreateAsync(newUser);
+                                        await _userManager.AddToRoleAsync(newUser, "Member");
+                                    }
 
                                     #endregion
 
-                                    dbVin.CreatedAt = DateTime.UtcNow.AddHours(4);
+                                    Event newUserEvent = new Event()
+                                    {
+                                        AppUser = appUser ?? newUser,
+                                        CreatedAt = DateTime.UtcNow.AddHours(4),
+                                        DidRefundToBalance = true,
+                                        ErrorWhileRenew = false,
+                                        ErrorWhileReplace = true,
+                                        FileExists = false,
+                                        IsApiError = true,
+                                        IsFromApi = true,
+                                        IsRenewedDueToAbsence = false,
+                                        IsRenewedDueToExpire = false,
+                                        Vin = vin,
+                                        EventMessages = new List<EventMessage>()
+                                        {
+                                             new EventMessage()
+                                             {
+                                                 Message = "Userin hacansa aldigi vinkodu getirmek istedik, getire bilmedik, cunki papkada yoxdu ve API error verdi. " +
+                                                 "Refund etdik. Relationu sildik, cunki papkada yoxdu ve ala bilmirik.",
+                                                 CreatedAt = DateTime.UtcNow.AddHours(4)
+                                             }
+                                        }
+                                    };
 
-                                    await _unitOfWork.CommitAsync();
-
-                                    return dbVin.FileName;
+                                    await _unitOfWork.EventRepository.AddAsync(newUserEvent);
                                 }
                                 else
                                 {
-                                    await Refund(phone);
-                                    await Refund(phone);
-
-                                    AppUserToVincode appUserToVincode = await _unitOfWork.AppUserToVincodeRepository.GetAsync(x =>
-                                    x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == dbVin.Vin);
-
-                                    _unitOfWork.AppUserToVincodeRepository.Remove(appUserToVincode);
-
-                                    #region Event handle
-
                                     userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                                     userEvent.DidRefundToBalance = true;
 
@@ -277,31 +346,45 @@ namespace Vinyoxla.Service.Implementations
                                     userEvent.ErrorWhileRenew = false;
                                     userEvent.ErrorWhileReplace = true;
 
-                                    userEvent.EventMessages.Add(new EventMessage()
+                                    if (userEvent.EventMessages.Count > 0)
                                     {
-                                        Message = "Userin vinkodunu gaytarmag isteyende gorduk ki " +
-                                        "report folderde yoxa cixib. Ona gore pulun qaytariram, ozude dvoynoy refund 8 manat (birinci defe ve indiki defe ucun), " +
-                                        "bu vinkod daha onun deyil. Negeder alir alsin error verenecen relation olamayacag",
-                                        CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    });
-
-                                    #endregion
-
-                                    await _unitOfWork.CommitAsync();
-
-                                    return "0";
+                                        userEvent.EventMessages.Add(new EventMessage()
+                                        {
+                                            Message = "Userin hacansa aldigi vinkodu getirmek istedik, getire bilmedik, cunki papkada yoxdu ve API error verdi. " +
+                                            "Refund etdik. Relationu sildik, cunki papkada yoxdu ve ala bilmirik.",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        });
+                                    }
+                                    else
+                                    {
+                                        userEvent.EventMessages = new List<EventMessage>()
+                                        {
+                                            new EventMessage()
+                                            {
+                                                Message = "Userin hacansa aldigi vinkodu getirmek istedik, getire bilmedik, cunki papkada yoxdu ve API error verdi. " +
+                                                "Refund etdik. Relationu sildik, cunki papkada yoxdu ve ala bilmirik.",
+                                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                                            }
+                                        };
+                                    }
                                 }
+
+                                #endregion
+
+                                await _unitOfWork.CommitAsync();
+
+                                return "0";
                             }
                         }
-                        else
-                        {
-                            return "1";
-                        }
+                    }
+                    else
+                    {
+                        return "1";
                     }
                 }
-
-                return "2";
             }
+
+            return "2";
         }
 
         public async Task<bool> FileExists(string fileName)
@@ -328,7 +411,7 @@ namespace Vinyoxla.Service.Implementations
             return false;
         }
 
-        public async Task<string> ReplaceOldReport(string phone, string vin, bool isFromBalance)
+        public async Task<string> ReplaceOldReport(string phone, string vin, bool isFromBalance, string orderId, string sessionId)
         {
             VinCode vinCode = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vin.Trim().ToUpperInvariant());
 
@@ -394,11 +477,26 @@ namespace Vinyoxla.Service.Implementations
                     userEvent.IsRenewedDueToAbsence = false;
                     userEvent.ErrorWhileRenew = false;
                     userEvent.ErrorWhileReplace = false;
-                    userEvent.EventMessages.Add(new EventMessage()
+
+                    if (userEvent.EventMessages.Count > 0)
                     {
-                        Message = "User onda olan vinkodu yeniden alir, reportun 7si cixib, ona gore tezeden alirig",
-                        CreatedAt = DateTime.UtcNow.AddHours(4)
-                    });
+                        userEvent.EventMessages.Add(new EventMessage()
+                        {
+                            Message = "User onda olan vinkodu yeniden alir, reportun 7si cixib, ona gore tezeden alirig",
+                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                        });
+                    }
+                    else
+                    {
+                        userEvent.EventMessages = new List<EventMessage>()
+                        {
+                            new EventMessage()
+                            {
+                                Message = "User onda olan vinkodu yeniden alir, reportun 7si cixib, ona gore tezeden alirig",
+                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                            }
+                        };
+                    }
                 }
 
                 #endregion
@@ -409,7 +507,8 @@ namespace Vinyoxla.Service.Implementations
                 {
                     Amount = 4,
                     AppUser = appUser,
-                    Code = "nese",
+                    OrderId = orderId,
+                    SessionId = sessionId,
                     CreatedAt = DateTime.UtcNow.AddHours(4),
                     IsFromBalance = isFromBalance,
                     IsTopUp = false,
@@ -447,14 +546,14 @@ namespace Vinyoxla.Service.Implementations
                     IsRenewedDueToExpire = false,
                     Vin = vin,
                     EventMessages = new List<EventMessage>()
+                    {
+                        new EventMessage()
                         {
-                             new EventMessage()
-                             {
-                                 Message = "User kohne reportunu yenilemek istedi, api error verdi, ona gore refund edirik cunki odenish edib indice. " +
-                                 "Kohne report var amma assets de. Axtarsin, alsin, error olsa refundunu alsin, negeder isteyir.",
-                                 CreatedAt = DateTime.UtcNow.AddHours(4)
-                             }
+                            Message = "User kohne reportunu yenilemek istedi, api error verdi, ona gore refund edirik cunki odenish edib indice. " +
+                            "Kohne report var amma assets de. Axtarsin, alsin, error olsa refundunu alsin, negeder isteyir.",
+                            CreatedAt = DateTime.UtcNow.AddHours(4)
                         }
+                    }
                 };
 
                 await _unitOfWork.EventRepository.AddAsync(newUserEvent);
@@ -470,12 +569,28 @@ namespace Vinyoxla.Service.Implementations
                 userEvent.IsRenewedDueToAbsence = false;
                 userEvent.ErrorWhileRenew = true;
                 userEvent.ErrorWhileReplace = false;
-                userEvent.EventMessages.Add(new EventMessage()
+
+                if (userEvent.EventMessages.Count > 0)
                 {
-                    Message = "User kohne reportunu yenilemek istedi, api error verdi, ona gore refund edirik cunki odenish edib indice. " +
-                    "Kohne report var amma assets de. Axtarsin, alsin, error olsa refundunu alsin, negeder isteyir.",
-                    CreatedAt = DateTime.UtcNow.AddHours(4)
-                });
+                    userEvent.EventMessages.Add(new EventMessage()
+                    {
+                        Message = "User kohne reportunu yenilemek istedi, api error verdi, ona gore refund edirik cunki odenish edib indice. " +
+                        "Kohne report var amma assets de. Axtarsin, alsin, error olsa refundunu alsin, negeder isteyir.",
+                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                    });
+                }
+                else
+                {
+                    userEvent.EventMessages = new List<EventMessage>()
+                    {
+                        new EventMessage()
+                        {
+                            Message = "User kohne reportunu yenilemek istedi, api error verdi, ona gore refund edirik cunki odenish edib indice. " +
+                            "Kohne report var amma assets de. Axtarsin, alsin, error olsa refundunu alsin, negeder isteyir.",
+                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                        }
+                    };
+                }
             }
 
             #endregion
@@ -485,7 +600,7 @@ namespace Vinyoxla.Service.Implementations
             return null;
         }
 
-        public async Task<string> GetReport(string phone, string vin, bool isFromBalance)
+        public async Task<string> GetReport(string phone, string vin, bool isFromBalance, string orderId, string sessionId)
         {
             VinCode dbVin = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Vin == vin.ToUpperInvariant().Trim());
 
@@ -515,7 +630,8 @@ namespace Vinyoxla.Service.Implementations
                 Amount = 4,
                 PaymentIsSuccessful = true,
                 CreatedAt = DateTime.UtcNow.AddHours(4),
-                Code = "nese",
+                OrderId = orderId,
+                SessionId = sessionId,
                 IsTopUp = false,
                 IsFromBalance = isFromBalance
             };
@@ -575,14 +691,26 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromApi = false;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = false;
-                            userEvent.EventMessages = new List<EventMessage>()
+
+                            if (userEvent.EventMessages.Count > 0)
                             {
-                                new EventMessage()
+                                userEvent.EventMessages.Add(new EventMessage()
                                 {
                                     Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
-                                }
-                            };
+                                });
+                            }
+                            else
+                            {
+                                userEvent.EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                };
+                            }
                         }
 
                         #endregion
@@ -641,15 +769,28 @@ namespace Vinyoxla.Service.Implementations
                                 userEvent.IsFromApi = true;
                                 userEvent.IsRenewedDueToAbsence = true;
                                 userEvent.IsRenewedDueToExpire = false;
-                                userEvent.EventMessages = new List<EventMessage>()
+
+                                if (userEvent.EventMessages.Count > 0)
                                 {
-                                    new EventMessage()
+                                    userEvent.EventMessages.Add(new EventMessage()
                                     {
                                         Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
                                         "Pul odeyib deye yari yolda goymadig, getdik aldig reportu",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    }
-                                };
+                                    });
+                                }
+                                else
+                                {
+                                    userEvent.EventMessages = new List<EventMessage>()
+                                    {
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
+                                            "Pul odeyib deye yari yolda goymadig, getdik aldig reportu",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
+                                    };
+                                }
                             }
 
                             #endregion
@@ -705,16 +846,30 @@ namespace Vinyoxla.Service.Implementations
                                 userEvent.IsFromApi = true;
                                 userEvent.IsRenewedDueToAbsence = false;
                                 userEvent.IsRenewedDueToExpire = false;
-                                userEvent.EventMessages = new List<EventMessage>()
+
+                                if (userEvent.EventMessages.Count > 0)
                                 {
-                                    new EventMessage()
+                                    userEvent.EventMessages.Add(new EventMessage()
                                     {
                                         Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
                                         "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
                                         "Ona gore event yarandi, relation ise yox. Pulunu da qaytardig",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    }
-                                };
+                                    });
+                                }
+                                else
+                                {
+                                    userEvent.EventMessages = new List<EventMessage>()
+                                    {
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
+                                            "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
+                                            "Ona gore event yarandi, relation ise yox. Pulunu da qaytardig",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
+                                    };
+                                }
                             }
 
                             #endregion
@@ -774,15 +929,28 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromApi = true;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = true;
-                            userEvent.EventMessages = new List<EventMessage>()
+
+                            if (userEvent.EventMessages.Count > 0)
                             {
-                                new EventMessage()
+                                userEvent.EventMessages.Add(new EventMessage()
                                 {
                                     Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
                                     "Yari yolda qoymayag deye getdik reportu yeniledik, pul odeyib axi.",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
-                                }
-                            };
+                                });
+                            }
+                            else
+                            {
+                                userEvent.EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
+                                        "Yari yolda qoymayag deye getdik reportu yeniledik, pul odeyib axi.",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                };
+                            }
                         }
 
                         #endregion
@@ -838,15 +1006,28 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromApi = true;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = false;
-                            userEvent.EventMessages = new List<EventMessage>()
+
+                            if (userEvent.EventMessages.Count > 0)
                             {
-                                new EventMessage()
+                                userEvent.EventMessages.Add(new EventMessage()
                                 {
                                     Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
                                     "Yeniliye bilmedik, ona gore pulun gaytardig, dedik birazdan yene yoxla.",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
-                                }
-                            };
+                                });
+                            }
+                            else
+                            {
+                                userEvent.EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
+                                        "Yeniliye bilmedik, ona gore pulun gaytardig, dedik birazdan yene yoxla.",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                };
+                            }
                         }
 
                         #endregion
@@ -921,14 +1102,26 @@ namespace Vinyoxla.Service.Implementations
                         userEvent.IsFromApi = true;
                         userEvent.IsRenewedDueToAbsence = false;
                         userEvent.IsRenewedDueToExpire = false;
-                        userEvent.EventMessages = new List<EventMessage>()
+
+                        if (userEvent.EventMessages.Count > 0)
                         {
-                            new EventMessage()
+                            userEvent.EventMessages.Add(new EventMessage()
                             {
                                 Message = "report yox idi, yaratdig yenisini, relation gurdug",
                                 CreatedAt = DateTime.UtcNow.AddHours(4)
-                            }
-                        };
+                            });
+                        }
+                        else
+                        {
+                            userEvent.EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "report yox idi, yaratdig yenisini, relation gurdug",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            };
+                        }
                     }
 
                     #endregion
@@ -983,14 +1176,26 @@ namespace Vinyoxla.Service.Implementations
                         userEvent.IsFromApi = true;
                         userEvent.IsRenewedDueToAbsence = false;
                         userEvent.IsRenewedDueToExpire = false;
-                        userEvent.EventMessages = new List<EventMessage>()
+
+                        if (userEvent.EventMessages.Count > 0)
                         {
-                            new EventMessage()
+                            userEvent.EventMessages.Add(new EventMessage()
                             {
                                 Message = "User yeni report almag istedi, ala bilmedi, cunki api error verdi. Pulun qaytardig",
                                 CreatedAt = DateTime.UtcNow.AddHours(4)
-                            }
-                        };
+                            });
+                        }
+                        else
+                        {
+                            userEvent.EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "User yeni report almag istedi, ala bilmedi, cunki api error verdi. Pulun qaytardig",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            };
+                        }
                     }
 
                     #endregion
@@ -1119,6 +1324,281 @@ namespace Vinyoxla.Service.Implementations
             appUser.Balance -= 4;
 
             await _userManager.UpdateAsync(appUser);
+        }
+
+        public async Task<ReturnVM> Bank(string vin, string phoneno)
+        {
+            string url = $"https://tstpg.kapitalbank.az:5443/Exec";
+
+            string xml =
+                "<TKKPG>" +
+                    "<Request>" +
+                        "<Operation>CreateOrder</Operation>" +
+                        "<Language>AZ</Language>" +
+                        "<Order>" +
+                            "<OrderType>Purchase</OrderType>" +
+                            "<Merchant>E1000010</Merchant>" +
+                            "<Amount>400</Amount>" +
+                            "<Currency>944</Currency>" +
+                            $"<Description>{vin} vin / +994{phoneno} user / 4 azn</Description>" +
+                            $"<ApproveURL>https://vinyoxla.az/about</ApproveURL>" +
+                            "<CancelURL>vinyoxla.az/cancel</CancelURL>" +
+                            "<DeclineURL>vinyoxla.az/decline</DeclineURL>" +
+                        "</Order>" +
+                    "</Request>" +
+                "</TKKPG>";
+
+            //https://vinyoxla.az/Purchase/GetReport?vin={vin}&phoneno={phoneno}
+            //https://vinyoxla.az/Purchase/GetReport
+            //https://vinyoxla.az/Purchase/Error?errno=10
+
+            #region crt key
+
+            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
+            byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
+
+            using RSA rsa = RSA.Create();
+            rsa.ImportPkcs8PrivateKey(PrivateKey, out _);
+
+            X509Certificate2 publicCertificate = new X509Certificate2(PublicCertificate);
+            publicCertificate = publicCertificate.CopyWithPrivateKey(rsa);
+            publicCertificate = new X509Certificate2(publicCertificate.Export(X509ContentType.Pkcs12));
+
+            HttpClientHandler handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            handler.ClientCertificates.Add(new X509Certificate2(PublicCertificate));
+            handler.ClientCertificates.Add(new X509Certificate2(publicCertificate));
+
+            StringContent content = new StringContent(xml);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml");
+
+            HttpResponseMessage response = null;
+
+            TKKPG tkkpg = new TKKPG();
+
+            using (HttpClient client = new HttpClient(handler))
+            {
+                response = await client.PostAsync(url, content);
+            }
+
+            #endregion
+
+            /*
+             Production Endpoint – https://3dsrv.kapitalbank.az:5443/Exec
+
+             Ödəniş səhifəsinin linki - https://3dsrv.kapitalbank.az/index.jsp?orderid=$&sessionid=$
+             */
+
+            if (response.IsSuccessStatusCode)
+            {
+                string result = await response.Content.ReadAsStringAsync();
+
+                XmlSerializer ser = new XmlSerializer(typeof(TKKPG));
+
+                using (StringReader sr = new StringReader(result))
+                {
+                    tkkpg = (TKKPG)ser.Deserialize(sr);
+                }
+
+                if (tkkpg.Response.Status == "00")
+                {
+                    string newUrl = tkkpg.Response.Order.URL
+                        + "?ORDERID=" + tkkpg.Response.Order.OrderID
+                        + "&SESSIONID=" + tkkpg.Response.Order.SessionID;
+
+                    ReturnVM returnVM = new ReturnVM()
+                    {
+                        OrderId = tkkpg.Response.Order.OrderID,
+                        SessionId = tkkpg.Response.Order.SessionID,
+                        Url = newUrl
+                    };
+
+                    return returnVM;
+                }
+            }
+
+            return null;
+        }
+
+        public async Task<bool> CheckOrder(string orderid, string sessionId, string phone, string vin)
+        {
+            string url = $"https://tstpg.kapitalbank.az:5443/Exec";
+
+            string xml =
+                "<TKKPG>" +
+                    "<Request>" +
+                        "<Operation>GetOrderStatus</Operation>" +
+                        "<Language>AZ</Language>" +
+                        "<Order>" +
+                            "<Merchant>E1000010</Merchant>" +
+                            $"<OrderID>{orderid}</OrderID>" +
+                        "</Order>" +
+                        $"<SessionID>{sessionId}</SessionID>" +
+                    "</Request>" +
+                "</TKKPG>";
+
+            #region crt key
+
+            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
+            byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
+
+            using RSA rsa = RSA.Create();
+            rsa.ImportPkcs8PrivateKey(PrivateKey, out _);
+
+            X509Certificate2 publicCertificate = new X509Certificate2(PublicCertificate);
+            publicCertificate = publicCertificate.CopyWithPrivateKey(rsa);
+            publicCertificate = new X509Certificate2(publicCertificate.Export(X509ContentType.Pkcs12));
+
+            HttpClientHandler handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            handler.ClientCertificates.Add(new X509Certificate2(PublicCertificate));
+            handler.ClientCertificates.Add(new X509Certificate2(publicCertificate));
+
+            StringContent content = new StringContent(xml);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml");
+
+            HttpResponseMessage response = null;
+
+            TKKPG tkkpg = new TKKPG();
+
+            using (HttpClient client = new HttpClient(handler))
+            {
+                response = await client.PostAsync(url, content);
+            }
+
+            #endregion
+
+            if (response.IsSuccessStatusCode)
+            {
+                string result = await response.Content.ReadAsStringAsync();
+
+                XmlSerializer ser = new XmlSerializer(typeof(TKKPG));
+
+                using (StringReader sr = new StringReader(result))
+                {
+                    tkkpg = (TKKPG)ser.Deserialize(sr);
+                }
+
+                if (tkkpg.Response.Status == "00" && tkkpg.Response.Order.OrderStatus == "APPROVED")
+                {
+                    return true;
+                }
+                else
+                {
+                    AppUser appUser = null;
+
+                    if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                    {
+                        appUser = await _userManager.FindByNameAsync(_httpContextAccessor.HttpContext.User.Identity.Name);
+                    }
+
+                    AppUser newUser = new AppUser()
+                    {
+                        UserName = "+994" + phone,
+                        PhoneNumber = "+994" + phone,
+                        PhoneNumberConfirmed = false,
+                        Balance = 0,
+                        IsAdmin = false,
+                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                    };
+
+                    if (appUser == null)
+                    {
+                        await _userManager.CreateAsync(newUser);
+                        await _userManager.AddToRoleAsync(newUser, "Member");
+                    }
+
+                    Transaction transaction = new Transaction()
+                    {
+                        AppUser = appUser ?? newUser,
+                        Amount = 4,
+                        CreatedAt = DateTime.UtcNow.AddHours(4),
+                        IsFromBalance = false,
+                        IsTopUp = false,
+                        OrderId = orderid,
+                        SessionId = sessionId,
+                        PaymentIsSuccessful = false
+                    };
+
+                    Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == vin.Trim().ToUpperInvariant());
+
+                    #region Event handle
+
+                    if (userEvent == null)
+                    {
+                        Event newUserEvent = new Event()
+                        {
+                            AppUser = appUser ?? newUser,
+                            CreatedAt = DateTime.UtcNow.AddHours(4),
+                            IsFromApi = false,
+                            IsApiError = false,
+                            DidRefundToBalance = false,
+                            ErrorWhileRenew = false,
+                            ErrorWhileReplace = false,
+                            FileExists = false,
+                            IsRenewedDueToAbsence = false,
+                            IsRenewedDueToExpire = false,
+                            Vin = vin,
+                            EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "user sistemi qirmag istedi, pulu odemeyib vinkodu almag istedi, cehdine son goydug, akkaunt yaratdig, " +
+                                    "event yaratdig, getsin garnin gashisin",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            }
+                        };
+
+                        await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                    }
+                    else
+                    {
+                        userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                        userEvent.DidRefundToBalance = false;
+                        userEvent.IsApiError = false;
+                        userEvent.FileExists = false;
+                        userEvent.IsFromApi = false;
+                        userEvent.IsRenewedDueToExpire = false;
+                        userEvent.IsRenewedDueToAbsence = false;
+                        userEvent.ErrorWhileRenew = false;
+                        userEvent.ErrorWhileReplace = false;
+
+                        if (userEvent.EventMessages.Count > 0)
+                        {
+                            userEvent.EventMessages.Add(new EventMessage()
+                            {
+                                Message = "user sistemi qirmag istedi, pulu odemeyib vinkodu almag istedi, cehdine son goydug, akkaunt yaratdig, " +
+                                "event yaratdig, getsin garnin gashisin",
+                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                            });
+                        }
+                        else
+                        {
+                            userEvent.EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "user sistemi qirmag istedi, pulu odemeyib vinkodu almag istedi, cehdine son goydug, akkaunt yaratdig, " +
+                                    "event yaratdig, getsin garnin gashisin",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            };
+                        }
+                    }
+
+                    #endregion
+
+                    //ya tut delal vsakie veshi, proverit nado vse offfff
+
+                    await _unitOfWork.TransactionRepository.AddAsync(transaction);
+                    await _unitOfWork.CommitAsync();
+                }
+
+                return false;
+            }
+
+            return false;
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Vinyoxla.Service.ViewModels.AccountVMs;
+using Vinyoxla.Service.ViewModels.UserVMs;
 
 namespace Vinyoxla.Service.ViewModels.TransactionVMs
 {
@@ -9,11 +7,12 @@ namespace Vinyoxla.Service.ViewModels.TransactionVMs
     {
         public int Id { get; set; }
         public Nullable<DateTime> CreatedAt { get; set; }
-        public string Code { get; set; }
         public bool PaymentIsSuccessful { get; set; }
         public bool IsTopUp { get; set; }
         public int Amount { get; set; }
         public bool IsFromBalance { get; set; }
+        public string SessionId { get; set; }
+        public string OrderId { get; set; }
 
 
         //relation

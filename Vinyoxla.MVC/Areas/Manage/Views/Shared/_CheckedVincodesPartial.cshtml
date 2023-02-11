@@ -1,0 +1,20 @@
+﻿@model CheckVM
+
+<div class="col-lg-6 col-6">
+    <p>Old: @Model.OldCount pcs.</p>
+    <ul class="col-lg-12 col-12">
+        @foreach (var old in Model.OldVincodes)
+        {
+            <li>@old.Vin</li>
+        }
+    </ul>
+</div>
+<div class="col-lg-6 col-6">
+    <p>Absent: @Model.AbsentCount pcs.</p>
+    <ul class="col-lg-12 col-12">
+        @foreach (var absent in Model.AbsentVincodes)
+        {
+            <li>@absent.Vin</li>
+        }
+    </ul>
+</div>

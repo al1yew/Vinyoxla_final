@@ -39,6 +39,7 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
         public async Task<IActionResult> Delete(int? id, string vin, int select, int page)
         {
             ViewBag.Select = select;
+            ViewBag.Vin = vin;
             ViewBag.Page = page;
             ViewBag.WhereWeAre = "Vincodes";
 
@@ -47,6 +48,13 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
             IQueryable<VinCodeGetVM> vinCodes = await _adminVincodeService.GetAllAsync(vin);
 
             return PartialView("_VincodeIndexPartial", PaginationList<VinCodeGetVM>.Create(vinCodes, page, select));
+        }
+
+        public async Task<IActionResult> Check()
+        {
+            CheckVM checkVM = await _adminVincodeService.Check();
+
+            return PartialView("_CheckedVincodesPartial", checkVM);
         }
     }
 }

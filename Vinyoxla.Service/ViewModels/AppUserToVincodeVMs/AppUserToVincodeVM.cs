@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Vinyoxla.Service.ViewModels.AccountVMs;
+using Vinyoxla.Service.ViewModels.UserVMs;
 using Vinyoxla.Service.ViewModels.VinCodeVMs;
 
 namespace Vinyoxla.Service.ViewModels.AppUserToVincodeVMs

@@ -339,10 +339,6 @@ namespace Vinyoxla.Data.Migrations
                     b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("CreatedAt")
                         .IsRequired()
                         .HasColumnType("datetime2");
@@ -353,8 +349,16 @@ namespace Vinyoxla.Data.Migrations
                     b.Property<bool>("IsTopUp")
                         .HasColumnType("bit");
 
+                    b.Property<string>("OrderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("PaymentIsSuccessful")
                         .HasColumnType("bit");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

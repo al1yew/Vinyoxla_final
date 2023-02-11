@@ -1,0 +1,53 @@
+﻿@model int
+
+<main id="successmain">
+    <div class="container">
+        <div class="row all">
+            @if (Model == 0)
+            {
+                <p style="color: red">
+                    Error 0. <br> Hörmətli istifadəçi.
+                    <br> Axtardığınız VinKod sizin kabinetinizdə mövcud idi.
+                    <br> Təəssüf ki, serverimizdəki xətaya görə fayl tapılmadı.
+                    <br> Həmin Report üçün ödədiyiniz 4 ₼ balansınıza köçürüldü.
+                    <br> Bizimlə hər zaman əlaqə saxlaya bilərsiniz.
+                    <br> <a href="tel:+994515555557">+994 51 555 55 57</a>
+                    <br> və ya
+                    <br> <a target="_blank" href="https://wa.me/+994515555557"><i style="font-size: 30px; color: green; " class="fa-brands fa-whatsapp"></i></a>
+                </p>
+            }
+            else if (Model == 1)
+            {
+                <p style="color: red">
+                    Error 1. <br> Hörmətli istifadəçi.
+                    <br> Reportu yeniləyincə serverdə xəta baş verdi.
+                    <br> Ödədiyiniz 4 ₼ balansınıza köçürüldü.
+                    <br> Köhnə reporta kabinetinizdən baxa bilərsiniz.
+                    <br> Yenisini əldə etmək üçün biraz sonra təkrar edin.
+                    <br> Bizimlə hər zaman əlaqə saxlaya bilərsiniz.
+                    <br> <a href="tel:+994515555557">+994 51 555 55 57</a>
+                    <br> və ya
+                    <br> <a target="_blank" href="https://wa.me/+994515555557"><i style="font-size: 30px; color: green; " class="fa-brands fa-whatsapp"></i></a>
+                </p>
+            }
+            else if (Model == 2)
+            {
+                <p style="color: red">
+                    Error 2. <br> Hörmətli istifadəçi.
+                    <br> Serverdə xəta baş verdi.
+                    <br> Ödədiyiniz 4 ₼ balansınıza köçürüldü.
+                    <br> Bizimlə hər zaman əlaqə <br> saxlaya bilərsiniz.
+                    <br>  <a href="tel:+994515555557">+994 51 555 55 57</a>
+                    <br> və ya
+                    <br>  <a target="_blank" href="https://wa.me/+994515555557"><i style="font-size: 30px; color: green; " class="fa-brands fa-whatsapp"></i></a>
+                </p>
+            }
+            else if (Model == 10)
+            {
+                <p style="color: red">
+                    Sizin Ödənişiniz qəbul olunmadı. <br> <a asp-controller="Home" asp-action="Index">Bir daha cəhd edin.</a>
+                </p>
+            }
+        </div>
+    </div>
+</main>

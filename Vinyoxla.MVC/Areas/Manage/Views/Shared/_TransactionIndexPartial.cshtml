@@ -1,0 +1,52 @@
+﻿@model PaginationList<TransactionGetVM>
+
+@{
+    int no = Model.ItemsCount * (Model.Page - 1);
+}
+
+<style>
+    td {
+        letter-spacing: 1.2px;
+        text-align: center;
+        font-size: 14px;
+        padding: 4px !important;
+    }
+
+    th {
+        padding: 4px !important;
+        text-align: center;
+    }
+</style>
+
+<table class="table table-bordered table-striped tblContent">
+    <thead>
+        <tr>
+            <th class="col-lg-1 col-1 text-wrap">№</th>
+            <th class="col-lg-1 col-1 text-wrap">Created At</th>
+            <th class="col-lg-1 col-1 text-wrap">Order Id</th>
+            <th class="col-lg-1 col-1 text-wrap">Session Id</th>
+            <th class="col-lg-1 col-1 text-wrap">Successful?</th>
+            <th class="col-lg-1 col-1 text-wrap">TopUp?</th>
+            <th class="col-lg-1 col-1 text-wrap">FromBalance?</th>
+            <th class="col-lg-1 col-1 text-wrap">Amount</th>
+            <th class="col-lg-1 col-1 text-wrap">User Phone</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (TransactionGetVM transaction in Model)
+        {
+            no++;
+            <tr>
+                <td class="col-lg-1 col-1 text-wrap">@no</td>
+                <td class="col-lg-1 col-1 text-wrap">@transaction.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td class="col-lg-1 col-1 text-wrap">@transaction.OrderId</td>
+                <td class="col-lg-1 col-1 text-wrap">@transaction.SessionId</td>
+                <td class="col-lg-1 col-1 text-wrap">@(transaction.PaymentIsSuccessful ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap">@(transaction.IsTopUp ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap">@(transaction.IsFromBalance ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap">@transaction.Amount azn</td>
+                <td class="col-lg-1 col-1 text-wrap">@transaction.AppUser.PhoneNumber</td>
+            </tr>
+        }
+    </tbody>
+</table>

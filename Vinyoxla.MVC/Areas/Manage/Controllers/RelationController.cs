@@ -49,6 +49,8 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(AppUserToVincodeCreateVM appUserToVincodeCreateVM)
         {
+            ViewBag.WhereWeAre = "Relations";
+
             if (!ModelState.IsValid)
             {
                 return View(appUserToVincodeCreateVM);

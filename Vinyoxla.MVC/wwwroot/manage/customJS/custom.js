@@ -1,18 +1,3 @@
-toastr.options = {
-    hideDuration: 300,
-    timeOut: 2500,
-    positionClass: "toast-bottom-right",
-    "closeButton": false,
-    "debug": false,
-    "newestOnTop": true,
-    "progressBar": false,
-    "preventDuplicates": false,
-    "onclick": null,
-    "showEasing": "swing",
-    "hideEasing": "linear",
-    "showMethod": "fadeIn",
-    "hideMethod": "fadeOut"
-}
 
 $(document).ready(function () {
 
@@ -59,9 +44,10 @@ $(document).ready(function () {
 
     //#region Prevent non numeric in phone input
 
-    $(document).on('input keyup', '#finduser', function () {
+    $(document).on('input keyup', '#finduser, #login, #balanceinp', function () {
         if (!/^[0-9]+$/.test($(this).val())) {
-            $(this).val($(this).val().slice(0, -1))
+            $(this).val($(this).val().slice(0, -1));
+            console.log('salam')
         }
     });
 
@@ -73,11 +59,34 @@ $(document).ready(function () {
         $("#finduser").val("");
         $("#findvin").val("");
 
-        let url = window.location.href
-        url = url.split("?")
+        let url = window.location.href;
+        url = url.split("?");
         window.location.href = url[0];
     });
 
     //#endregion Clear form and url, reload
 
+    //#region Check Vincodes page
+
+    $(document).on('click', '#clickforcheck', function (e) {
+        e.preventDefault();
+
+        axios.get($(this).attr("href"))
+            .then(function (response) {
+
+                $("#forcheck").slideDown();
+                $("#forcheckinichi").html(response.data);
+            });
+    });
+
+    //#endregion Check Vincodes page
+
+    //#region Event table at user detail page
+
+    $(document).on('click', '#eventtr', function (e) {
+
+        $(this).next().find('.eventmsgs').slideToggle();
+    });
+
+    //#endregion Event table at user detail page
 });

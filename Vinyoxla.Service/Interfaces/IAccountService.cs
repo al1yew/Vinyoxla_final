@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Vinyoxla.Service.ViewModels;
 using Vinyoxla.Service.ViewModels.AccountVMs;
 using Vinyoxla.Service.ViewModels.AppUserToVincodeVMs;
+using Vinyoxla.Service.ViewModels.BankVMs;
 
 namespace Vinyoxla.Service.Interfaces
 {
@@ -19,6 +20,12 @@ namespace Vinyoxla.Service.Interfaces
         Task<AccountVM> Profile();
 
         Task<PaginationList<AppUserToVincodeVM>> Sort(int page, string vin, int sortbydate, int showcount);
+
+        Task<ReturnVM> Bank(string amonut);
+
+        Task<bool> CheckOrder(string amount, string orderId, string sessionId);
+
+        Task UpdateBalance(string amount, string orderId, string sessionId);
 
     }
 }

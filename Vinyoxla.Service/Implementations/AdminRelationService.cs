@@ -26,6 +26,7 @@ namespace Vinyoxla.Service.Implementations
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _env;
         private readonly UserManager<AppUser> _userManager;
+
         public AdminRelationService(IUnitOfWork unitOfWork, IMapper mapper, IWebHostEnvironment env, UserManager<AppUser> userManager, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
@@ -48,7 +49,7 @@ namespace Vinyoxla.Service.Implementations
 
             if (phone != null)
             {
-                query = query.Where(x => x.AppUser.UserName.Contains("+994" + phone));
+                query = query.Where(x => x.AppUser.UserName.Contains(phone));
             }
 
             return query;
@@ -107,20 +108,32 @@ namespace Vinyoxla.Service.Implementations
                 if (appUserToVincode != null)
                 {
                     _unitOfWork.AppUserToVincodeRepository.Remove(appUserToVincode);
-                }
 
-                if (userEvent != null)
-                {
-                    userEvent.IsFromAdminArea = true;
-                    userEvent.Vin = dbVin.Vin;
-                    userEvent.EventMessages = new List<EventMessage>()
+                    if (userEvent != null)
                     {
-                        new EventMessage()
+                        userEvent.IsFromAdminArea = true;
+                        userEvent.Vin = dbVin.Vin;
+
+                        if (userEvent.EventMessages.Count > 0)
                         {
-                            Message = "User ucun admin panelden relation qurmag sorgusu geldi, kohne relationu sildik. Bunu admin panelden etdik.",
-                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                            userEvent.EventMessages.Add(new EventMessage()
+                            {
+                                Message = "User ucun admin panelden relation qurmag sorgusu geldi, kohne relationu sildik. Bunu admin panelden etdik.",
+                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                            });
                         }
-                    };
+                        else
+                        {
+                            userEvent.EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "User ucun admin panelden relation qurmag sorgusu geldi, kohne relationu sildik. Bunu admin panelden etdik.",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            };
+                        }
+                    }
                 }
 
                 await _unitOfWork.CommitAsync();
@@ -183,14 +196,26 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromApi = false;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = false;
-                            userEvent.EventMessages = new List<EventMessage>()
+
+                            if (userEvent.EventMessages.Count > 0)
                             {
-                                new EventMessage()
+                                userEvent.EventMessages.Add(new EventMessage()
                                 {
                                     Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.  Bunu Admin Panelden Etdik!",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
-                                }
-                            };
+                                });
+                            }
+                            else
+                            {
+                                userEvent.EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.  Bunu Admin Panelden Etdik!",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                };
+                            }
                         }
 
                         #endregion
@@ -248,15 +273,28 @@ namespace Vinyoxla.Service.Implementations
                                 userEvent.IsFromApi = true;
                                 userEvent.IsRenewedDueToAbsence = true;
                                 userEvent.IsRenewedDueToExpire = false;
-                                userEvent.EventMessages = new List<EventMessage>()
+
+                                if (userEvent.EventMessages.Count > 0)
                                 {
-                                    new EventMessage()
+                                    userEvent.EventMessages.Add(new EventMessage()
                                     {
                                         Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
                                         "Pul odeyib deye yari yolda goymadig, getdik aldig reportu. Bunu Admin Panelden Etdik!",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    }
-                                };
+                                    });
+                                }
+                                else
+                                {
+                                    userEvent.EventMessages = new List<EventMessage>()
+                                    {
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
+                                            "Pul odeyib deye yari yolda goymadig, getdik aldig reportu. Bunu Admin Panelden Etdik!",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
+                                    };
+                                }
                             }
 
                             #endregion
@@ -310,16 +348,30 @@ namespace Vinyoxla.Service.Implementations
                                 userEvent.IsFromApi = true;
                                 userEvent.IsRenewedDueToAbsence = false;
                                 userEvent.IsRenewedDueToExpire = false;
-                                userEvent.EventMessages = new List<EventMessage>()
+
+                                if (userEvent.EventMessages.Count > 0)
                                 {
-                                    new EventMessage()
+                                    userEvent.EventMessages.Add(new EventMessage()
                                     {
                                         Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
                                         "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
                                         "Ona gore event yarandi, relation ise yox. Bunu Admin Panelden Etdik!",
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    }
-                                };
+                                    });
+                                }
+                                else
+                                {
+                                    userEvent.EventMessages = new List<EventMessage>()
+                                    {
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
+                                            "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
+                                            "Ona gore event yarandi, relation ise yox. Bunu Admin Panelden Etdik!",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
+                                    };
+                                }
                             }
 
                             #endregion
@@ -380,15 +432,28 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromApi = true;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = true;
-                            userEvent.EventMessages = new List<EventMessage>()
+
+                            if (userEvent.EventMessages.Count > 0)
                             {
-                                new EventMessage()
+                                userEvent.EventMessages.Add(new EventMessage()
                                 {
                                     Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
                                     "Getdik reportu yeniledik. Bunu admin panelden etdik!",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
-                                }
-                            };
+                                });
+                            }
+                            else
+                            {
+                                userEvent.EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
+                                        "Getdik reportu yeniledik. Bunu admin panelden etdik!",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                };
+                            }
                         }
 
                         #endregion
@@ -441,15 +506,28 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromApi = true;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = false;
-                            userEvent.EventMessages = new List<EventMessage>()
+
+                            if (userEvent.EventMessages.Count > 0)
                             {
-                                new EventMessage()
+                                userEvent.EventMessages.Add(new EventMessage()
                                 {
                                     Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
                                     "Yeniliye bilmedik, api error verdi. Bunu admin panelden etdik!",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
-                                }
-                            };
+                                });
+                            }
+                            else
+                            {
+                                userEvent.EventMessages = new List<EventMessage>()
+                                {
+                                    new EventMessage()
+                                    {
+                                        Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
+                                        "Yeniliye bilmedik, api error verdi. Bunu admin panelden etdik!",
+                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                    }
+                                };
+                            }
                         }
 
                         #endregion
@@ -525,14 +603,25 @@ namespace Vinyoxla.Service.Implementations
                         userEvent.IsFromAdminArea = true;
                         userEvent.IsRenewedDueToAbsence = false;
                         userEvent.IsRenewedDueToExpire = false;
-                        userEvent.EventMessages = new List<EventMessage>()
+                        if (userEvent.EventMessages.Count > 0)
                         {
-                            new EventMessage()
+                            userEvent.EventMessages.Add(new EventMessage()
                             {
                                 Message = "report yox idi, yaratdig yenisini, relation gurdug, Bunu admin panelden etdik!",
                                 CreatedAt = DateTime.UtcNow.AddHours(4)
-                            }
-                        };
+                            });
+                        }
+                        else
+                        {
+                            userEvent.EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "report yox idi, yaratdig yenisini, relation gurdug, Bunu admin panelden etdik!",
+                                    CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            };
+                        }
                     }
 
                     #endregion
@@ -584,14 +673,26 @@ namespace Vinyoxla.Service.Implementations
                         userEvent.IsFromApi = true;
                         userEvent.IsRenewedDueToAbsence = false;
                         userEvent.IsRenewedDueToExpire = false;
-                        userEvent.EventMessages = new List<EventMessage>()
+
+                        if (userEvent.EventMessages.Count > 0)
                         {
-                            new EventMessage()
+                            userEvent.EventMessages.Add(new EventMessage()
                             {
                                 Message = "User yeni report almag istedi, ala bilmedi, cunki api error verdi. Bunu admin panelden etdik!",
                                 CreatedAt = DateTime.UtcNow.AddHours(4)
-                            }
-                        };
+                            });
+                        }
+                        else
+                        {
+                            userEvent.EventMessages = new List<EventMessage>()
+                            {
+                                new EventMessage()
+                                {
+                                    Message = "User yeni report almag istedi, ala bilmedi, cunki api error verdi. Bunu admin panelden etdik!",
+                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                                }
+                            };
+                        }
                     }
 
                     #endregion
@@ -615,21 +716,32 @@ namespace Vinyoxla.Service.Implementations
                 throw new NotFoundException($"Relation cannot be found by id = {id}");
 
             Event userEvent = await _unitOfWork.EventRepository.GetAsync(x =>
-            x.AppUser.UserName == "+994" + appUserToVincode.AppUser.PhoneNumber &&
+            x.AppUser.UserName == appUserToVincode.AppUser.UserName &&
             x.Vin == appUserToVincode.VinCode.Vin, "EventMessages");
 
             if (userEvent != null)
             {
                 userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                 userEvent.IsFromAdminArea = true;
-                userEvent.EventMessages = new List<EventMessage>()
+                if (userEvent.EventMessages.Count > 0)
                 {
-                    new EventMessage()
+                    userEvent.EventMessages.Add(new EventMessage()
                     {
                         Message = "Relationu sildik, Bunu admin panelden etdik!",
                         CreatedAt = DateTime.UtcNow.AddHours(4)
-                    }
-                };
+                    });
+                }
+                else
+                {
+                    userEvent.EventMessages = new List<EventMessage>()
+                    {
+                        new EventMessage()
+                        {
+                            Message = "Relationu sildik, Bunu admin panelden etdik!",
+                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                        }
+                    };
+                }
             }
 
             _unitOfWork.AppUserToVincodeRepository.Remove(appUserToVincode);

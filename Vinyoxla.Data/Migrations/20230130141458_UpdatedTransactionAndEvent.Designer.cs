@@ -10,8 +10,8 @@ using Vinyoxla.Data;
 namespace Vinyoxla.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230125104343_UpdatedEventTable")]
-    partial class UpdatedEventTable
+    [Migration("20230130141458_UpdatedTransactionAndEvent")]
+    partial class UpdatedTransactionAndEvent
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -341,10 +341,6 @@ namespace Vinyoxla.Data.Migrations
                     b.Property<string>("AppUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("CreatedAt")
                         .IsRequired()
                         .HasColumnType("datetime2");
@@ -355,8 +351,16 @@ namespace Vinyoxla.Data.Migrations
                     b.Property<bool>("IsTopUp")
                         .HasColumnType("bit");
 
+                    b.Property<string>("OrderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("PaymentIsSuccessful")
                         .HasColumnType("bit");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

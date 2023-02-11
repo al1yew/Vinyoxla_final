@@ -47,6 +47,8 @@
 	  <Compile Remove="Migrations\20230115220400_AddedEventTableAndUpdatedSomeTables.Designer.cs" />
 	  <Compile Remove="Migrations\20230121195201_UpdatedAppUser.cs" />
 	  <Compile Remove="Migrations\20230121195201_UpdatedAppUser.Designer.cs" />
+	  <Compile Remove="Migrations\20230125104343_UpdatedEventTable.cs" />
+	  <Compile Remove="Migrations\20230125104343_UpdatedEventTable.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

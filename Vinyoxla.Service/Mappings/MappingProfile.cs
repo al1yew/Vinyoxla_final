@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using Vinyoxla.Core.Models;
-using Vinyoxla.Service.ViewModels.AccountVMs;
 using Vinyoxla.Service.ViewModels.AppUserToVincodeVMs;
+using Vinyoxla.Service.ViewModels.EventMessageVMs;
+using Vinyoxla.Service.ViewModels.EventVMs;
+using Vinyoxla.Service.ViewModels.TransactionVMs;
+using Vinyoxla.Service.ViewModels.UserVMs;
 using Vinyoxla.Service.ViewModels.VinCodeVMs;
 
 namespace Vinyoxla.Service.Mappings
@@ -17,6 +20,8 @@ namespace Vinyoxla.Service.Mappings
                 .ForPath(des => des.Events, src => src.MapFrom(x => x.Events))
                 .ForPath(des => des.Transactions, src => src.MapFrom(x => x.Transactions));
 
+            CreateMap<AppUserGetVM, AppUserUpdateVM>()
+                .ForMember(des => des.PhoneNumber, src => src.MapFrom(x => x.PhoneNumber.Substring(4)));
 
             #endregion
 
@@ -35,6 +40,27 @@ namespace Vinyoxla.Service.Mappings
 
             #endregion
 
+            #region Events
+
+            CreateMap<Event, EventGetVM>()
+                .ForPath(des => des.AppUser, src => src.MapFrom(x => x.AppUser))
+                .ForPath(des => des.EventMessages, src => src.MapFrom(x => x.EventMessages));
+
+            #endregion
+
+            #region Transactions
+
+            CreateMap<Transaction, TransactionGetVM>()
+                .ForPath(des => des.AppUser, src => src.MapFrom(x => x.AppUser));
+
+            #endregion
+
+            #region Event Messages
+
+            CreateMap<EventMessage, EventMessageGetVM>()
+                .ForPath(des => des.Event, src => src.MapFrom(x => x.Event));
+
+            #endregion
         }
     }
 }

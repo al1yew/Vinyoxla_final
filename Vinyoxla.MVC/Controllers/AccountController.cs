@@ -1,17 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
+using Vinyoxla.Core.Models;
 using Vinyoxla.Service.Interfaces;
 using Vinyoxla.Service.ViewModels.AccountVMs;
+using Vinyoxla.Service.ViewModels.BankVMs;
 
 namespace Vinyoxla.MVC.Controllers
 {
     public class AccountController : Controller
     {
         private readonly IAccountService _accountService;
-
-        public AccountController(IAccountService accountService)
+        private readonly UserManager<AppUser> _userManager;
+        public AccountController(IAccountService accountService, UserManager<AppUser> userManager)
         {
             _accountService = accountService;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -70,11 +75,54 @@ namespace Vinyoxla.MVC.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> TopUp(string amount)
+        {
+            ReturnVM returnVM = await _accountService.Bank(amount);
+            TempData["orderId"] = returnVM.OrderId;
+            TempData["sessionId"] = returnVM.SessionId;
+            TempData["amount"] = amount;
 
+            return Redirect(returnVM.Url);
+        }
 
+        public async Task<IActionResult> UpdateBalance()
+        {
+            string orderId = TempData["orderId"].ToString();
+            string sessionId = TempData["sessionId"].ToString();
+            string amount = TempData["amount"].ToString();
 
+            if (amount.Length > 0)
+            {
+                if (await _accountService.CheckOrder(amount, orderId, sessionId))
+                {
+                    await _accountService.UpdateBalance(amount, orderId, sessionId);
 
+                    TempData["amount"] = "";
+                    TempData["sessionId"] = "";
+                    TempData["orderId"] = "";
 
+                    return RedirectToAction("Profile");
+                }
+                else
+                {
+                    TempData["amount"] = "";
+                    TempData["sessionId"] = "";
+                    TempData["orderId"] = "";
+
+                    return RedirectToAction("Error", new { errno = 10 });
+                }
+            }
+            else
+            {
+                return RedirectToAction("Profile");
+            }
+        }
+
+        public async Task<IActionResult> Error(int errno)
+        {
+            return View(errno);
+        }
 
 
 
@@ -102,18 +150,17 @@ namespace Vinyoxla.MVC.Controllers
         //{
         //    AppUser appUser = new AppUser
         //    {
-        //        UserName = "Admin",
-        //        Email = "admin@admin",
+        //        UserName = "+994505788901",
         //        PhoneNumber = "+994505788901",
         //        PhoneNumberConfirmed = true,
-        //        EmailConfirmed = true,
         //        Balance = 0,
-        //        IsAdmin = true
+        //        IsAdmin = true,
+        //        CreatedAt = DateTime.UtcNow.AddHours(4),
         //    };
 
         //    appUser.IsAdmin = true;
 
-        //    await _userManager.CreateAsync(appUser, "Admin@123");
+        //    await _userManager.CreateAsync(appUser, "Admin123");
 
         //    await _userManager.AddToRoleAsync(appUser, "Admin");
 

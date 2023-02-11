@@ -9,5 +9,9 @@ namespace Vinyoxla.Service.Interfaces
         Task<IQueryable<VinCodeGetVM>> GetAllAsync(string vin);
 
         Task DeleteAsync(int? id);
+
+        Task<CheckVM> Check();
+
+        Task<bool> FileExists(string vin, string fileName);
     }
 }

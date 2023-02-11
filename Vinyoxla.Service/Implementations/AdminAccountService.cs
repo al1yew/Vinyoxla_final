@@ -24,7 +24,8 @@ namespace Vinyoxla.Service.Implementations
 
         public async Task<List<string>> Login(AdminLoginVM adminLoginVM)
         {
-            AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(u => (u.NormalizedEmail == adminLoginVM.Login.Trim().ToUpperInvariant() || u.UserName == adminLoginVM.Login.Trim().ToUpperInvariant()) && u.IsAdmin);
+            AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(u =>
+            u.UserName == "+994" + adminLoginVM.Login && u.IsAdmin);
 
             List<string> errors = new List<string>();
 
@@ -34,7 +35,7 @@ namespace Vinyoxla.Service.Implementations
                 return errors;
             }
 
-            SignInResult signInResult = await _signInManager.PasswordSignInAsync(appUser, adminLoginVM.Password, false, false);
+            SignInResult signInResult = await _signInManager.PasswordSignInAsync(appUser, adminLoginVM.Password, true, false);
 
             if (!signInResult.Succeeded)
             {

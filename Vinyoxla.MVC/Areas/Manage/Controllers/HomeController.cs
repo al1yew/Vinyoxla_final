@@ -18,6 +18,8 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
 
         public async Task<IActionResult> Index()
         {
+            ViewBag.WhereWeAre = "Main Page";
+
             return View(await _adminHomeService.GetData());
         }
     }

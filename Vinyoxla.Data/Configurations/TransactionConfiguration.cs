@@ -11,7 +11,9 @@ namespace Vinyoxla.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {
-            builder.Property(x => x.Code).IsRequired();
+            builder.Property(x => x.SessionId).IsRequired();
+            builder.Property(x => x.OrderId).IsRequired();
+            builder.Property(x => x.Amount).IsRequired();
             builder.Property(x => x.CreatedAt).IsRequired();
         }
     }

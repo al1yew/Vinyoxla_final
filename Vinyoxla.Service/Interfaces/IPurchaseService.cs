@@ -1,13 +1,12 @@
 ﻿using System.Threading.Tasks;
-using Vinyoxla.Core.Models;
+using Vinyoxla.Service.ViewModels.BankVMs;
 using Vinyoxla.Service.ViewModels.PurchaseVMs;
-using Vinyoxla.Service.ViewModels.VinCodeVMs;
 
 namespace Vinyoxla.Service.Interfaces
 {
     public interface IPurchaseService
     {
-        Task<string> CheckEverything(string phone, string vin);
+        Task<string> CheckEverything(string phone, string vin, bool refund);
 
         Task<bool> FileExists(string fileName);
 
@@ -15,9 +14,9 @@ namespace Vinyoxla.Service.Interfaces
 
         Task<PurchaseVM> GetViewModelForOrderPage(SelectedReportVM selectedReportVM);
 
-        Task<string> ReplaceOldReport(string phone, string vin, bool isFromBalance);
+        Task<string> ReplaceOldReport(string phone, string vin, bool isFromBalance, string orderId, string sessionId);
 
-        Task<string> GetReport(string phone, string vin, bool isFromBalance);
+        Task<string> GetReport(string phone, string vin, bool isFromBalance, string orderId, string sessionId);
 
         Task SubstractFromBalance();
 
@@ -26,5 +25,9 @@ namespace Vinyoxla.Service.Interfaces
         Task<string> GetUserPhoneNumber();
 
         Task Refund(string phone);
+
+        Task<ReturnVM> Bank(string vin, string phoneno);
+
+        Task<bool> CheckOrder(string orderId, string sessionId, string phone, string vin);
     }
 }

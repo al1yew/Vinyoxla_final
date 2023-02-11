@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Vinyoxla.Service.ViewModels.AppUserToVincodeVMs;
 using Vinyoxla.Service.ViewModels.EventVMs;
 using Vinyoxla.Service.ViewModels.TransactionVMs;
 
-namespace Vinyoxla.Service.ViewModels.AccountVMs
+namespace Vinyoxla.Service.ViewModels.UserVMs
 {
     public class AppUserGetVM
     {

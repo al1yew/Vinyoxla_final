@@ -22,7 +22,6 @@
             <th class="col-lg-1 col-1 text-wrap">User Number</th>
             <th class="col-lg-1 col-1 text-wrap">Vin Code</th>
             <th class="col-lg-1 col-1 text-wrap">Created At</th>
-            <th class="col-lg-1 col-1 text-wrap">Update</th>
             <th class="col-lg-1 col-1 text-wrap">Delete</th>
         </tr>
     </thead>
@@ -35,9 +34,6 @@
                 <td class="col-lg-1 col-1 text-wrap">@appUserToVincode.AppUser.PhoneNumber</td>
                 <td class="col-lg-1 col-1 text-wrap">@appUserToVincode.VinCode.Vin</td>
                 <td class="col-lg-1 col-1 text-wrap">@appUserToVincode.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
-                <td class="col-lg-1 col-1 text-wrap">
-                    <a class="btn btn-warning" asp-area="Manage" asp-controller="Relation" asp-action="Update" asp-route-id="@appUserToVincode.Id">Update</a>
-                </td>
                 <td class="col-lg-1 col-1 text-wrap">
                     <a class="btn btn-danger deleteBtn" asp-area="Manage" asp-controller="Relation"
                        asp-action="Delete" asp-route-id="@appUserToVincode.Id" asp-route-select="@ViewBag.Select" asp-route-vin="@ViewBag.Vin" asp-route-phone="@ViewBag.Phone" asp-route-page="@ViewBag.Page">Delete</a>
