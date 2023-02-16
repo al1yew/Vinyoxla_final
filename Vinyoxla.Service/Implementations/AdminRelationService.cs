@@ -128,7 +128,8 @@ namespace Vinyoxla.Service.Implementations
                             {
                                 new EventMessage()
                                 {
-                                    Message = "User ucun admin panelden relation qurmag sorgusu geldi, kohne relationu sildik. Bunu admin panelden etdik.",
+                                    Message = "User ucun admin panelden relation qurmag sorgusu geldi, kohne relationu sildik. " +
+                                    "Bunu admin panelden etdik.",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 }
                             };
@@ -148,31 +149,29 @@ namespace Vinyoxla.Service.Implementations
                     CreatedAt = DateTime.UtcNow.AddHours(4)
                 };
 
-                if (!((DateTime.Now - dbVin.CreatedAt.Value).TotalDays >= 7))
+                if (await FileExists(dbVin.FileName))
                 {
-                    if (await FileExists(dbVin.FileName))
+                    dbVin.PurchasedTimes++;
+
+                    #region Event handle
+
+                    if (userEvent == null)
                     {
-                        dbVin.PurchasedTimes++;
-
-                        #region Event handle
-
-                        if (userEvent == null)
+                        Event newUserEvent = new Event()
                         {
-                            Event newUserEvent = new Event()
-                            {
-                                AppUser = appUser ?? newUser,
-                                CreatedAt = DateTime.UtcNow.AddHours(4),
-                                DidRefundToBalance = false,
-                                ErrorWhileRenew = false,
-                                ErrorWhileReplace = false,
-                                FileExists = true,
-                                IsApiError = false,
-                                IsFromApi = false,
-                                IsRenewedDueToAbsence = false,
-                                IsFromAdminArea = true,
-                                IsRenewedDueToExpire = false,
-                                Vin = dbVin.Vin,
-                                EventMessages = new List<EventMessage>()
+                            AppUser = appUser ?? newUser,
+                            CreatedAt = DateTime.UtcNow.AddHours(4),
+                            DidRefundToBalance = false,
+                            ErrorWhileRenew = false,
+                            ErrorWhileReplace = false,
+                            FileExists = true,
+                            IsApiError = false,
+                            IsFromApi = false,
+                            IsRenewedDueToAbsence = false,
+                            IsFromAdminArea = true,
+                            IsRenewedDueToExpire = false,
+                            Vin = dbVin.Vin,
+                            EventMessages = new List<EventMessage>()
                                 {
                                     new EventMessage()
                                     {
@@ -180,34 +179,34 @@ namespace Vinyoxla.Service.Implementations
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     }
                                 }
-                            };
+                        };
 
-                            await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                        await _unitOfWork.EventRepository.AddAsync(newUserEvent);
+                    }
+                    else
+                    {
+                        userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
+                        userEvent.DidRefundToBalance = false;
+                        userEvent.ErrorWhileRenew = false;
+                        userEvent.ErrorWhileReplace = false;
+                        userEvent.FileExists = true;
+                        userEvent.IsFromAdminArea = true;
+                        userEvent.IsApiError = false;
+                        userEvent.IsFromApi = false;
+                        userEvent.IsRenewedDueToAbsence = false;
+                        userEvent.IsRenewedDueToExpire = false;
+
+                        if (userEvent.EventMessages.Count > 0)
+                        {
+                            userEvent.EventMessages.Add(new EventMessage()
+                            {
+                                Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.  Bunu Admin Panelden Etdik!",
+                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                            });
                         }
                         else
                         {
-                            userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                            userEvent.DidRefundToBalance = false;
-                            userEvent.ErrorWhileRenew = false;
-                            userEvent.ErrorWhileReplace = false;
-                            userEvent.FileExists = true;
-                            userEvent.IsFromAdminArea = true;
-                            userEvent.IsApiError = false;
-                            userEvent.IsFromApi = false;
-                            userEvent.IsRenewedDueToAbsence = false;
-                            userEvent.IsRenewedDueToExpire = false;
-
-                            if (userEvent.EventMessages.Count > 0)
-                            {
-                                userEvent.EventMessages.Add(new EventMessage()
-                                {
-                                    Message = "User bazadan papkada olan, kohne olmayan report ile relation qurdu.  Bunu Admin Panelden Etdik!",
-                                    CreatedAt = DateTime.UtcNow.AddHours(4)
-                                });
-                            }
-                            else
-                            {
-                                userEvent.EventMessages = new List<EventMessage>()
+                            userEvent.EventMessages = new List<EventMessage>()
                                 {
                                     new EventMessage()
                                     {
@@ -215,176 +214,17 @@ namespace Vinyoxla.Service.Implementations
                                         CreatedAt = DateTime.UtcNow.AddHours(4)
                                     }
                                 };
-                            }
-                        }
-
-                        #endregion
-
-                        await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
-                        await _unitOfWork.CommitAsync();
-                    }
-                    else
-                    {
-                        if (await TryToFixAbsence(dbVin.Vin, dbVin.FileName))
-                        {
-                            dbVin.PurchasedTimes++;
-                            dbVin.CreatedAt = DateTime.UtcNow.AddHours(4);
-
-                            #region Event handle
-
-                            if (userEvent == null)
-                            {
-                                Event newUserEvent = new Event()
-                                {
-                                    AppUser = appUser ?? newUser,
-                                    CreatedAt = DateTime.UtcNow.AddHours(4),
-                                    DidRefundToBalance = false,
-                                    ErrorWhileRenew = false,
-                                    ErrorWhileReplace = false,
-                                    FileExists = true,
-                                    IsApiError = false,
-                                    IsFromApi = true,
-                                    IsRenewedDueToAbsence = true,
-                                    IsFromAdminArea = true,
-                                    IsRenewedDueToExpire = false,
-                                    Vin = dbVin.Vin,
-                                    EventMessages = new List<EventMessage>()
-                                    {
-                                        new EventMessage()
-                                        {
-                                            Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
-                                            "Pul odeyib deye yari yolda goymadig, getdik aldig reportu. Bunu Admin Panelden Etdik!",
-                                            CreatedAt = DateTime.UtcNow.AddHours(4)
-                                        }
-                                    }
-                                };
-
-                                await _unitOfWork.EventRepository.AddAsync(newUserEvent);
-                            }
-                            else
-                            {
-                                userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                                userEvent.DidRefundToBalance = false;
-                                userEvent.ErrorWhileRenew = false;
-                                userEvent.ErrorWhileReplace = false;
-                                userEvent.FileExists = true;
-                                userEvent.IsFromAdminArea = true;
-                                userEvent.IsApiError = false;
-                                userEvent.IsFromApi = true;
-                                userEvent.IsRenewedDueToAbsence = true;
-                                userEvent.IsRenewedDueToExpire = false;
-
-                                if (userEvent.EventMessages.Count > 0)
-                                {
-                                    userEvent.EventMessages.Add(new EventMessage()
-                                    {
-                                        Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
-                                        "Pul odeyib deye yari yolda goymadig, getdik aldig reportu. Bunu Admin Panelden Etdik!",
-                                        CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    });
-                                }
-                                else
-                                {
-                                    userEvent.EventMessages = new List<EventMessage>()
-                                    {
-                                        new EventMessage()
-                                        {
-                                            Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
-                                            "Pul odeyib deye yari yolda goymadig, getdik aldig reportu. Bunu Admin Panelden Etdik!",
-                                            CreatedAt = DateTime.UtcNow.AddHours(4)
-                                        }
-                                    };
-                                }
-                            }
-
-                            #endregion
-
-                            await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
-                            await _unitOfWork.CommitAsync();
-                        }
-                        else
-                        {
-                            #region Event handle
-
-                            if (userEvent == null)
-                            {
-                                Event newUserEvent = new Event()
-                                {
-                                    AppUser = appUser ?? newUser,
-                                    CreatedAt = DateTime.UtcNow.AddHours(4),
-                                    DidRefundToBalance = false,
-                                    ErrorWhileRenew = false,
-                                    ErrorWhileReplace = true,
-                                    FileExists = false,
-                                    IsApiError = true,
-                                    IsFromAdminArea = true,
-                                    IsFromApi = true,
-                                    IsRenewedDueToAbsence = false,
-                                    IsRenewedDueToExpire = false,
-                                    Vin = dbVin.Vin,
-                                    EventMessages = new List<EventMessage>()
-                                    {
-                                        new EventMessage()
-                                        {
-                                            Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
-                                            "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
-                                            "Ona gore event yarandi, relation ise yox. Bunu Admin Panelden Etdik!",
-                                            CreatedAt = DateTime.UtcNow.AddHours(4)
-                                        }
-                                    }
-                                };
-
-                                await _unitOfWork.EventRepository.AddAsync(newUserEvent);
-                            }
-                            else
-                            {
-                                userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
-                                userEvent.DidRefundToBalance = false;
-                                userEvent.ErrorWhileRenew = false;
-                                userEvent.ErrorWhileReplace = true;
-                                userEvent.FileExists = false;
-                                userEvent.IsApiError = true;
-                                userEvent.IsFromAdminArea = true;
-                                userEvent.IsFromApi = true;
-                                userEvent.IsRenewedDueToAbsence = false;
-                                userEvent.IsRenewedDueToExpire = false;
-
-                                if (userEvent.EventMessages.Count > 0)
-                                {
-                                    userEvent.EventMessages.Add(new EventMessage()
-                                    {
-                                        Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
-                                        "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
-                                        "Ona gore event yarandi, relation ise yox. Bunu Admin Panelden Etdik!",
-                                        CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    });
-                                }
-                                else
-                                {
-                                    userEvent.EventMessages = new List<EventMessage>()
-                                    {
-                                        new EventMessage()
-                                        {
-                                            Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
-                                            "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
-                                            "Ona gore event yarandi, relation ise yox. Bunu Admin Panelden Etdik!",
-                                            CreatedAt = DateTime.UtcNow.AddHours(4)
-                                        }
-                                    };
-                                }
-                            }
-
-                            #endregion
-
-                            await _unitOfWork.CommitAsync();
-
-                            throw new BadRequestException("User ile vinkodun relationun yaratmag istedik. Vinkod databazada var, papkada ise yox. Ona gore yeniden almag istedik, API error verdi. Yarada bilmedik. Event yaradildi. Refund olmamalidir ve olmadi. Transaction yaradilmadi ve yaradilmamalidir.");
                         }
                     }
+
+                    #endregion
+
+                    await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
+                    await _unitOfWork.CommitAsync();
                 }
                 else
                 {
-                    if (await BuyReport(dbVin.Vin, dbVin.FileName))
+                    if (await TryToFixAbsence(dbVin.Vin, dbVin.FileName))
                     {
                         dbVin.PurchasedTimes++;
                         dbVin.CreatedAt = DateTime.UtcNow.AddHours(4);
@@ -401,21 +241,21 @@ namespace Vinyoxla.Service.Implementations
                                 ErrorWhileRenew = false,
                                 ErrorWhileReplace = false,
                                 FileExists = true,
-                                IsFromAdminArea = true,
                                 IsApiError = false,
                                 IsFromApi = true,
-                                IsRenewedDueToAbsence = false,
-                                IsRenewedDueToExpire = true,
+                                IsRenewedDueToAbsence = true,
+                                IsFromAdminArea = true,
+                                IsRenewedDueToExpire = false,
                                 Vin = dbVin.Vin,
                                 EventMessages = new List<EventMessage>()
-                                {
-                                    new EventMessage()
                                     {
-                                        Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
-                                        "Getdik reportu yeniledik. Bunu admin panelden etdik!",
-                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
+                                            "Pul odeyib deye yari yolda goymadig, getdik aldig reportu. Bunu Admin Panelden Etdik!",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
                                     }
-                                }
                             };
 
                             await _unitOfWork.EventRepository.AddAsync(newUserEvent);
@@ -430,29 +270,29 @@ namespace Vinyoxla.Service.Implementations
                             userEvent.IsFromAdminArea = true;
                             userEvent.IsApiError = false;
                             userEvent.IsFromApi = true;
-                            userEvent.IsRenewedDueToAbsence = false;
-                            userEvent.IsRenewedDueToExpire = true;
+                            userEvent.IsRenewedDueToAbsence = true;
+                            userEvent.IsRenewedDueToExpire = false;
 
                             if (userEvent.EventMessages.Count > 0)
                             {
                                 userEvent.EventMessages.Add(new EventMessage()
                                 {
-                                    Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
-                                    "Getdik reportu yeniledik. Bunu admin panelden etdik!",
+                                    Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
+                                    "Pul odeyib deye yari yolda goymadig, getdik aldig reportu. Bunu Admin Panelden Etdik!",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 });
                             }
                             else
                             {
                                 userEvent.EventMessages = new List<EventMessage>()
-                                {
-                                    new EventMessage()
                                     {
-                                        Message = "User bazadan papkada olan, kohne olan report ile relation qurdu. " +
-                                        "Getdik reportu yeniledik. Bunu admin panelden etdik!",
-                                        CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    }
-                                };
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazadan papkada olmayan, kohne olmayan report ile relation qurdu. " +
+                                            "Pul odeyib deye yari yolda goymadig, getdik aldig reportu. Bunu Admin Panelden Etdik!",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
+                                    };
                             }
                         }
 
@@ -472,24 +312,25 @@ namespace Vinyoxla.Service.Implementations
                                 AppUser = appUser ?? newUser,
                                 CreatedAt = DateTime.UtcNow.AddHours(4),
                                 DidRefundToBalance = false,
-                                IsFromAdminArea = true,
-                                ErrorWhileRenew = true,
-                                ErrorWhileReplace = false,
-                                FileExists = true,
+                                ErrorWhileRenew = false,
+                                ErrorWhileReplace = true,
+                                FileExists = false,
                                 IsApiError = true,
+                                IsFromAdminArea = true,
                                 IsFromApi = true,
                                 IsRenewedDueToAbsence = false,
                                 IsRenewedDueToExpire = false,
                                 Vin = dbVin.Vin,
                                 EventMessages = new List<EventMessage>()
-                                {
-                                    new EventMessage()
                                     {
-                                        Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
-                                        "Yeniliye bilmedik, api error verdi. Bunu admin panelden etdik!",
-                                        CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
+                                            "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
+                                            "Ona gore event yarandi, relation ise yox. Bunu Admin Panelden Etdik!",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
                                     }
-                                }
                             };
 
                             await _unitOfWork.EventRepository.AddAsync(newUserEvent);
@@ -498,11 +339,11 @@ namespace Vinyoxla.Service.Implementations
                         {
                             userEvent.UpdatedAt = DateTime.UtcNow.AddHours(4);
                             userEvent.DidRefundToBalance = false;
-                            userEvent.IsFromAdminArea = true;
-                            userEvent.ErrorWhileRenew = true;
-                            userEvent.ErrorWhileReplace = false;
-                            userEvent.FileExists = true;
+                            userEvent.ErrorWhileRenew = false;
+                            userEvent.ErrorWhileReplace = true;
+                            userEvent.FileExists = false;
                             userEvent.IsApiError = true;
+                            userEvent.IsFromAdminArea = true;
                             userEvent.IsFromApi = true;
                             userEvent.IsRenewedDueToAbsence = false;
                             userEvent.IsRenewedDueToExpire = false;
@@ -511,22 +352,24 @@ namespace Vinyoxla.Service.Implementations
                             {
                                 userEvent.EventMessages.Add(new EventMessage()
                                 {
-                                    Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
-                                    "Yeniliye bilmedik, api error verdi. Bunu admin panelden etdik!",
+                                    Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
+                                    "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
+                                    "Ona gore event yarandi, relation ise yox. Bunu Admin Panelden Etdik!",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 });
                             }
                             else
                             {
                                 userEvent.EventMessages = new List<EventMessage>()
-                                {
-                                    new EventMessage()
                                     {
-                                        Message = "User bazada ve papkada olan kohne reportu almag istedi, pul odeyib deye getdik onu yenilemeye. " +
-                                        "Yeniliye bilmedik, api error verdi. Bunu admin panelden etdik!",
-                                        CreatedAt = DateTime.UtcNow.AddHours(4)
-                                    }
-                                };
+                                        new EventMessage()
+                                        {
+                                            Message = "User bazada olan, sveji olan, papkada olmayan reportu almag istedi, " +
+                                            "amma biz o reportu yenisi ile evez ede bilmedik, api error verdi. " +
+                                            "Ona gore event yarandi, relation ise yox. Bunu Admin Panelden Etdik!",
+                                            CreatedAt = DateTime.UtcNow.AddHours(4)
+                                        }
+                                    };
                             }
                         }
 
@@ -534,7 +377,7 @@ namespace Vinyoxla.Service.Implementations
 
                         await _unitOfWork.CommitAsync();
 
-                        throw new BadRequestException("User ile vinkodun relationun yaratmag istedik. Vinkod databazada var, kohnedir. Ona gore yeniden almag istedik, API error verdi. Yarada bilmedik. Event yaradildi. Refund olmamalidir ve olmadi. Transaction yaradilmadi ve yaradilmamalidir.");
+                        throw new BadRequestException("User ile vinkodun relationun yaratmag istedik. Vinkod databazada var, papkada ise yox. Ona gore yeniden almag istedik, API error verdi. Yarada bilmedik. Event yaradildi. Refund olmamalidir ve olmadi. Transaction yaradilmadi ve yaradilmamalidir.");
                     }
                 }
             }

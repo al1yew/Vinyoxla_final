@@ -36,25 +36,28 @@
         <div asp-validation-summary="ModelOnly" class="text-danger col-lg-12"></div>
         <form method="post" class="p-5 d-flex col-lg-12 align-items-baseline flex-wrap justify-content-between">
 
-            <div class="flex-wrap d-flex justify-content-between col-lg-4 col-12 p-1" style="margin-bottom: 20px">
+            <div class="flex-wrap d-flex justify-content-between @(!Model.IsAdmin ? "col-lg-6" : "col-lg-4") col-12 p-1" style="margin-bottom: 20px">
                 <div class="col-lg-12 col-12 form-control align-items-center keeperadminphone">
                     <span>+994</span>
                     <input maxlength="9" id="login" placeholder="Phone..." asp-for="PhoneNumber">
                 </div>
                 <span asp-validation-for="PhoneNumber" class="text-danger col-lg-12 col-12 text-center"></span>
             </div>
-            <div class="flex-wrap d-flex justify-content-between col-lg-4 col-12 p-1 mb-3">
+            <div class="flex-wrap d-flex justify-content-between @(!Model.IsAdmin ? "col-lg-6" : "col-lg-4") col-12 p-1 mb-3">
                 <div class="col-lg-12 col-12 align-items-center p-0">
                     <input asp-for="Balance" id="balanceinp" class="form-control" placeholder="Balance...">
                 </div>
                 <span asp-validation-for="Balance" class="text-danger col-lg-12 col-12 text-center pt-1"></span>
             </div>
-            <div class="flex-wrap d-flex justify-content-between col-lg-4 col-12 p-1 mb-3">
-                <div class="col-lg-12 col-12 align-items-center p-0">
-                    <input asp-for="Password" class="form-control" placeholder="Password...">
+            @if (Model.IsAdmin)
+            {
+                <div class="flex-wrap d-flex justify-content-between col-lg-4 col-12 p-1 mb-3">
+                    <div class="col-lg-12 col-12 align-items-center p-0">
+                        <input asp-for="Password" class="form-control" placeholder="Password...">
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger col-lg-12 col-12 text-center pt-1"></span>
                 </div>
-                <span asp-validation-for="Password" class="text-danger col-lg-12 col-12 text-center pt-1"></span>
-            </div>
+            }
 
             <button type="submit" class="btn btn-primary col-lg-12 col-12 ">Update</button>
         </form>

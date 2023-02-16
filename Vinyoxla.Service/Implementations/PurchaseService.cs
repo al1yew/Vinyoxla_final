@@ -279,7 +279,10 @@ namespace Vinyoxla.Service.Implementations
                                 AppUserToVincode appUserToVincode = await _unitOfWork.AppUserToVincodeRepository.GetAsync(x =>
                                 x.AppUser.UserName == "+994" + phone && x.VinCode.Vin == dbVin.Vin);
 
-                                _unitOfWork.AppUserToVincodeRepository.Remove(appUserToVincode);
+                                if (appUserToVincode != null)
+                                {
+                                    _unitOfWork.AppUserToVincodeRepository.Remove(appUserToVincode);
+                                }
 
                                 #region Event handle
 
@@ -955,8 +958,20 @@ namespace Vinyoxla.Service.Implementations
 
                         #endregion
 
+                        if (appUser != null)
+                        {
+                            if (!await _unitOfWork.AppUserToVincodeRepository.IsExistAsync(x =>
+                            x.AppUser.UserName == appUser.UserName && x.VinCode.Vin == dbVin.Vin))
+                            {
+                                await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
+                            }
+                        }
+                        else
+                        {
+                            await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
+                        }
+
                         await _unitOfWork.TransactionRepository.AddAsync(transaction);
-                        await _unitOfWork.AppUserToVincodeRepository.AddAsync(appUserToVincode);
                         await _unitOfWork.CommitAsync();
 
                         return dbVin.FileName;
@@ -1245,6 +1260,8 @@ namespace Vinyoxla.Service.Implementations
 
             if (response.IsSuccessStatusCode)
             {
+                #region vse operacii
+
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
@@ -1288,6 +1305,8 @@ namespace Vinyoxla.Service.Implementations
 
                 await File.WriteAllTextAsync(path, responseHTML);
 
+                #endregion
+
                 return true;
             }
 
@@ -1328,7 +1347,12 @@ namespace Vinyoxla.Service.Implementations
 
         public async Task<ReturnVM> Bank(string vin, string phoneno)
         {
-            string url = $"https://tstpg.kapitalbank.az:5443/Exec";
+            string url = $"https://3dsrv.kapitalbank.az:5443/Exec";
+
+            //https://tstpg.kapitalbank.az:5443/Exec
+            //https://3dsrv.kapitalbank.az:5443/Exec
+            //E1090050
+            //E1000010
 
             string xml =
                 "<TKKPG>" +
@@ -1337,19 +1361,18 @@ namespace Vinyoxla.Service.Implementations
                         "<Language>AZ</Language>" +
                         "<Order>" +
                             "<OrderType>Purchase</OrderType>" +
-                            "<Merchant>E1000010</Merchant>" +
-                            "<Amount>400</Amount>" +
+                            "<Merchant>E1090050</Merchant>" +
+                            "<Amount>50</Amount>" +
                             "<Currency>944</Currency>" +
                             $"<Description>{vin} vin / +994{phoneno} user / 4 azn</Description>" +
-                            $"<ApproveURL>https://vinyoxla.az/about</ApproveURL>" +
-                            "<CancelURL>vinyoxla.az/cancel</CancelURL>" +
-                            "<DeclineURL>vinyoxla.az/decline</DeclineURL>" +
+                            $"<ApproveURL>https://vinyoxla.az/Purchase/GetReport</ApproveURL>" +
+                            "<CancelURL>https://vinyoxla.az/Purchase/Error?errno=10</CancelURL>" +
+                            "<DeclineURL>https://vinyoxla.az/Purchase/Error?errno=10</DeclineURL>" +
                         "</Order>" +
                     "</Request>" +
                 "</TKKPG>";
 
             //https://vinyoxla.az/Purchase/GetReport?vin={vin}&phoneno={phoneno}
-            //https://vinyoxla.az/Purchase/GetReport
             //https://vinyoxla.az/Purchase/Error?errno=10
 
             #region crt key
@@ -1382,12 +1405,6 @@ namespace Vinyoxla.Service.Implementations
             }
 
             #endregion
-
-            /*
-             Production Endpoint – https://3dsrv.kapitalbank.az:5443/Exec
-
-             Ödəniş səhifəsinin linki - https://3dsrv.kapitalbank.az/index.jsp?orderid=$&sessionid=$
-             */
 
             if (response.IsSuccessStatusCode)
             {
@@ -1422,7 +1439,11 @@ namespace Vinyoxla.Service.Implementations
 
         public async Task<bool> CheckOrder(string orderid, string sessionId, string phone, string vin)
         {
-            string url = $"https://tstpg.kapitalbank.az:5443/Exec";
+            string url = $"https://3dsrv.kapitalbank.az:5443/Exec";
+            //https://tstpg.kapitalbank.az:5443/Exec
+            //https://3dsrv.kapitalbank.az:5443/Exec
+            //E1090050
+            //E1000010
 
             string xml =
                 "<TKKPG>" +
@@ -1430,7 +1451,7 @@ namespace Vinyoxla.Service.Implementations
                         "<Operation>GetOrderStatus</Operation>" +
                         "<Language>AZ</Language>" +
                         "<Order>" +
-                            "<Merchant>E1000010</Merchant>" +
+                            "<Merchant>E1090050</Merchant>" +
                             $"<OrderID>{orderid}</OrderID>" +
                         "</Order>" +
                         $"<SessionID>{sessionId}</SessionID>" +
@@ -1508,18 +1529,6 @@ namespace Vinyoxla.Service.Implementations
                         await _userManager.AddToRoleAsync(newUser, "Member");
                     }
 
-                    Transaction transaction = new Transaction()
-                    {
-                        AppUser = appUser ?? newUser,
-                        Amount = 4,
-                        CreatedAt = DateTime.UtcNow.AddHours(4),
-                        IsFromBalance = false,
-                        IsTopUp = false,
-                        OrderId = orderid,
-                        SessionId = sessionId,
-                        PaymentIsSuccessful = false
-                    };
-
                     Event userEvent = await _unitOfWork.EventRepository.GetAsync(x => x.AppUser.UserName == "+994" + phone && x.Vin == vin.Trim().ToUpperInvariant());
 
                     #region Event handle
@@ -1543,7 +1552,7 @@ namespace Vinyoxla.Service.Implementations
                             {
                                 new EventMessage()
                                 {
-                                    Message = "user sistemi qirmag istedi, pulu odemeyib vinkodu almag istedi, cehdine son goydug, akkaunt yaratdig, " +
+                                    Message = "user sistemi qirmag istedi, pulu odemeyib vinkodu almag istedi, cehdine son goydug" +
                                     "event yaratdig, getsin garnin gashisin",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 }
@@ -1568,7 +1577,7 @@ namespace Vinyoxla.Service.Implementations
                         {
                             userEvent.EventMessages.Add(new EventMessage()
                             {
-                                Message = "user sistemi qirmag istedi, pulu odemeyib vinkodu almag istedi, cehdine son goydug, akkaunt yaratdig, " +
+                                Message = "user sistemi qirmag istedi, pulu odemeyib vinkodu almag istedi, cehdine son goydug" +
                                 "event yaratdig, getsin garnin gashisin",
                                 CreatedAt = DateTime.UtcNow.AddHours(4)
                             });
@@ -1579,7 +1588,7 @@ namespace Vinyoxla.Service.Implementations
                             {
                                 new EventMessage()
                                 {
-                                    Message = "user sistemi qirmag istedi, pulu odemeyib vinkodu almag istedi, cehdine son goydug, akkaunt yaratdig, " +
+                                    Message = "user sistemi qirmag istedi, pulu odemeyib vinkodu almag istedi, cehdine son goydug" +
                                     "event yaratdig, getsin garnin gashisin",
                                     CreatedAt = DateTime.UtcNow.AddHours(4)
                                 }
@@ -1589,9 +1598,6 @@ namespace Vinyoxla.Service.Implementations
 
                     #endregion
 
-                    //ya tut delal vsakie veshi, proverit nado vse offfff
-
-                    await _unitOfWork.TransactionRepository.AddAsync(transaction);
                     await _unitOfWork.CommitAsync();
                 }
 

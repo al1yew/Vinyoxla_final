@@ -1,0 +1,46 @@
+﻿@model ResultVM
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="Avtomobillərin VİN kodunun yoxlanışı">
+
+    <link rel="stylesheet" href="~/assets/styles/style.css">
+</head>
+
+<body class="body">
+
+    <main id="reportmain">
+        @Html.Raw(Model.HTML)
+
+        <a class="klassdlacssdownloadreport" id="printbtn">Yükləmək</a>
+
+        <a asp-controller="Home" asp-action="Index" class="returntoindex">Əsas Səhifə</a>
+    </main>
+
+    <!-- JQUERY  -->
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+            integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <!-- Toastr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"
+            integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Slick -->
+    <script src="~/assets/slick-1.8.1/slick/slick.min.js"></script>
+    <!-- axios -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"
+            integrity="sha512-zJYu9ICC+mWF3+dJ4QC34N9RA0OVS1XtPbnf6oXlvGrLGNB8egsEzu/5wgG90I61hOOKvcywoLzwNmPqGAdATA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- My JS -->
+    <script src="~/assets/scripts/main.js" asp-append-version="true"></script>
+</body>
+
+</html>

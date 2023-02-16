@@ -20,9 +20,9 @@
         <tr>
             <th class="col-lg-1 col-1 text-wrap">№</th>
             <th class="col-lg-1 col-1 text-wrap">Vin Code</th>
-            <th class="col-lg-1 col-1 text-wrap">File Name</th>
             <th class="col-lg-1 col-1 text-wrap">Purchased Times</th>
             <th class="col-lg-1 col-1 text-wrap">Created At</th>
+            <th class="col-lg-1 col-1 text-wrap">Open</th>
             <th class="col-lg-1 col-1 text-wrap">Delete</th>
         </tr>
     </thead>
@@ -33,9 +33,12 @@
             <tr>
                 <td class="col-lg-1 col-1 text-wrap">@no</td>
                 <td class="col-lg-1 col-1 text-wrap">@vinCode.Vin</td>
-                <td class="col-lg-1 col-1 text-wrap">@vinCode.FileName</td>
                 <td class="col-lg-1 col-1 text-wrap">@vinCode.PurchasedTimes</td>
                 <td class="col-lg-1 col-1 text-wrap">@vinCode.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    <a class="btn btn-warning" asp-area="Manage" asp-controller="Report"
+                       asp-action="Index" asp-route-fileName="@vinCode.FileName">Open</a>
+                </td>
                 <td class="col-lg-1 col-1 text-wrap">
                     <a class="btn btn-danger deleteBtn" asp-area="Manage" asp-controller="Vincode"
                        asp-action="Delete" asp-route-id="@vinCode.Id" asp-route-select="@ViewBag.Select" asp-route-vin="@ViewBag.Vin" asp-route-page="@ViewBag.Page">Delete</a>

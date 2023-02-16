@@ -33,8 +33,8 @@ namespace Vinyoxla.Service.Implementations
             //request image api
             homeVM.ImageVM = new ImageVM()
             {
-                AuctionCount = 2,
-                ImageCount = 33,
+                AuctionCount = 0,
+                ImageCount = 0,
                 Vehicle = homeVM.Carfax.Vehicle,
                 Vin = homeVM.Carfax.Vin
             };

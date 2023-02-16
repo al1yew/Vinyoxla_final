@@ -31,7 +31,7 @@ namespace Vinyoxla.MVC.Controllers
 
             if (resultVM == null)
             {
-                return RedirectToAction("Error", new { errno = 6 });
+                return RedirectToAction("Error", new { errno = 3 });
             }
 
             return View(resultVM);

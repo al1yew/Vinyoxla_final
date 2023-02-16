@@ -40,7 +40,7 @@ namespace Vinyoxla.MVC.Controllers
                 return StatusCode(404);
             }
 
-            TempData["UserConfirmationCode"] = response;
+            TempData["Code"] = response;
 
             return PartialView("_AccountCodePartial");
         }
@@ -48,7 +48,7 @@ namespace Vinyoxla.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM loginVM)
         {
-            foreach (string err in await _accountService.Login(loginVM, (int)TempData["UserConfirmationCode"]))
+            foreach (string err in await _accountService.Login(loginVM, (int)TempData["Code"]))
             {
                 ModelState.AddModelError("", err);
                 return View();
@@ -74,16 +74,21 @@ namespace Vinyoxla.MVC.Controllers
             return PartialView("_AccountReportsPartial", await _accountService.Sort(page, vin, sortbydate, showcount));
         }
 
-
         [HttpPost]
         public async Task<IActionResult> TopUp(string amount)
         {
             ReturnVM returnVM = await _accountService.Bank(amount);
-            TempData["orderId"] = returnVM.OrderId;
-            TempData["sessionId"] = returnVM.SessionId;
-            TempData["amount"] = amount;
 
-            return Redirect(returnVM.Url);
+            if (returnVM != null && returnVM.OrderId != null)
+            {
+                TempData["orderId"] = returnVM.OrderId;
+                TempData["sessionId"] = returnVM.SessionId;
+                TempData["amount"] = amount;
+
+                return Redirect(returnVM.Url);
+            }
+
+            return RedirectToAction("Error", new { errno = 3 });
         }
 
         public async Task<IActionResult> UpdateBalance()
@@ -115,6 +120,10 @@ namespace Vinyoxla.MVC.Controllers
             }
             else
             {
+                TempData["amount"] = "";
+                TempData["sessionId"] = "";
+                TempData["orderId"] = "";
+
                 return RedirectToAction("Profile");
             }
         }
@@ -123,12 +132,6 @@ namespace Vinyoxla.MVC.Controllers
         {
             return View(errno);
         }
-
-
-
-
-
-
 
 
 

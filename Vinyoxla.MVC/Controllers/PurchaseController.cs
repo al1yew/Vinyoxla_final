@@ -81,20 +81,26 @@ namespace Vinyoxla.MVC.Controllers
         public async Task<IActionResult> Purchase(OrderVM orderVM)
         {
             ReturnVM returnVM = await _purchaseService.Bank(orderVM.Vin, orderVM.PhoneNumber);
-            TempData["orderId"] = returnVM.OrderId;
-            TempData["sessionId"] = returnVM.SessionId;
-            TempData["vin"] = orderVM.Vin;
-            TempData["phone"] = orderVM.PhoneNumber;
 
-            return Redirect(returnVM.Url);
+            if (returnVM != null && returnVM.OrderId != null)
+            {
+                TempData["orderId"] = returnVM.OrderId;
+                TempData["sessionId"] = returnVM.SessionId;
+                TempData["vin"] = orderVM.Vin.Trim().ToUpperInvariant();
+                TempData["phone"] = orderVM.PhoneNumber;
+
+                return Redirect(returnVM.Url);
+            }
+
+            return RedirectToAction("Error", new { errno = 2 });
         }
 
         public async Task<IActionResult> GetReport()
         {
             string orderId = TempData["orderId"].ToString();
             string sessionId = TempData["sessionId"].ToString();
-            string vin = TempData["vin"].ToString();
             string phoneno = TempData["phone"].ToString();
+            string vin = TempData["vin"].ToString();
 
             if (orderId.Length > 0)
             {
@@ -104,20 +110,15 @@ namespace Vinyoxla.MVC.Controllers
                     {
                         string fileName = await _purchaseService.GetReport(phoneno, vin, false, orderId, sessionId);
 
-                        if (fileName == null)
-                        {
-                            TempData["orderId"] = "";
-                            TempData["sessionId"] = "";
-                            TempData["vin"] = "";
-                            TempData["phone"] = "";
-
-                            return RedirectToAction("Error", new { errno = 2 });
-                        }
-
                         TempData["orderId"] = "";
                         TempData["sessionId"] = "";
-                        TempData["vin"] = "";
                         TempData["phone"] = "";
+                        TempData["vin"] = "";
+
+                        if (fileName == null)
+                        {
+                            return RedirectToAction("Error", new { errno = 2 });
+                        }
 
                         return RedirectToAction("Index", "Report", new { fileName });
                     }
@@ -129,8 +130,8 @@ namespace Vinyoxla.MVC.Controllers
                         {
                             TempData["orderId"] = "";
                             TempData["sessionId"] = "";
-                            TempData["vin"] = "";
                             TempData["phone"] = "";
+                            TempData["vin"] = "";
 
                             return RedirectToAction("Error", new { errno = 0 });
                         }
@@ -138,20 +139,15 @@ namespace Vinyoxla.MVC.Controllers
                         {
                             string fileName = await _purchaseService.ReplaceOldReport(phoneno, vin, false, orderId, sessionId);
 
-                            if (fileName == null)
-                            {
-                                TempData["orderId"] = "";
-                                TempData["sessionId"] = "";
-                                TempData["vin"] = "";
-                                TempData["phone"] = "";
-
-                                return RedirectToAction("Error", new { errno = 1 });
-                            }
-
                             TempData["orderId"] = "";
                             TempData["sessionId"] = "";
-                            TempData["vin"] = "";
                             TempData["phone"] = "";
+                            TempData["vin"] = "";
+
+                            if (fileName == null)
+                            {
+                                return RedirectToAction("Error", new { errno = 1 });
+                            }
 
                             return RedirectToAction("Index", "Report", new { fileName });
                         }
@@ -159,28 +155,23 @@ namespace Vinyoxla.MVC.Controllers
                         {
                             string fileName = await _purchaseService.GetReport(phoneno, vin, false, orderId, sessionId);
 
-                            if (fileName == null)
-                            {
-                                TempData["orderId"] = "";
-                                TempData["sessionId"] = "";
-                                TempData["vin"] = "";
-                                TempData["phone"] = "";
-
-                                return RedirectToAction("Error", new { errno = 2 });
-                            }
-
                             TempData["orderId"] = "";
                             TempData["sessionId"] = "";
-                            TempData["vin"] = "";
                             TempData["phone"] = "";
+                            TempData["vin"] = "";
+
+                            if (fileName == null)
+                            {
+                                return RedirectToAction("Error", new { errno = 2 });
+                            }
 
                             return RedirectToAction("Index", "Report", new { fileName });
                         }
 
                         TempData["orderId"] = "";
                         TempData["sessionId"] = "";
-                        TempData["vin"] = "";
                         TempData["phone"] = "";
+                        TempData["vin"] = "";
 
                         return RedirectToAction("Index", "Report", new { fileName = result });
                     }
@@ -189,8 +180,8 @@ namespace Vinyoxla.MVC.Controllers
                 {
                     TempData["orderId"] = "";
                     TempData["sessionId"] = "";
-                    TempData["vin"] = "";
                     TempData["phone"] = "";
+                    TempData["vin"] = "";
 
                     return RedirectToAction("Error", new { errno = 10 });
                 }

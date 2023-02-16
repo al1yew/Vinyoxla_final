@@ -76,7 +76,7 @@ namespace Vinyoxla.Service.Implementations
             Random random = new Random();
             int generatedcode = random.Next(1000, 9999);
 
-            string url = $"http://api.msm.az/sendsms?user={Configuration.GetSection("MSM:Username").Value}&password={Configuration.GetSection("MSM:Apikey").Value}&gsm={phone}&from=MSM&text={generatedcode}";
+            string url = $"http://api.msm.az/sendsms?user={Configuration.GetSection("MSM:Username").Value}&password={Configuration.GetSection("MSM:Apikey").Value}&gsm={phone}&from={Configuration.GetSection("MSM:From").Value}&text={generatedcode}";
 
             HttpResponseMessage response = null;
 
@@ -203,7 +203,11 @@ namespace Vinyoxla.Service.Implementations
 
         public async Task<ReturnVM> Bank(string amount)
         {
-            string url = $"https://tstpg.kapitalbank.az:5443/Exec";
+            string url = $"https://3dsrv.kapitalbank.az:5443/Exec";
+            //https://tstpg.kapitalbank.az:5443/Exec
+            //https://3dsrv.kapitalbank.az:5443/Exec
+            //E1090050
+            //E1000010
 
             string xml =
                 "<TKKPG>" +
@@ -212,19 +216,21 @@ namespace Vinyoxla.Service.Implementations
                         "<Language>AZ</Language>" +
                         "<Order>" +
                             "<OrderType>Purchase</OrderType>" +
-                            "<Merchant>E1000010</Merchant>" +
+                            "<Merchant>E1090050</Merchant>" +
                             $"<Amount>{int.Parse(amount) * 100}</Amount>" +
                             "<Currency>944</Currency>" +
                             $"<Description>{_httpContextAccessor.HttpContext.User.Identity.Name} Phone / {amount} azn</Description>" +
-                            $"<ApproveURL>https://vinyoxla.az/about</ApproveURL>" +
-                            "<CancelURL>vinyoxla.az</CancelURL>" +
-                            "<DeclineURL>vinyoxla.az</DeclineURL>" +
+                            "<ApproveURL>https://vinyoxla.az/Account/UpdateBalance</ApproveURL>" +
+                            "<CancelURL>https://vinyoxla.az/Account/Error?errno=10</CancelURL>" +
+                            "<DeclineURL>https://vinyoxla.az/Purchase/Error?errno=10</DeclineURL>" +
                         "</Order>" +
                     "</Request>" +
                 "</TKKPG>";
 
             //https://vinyoxla.az/Account/UpdateBalance
             //https://vinyoxla.az/Purchase/Error?errno=10
+
+            #region crt zad
 
             byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
             byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
@@ -243,6 +249,9 @@ namespace Vinyoxla.Service.Implementations
 
             StringContent content = new StringContent(xml);
             content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml");
+
+
+            #endregion
 
             HttpResponseMessage response = null;
 
@@ -286,7 +295,11 @@ namespace Vinyoxla.Service.Implementations
 
         public async Task<bool> CheckOrder(string amount, string orderid, string sessionId)
         {
-            string url = $"https://tstpg.kapitalbank.az:5443/Exec";
+            string url = $"https://3dsrv.kapitalbank.az:5443/Exec";
+            //https://tstpg.kapitalbank.az:5443/Exec
+            //https://3dsrv.kapitalbank.az:5443/Exec
+            //E1090050
+            //E1000010
 
             string xml =
                 "<TKKPG>" +
@@ -294,12 +307,14 @@ namespace Vinyoxla.Service.Implementations
                         "<Operation>GetOrderStatus</Operation>" +
                         "<Language>AZ</Language>" +
                         "<Order>" +
-                            "<Merchant>E1000010</Merchant>" +
+                            "<Merchant>E1090050</Merchant>" +
                             $"<OrderID>{orderid}</OrderID>" +
                         "</Order>" +
                         $"<SessionID>{sessionId}</SessionID>" +
                     "</Request>" +
                 "</TKKPG>";
+
+            #region crt zad
 
             byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
             byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
@@ -318,6 +333,8 @@ namespace Vinyoxla.Service.Implementations
 
             StringContent content = new StringContent(xml);
             content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml");
+
+            #endregion
 
             HttpResponseMessage response = null;
 
@@ -347,19 +364,35 @@ namespace Vinyoxla.Service.Implementations
                 {
                     AppUser appUser = await _userManager.FindByNameAsync(_httpContextAccessor.HttpContext.User.Identity.Name);
 
-                    Transaction transaction = new Transaction()
+                    #region Event handle
+
+                    Event newUserEvent = new Event()
                     {
                         AppUser = appUser,
-                        Amount = int.Parse(amount),
                         CreatedAt = DateTime.UtcNow.AddHours(4),
-                        IsFromBalance = false,
-                        IsTopUp = true,
-                        OrderId = orderid,
-                        SessionId = sessionId,
-                        PaymentIsSuccessful = true
+                        IsFromApi = false,
+                        IsApiError = false,
+                        DidRefundToBalance = false,
+                        ErrorWhileRenew = false,
+                        ErrorWhileReplace = false,
+                        FileExists = false,
+                        IsRenewedDueToAbsence = false,
+                        IsRenewedDueToExpire = false,
+                        Vin = "TOPUP",
+                        EventMessages = new List<EventMessage>()
+                        {
+                            new EventMessage()
+                            {
+                                Message = "user sistemi qirmag istedi, pulu odemeyib balansi artirmag istedi, cehdine son goydug" +
+                                "event yaratdig, getsin garnin gashisin",
+                                CreatedAt = DateTime.UtcNow.AddHours(4)
+                            }
+                        }
                     };
 
-                    await _unitOfWork.TransactionRepository.AddAsync(transaction);
+                    #endregion
+
+                    await _unitOfWork.EventRepository.AddAsync(newUserEvent);
                     await _unitOfWork.CommitAsync();
                 }
 

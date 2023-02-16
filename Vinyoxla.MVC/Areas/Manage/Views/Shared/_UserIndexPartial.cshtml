@@ -25,6 +25,7 @@
             <th class="col-lg-1 col-1 text-wrap">Transactions</th>
             <th class="col-lg-1 col-1 text-wrap">Events</th>
             <th class="col-lg-1 col-1 text-wrap">Created At</th>
+            <th class="col-lg-1 col-1 text-wrap">Is Admin?</th>
             <th class="col-lg-1 col-1 text-wrap">Update</th>
             <th class="col-lg-1 col-1 text-wrap">Delete</th>
         </tr>
@@ -45,6 +46,7 @@
                 <td class="col-lg-1 col-1 text-wrap">@user.Transactions.Count</td>
                 <td class="col-lg-1 col-1 text-wrap">@user.Events.Count</td>
                 <td class="col-lg-1 col-1 text-wrap">@user.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td class="col-lg-1 col-1 text-wrap @(user.IsAdmin ? "text-success" : "text-danger")">@(user.IsAdmin ? "Yes" : "No")</td>
                 <td class="col-lg-1 col-1 text-wrap">
                     <a class="btn btn-warning" asp-area="Manage" asp-controller="User" asp-action="Update"
                        asp-route-id="@user.Id">Update</a>

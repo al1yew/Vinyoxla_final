@@ -12,6 +12,8 @@ namespace Vinyoxla.Service.ViewModels.UserVMs
 
         public string Password { get; set; }
 
+        public bool IsAdmin { get; set; }
+
         [DataType(DataType.Text)]
         public int Balance { get; set; }
     }

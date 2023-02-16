@@ -27,6 +27,16 @@ $(document).ready(function () {
         $('.reklamhref').attr('href', 'https://www.instagram.com/garantauto.az/?hl=en')
     }
 
+    //#region prevent letters and nonnumeric
+
+    $(document).on('input', '#phonenumber, #phoneno, #code, #amounttopup', function (e) {
+        if (!/^[0-9]+$/.test($(this).val())) {
+            $(this).val($(this).val().slice(0, -1))
+        }
+    })
+
+    //#endregion prevent letters and nonnumeric
+
     // -------------------------- main page
 
     //#region input toUpperCase in vincode input
@@ -159,8 +169,6 @@ $(document).ready(function () {
 
     $(document).on('submit', '#loginform', function (e) {
         const formData = new FormData(e.target);
-
-        //iki variant var, kod olanda ve olmayanda
 
         let phoneno = formData.get('PhoneNumber');
         let code = formData.get('Code');
@@ -305,16 +313,6 @@ $(document).ready(function () {
     //});
 
     //#endregion purchase form
-
-    //#region prevent letters in purchase page
-
-    $(document).on('input', '#phonenumber', function (e) {
-        if (!/^[0-9]+$/.test($(this).val())) {
-            $(this).val($(this).val().slice(0, -1))
-        }
-    })
-
-    //#endregion prevent letters in purchase page
 
     //#region input toUpperCase
 
@@ -501,75 +499,6 @@ $(document).ready(function () {
     //#endregion balance form
 
     // -------------------------- account page
-
-    // -------------------------- 
-
-    // -------------------------- topup page
-
-    //#region amount input prevent entering of nonnumeric
-
-    $(document).on('input', '#amount', function (e) {
-
-        if (!/^[0-9]+$/.test($(this).val())) {
-            $(this).val($(this).val().slice(0, -1))
-        }
-    })
-
-    //#endregion amount input prevent entering of nonnumeric
-
-    //#region topup form submit
-
-    $(document).on('submit', '#topupmain', function (e) {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-
-        let cardno = formData.get('cardno');
-        let cardholder = formData.get('cardholder');
-        let year = formData.get('year');
-        let month = formData.get('month');
-        let cvv = formData.get('cvv');
-        let amount = formData.get('amount');
-
-        let date = new Date;
-
-        let cardDate = '01/' + month.trim() + '/' + year.trim();
-
-        let convertedDate = new Date(cardDate)
-
-        if (month.length > 2 || year.length > 4 || cvv.length > 3) {
-            toastr.error('Məlumatlar səhvdir.');
-            return;
-        }
-
-        if (!/^[a-zA-Z\s]*$/.test(cardholder)) {
-            toastr.error('Ad soyad səhvdir.');
-            return;
-        }
-
-        if (!/^[0-9]+$/.test(cardno) ||
-            !/^[0-9]+$/.test(year) ||
-            !/^[0-9]+$/.test(month) ||
-            !/^[0-9]+$/.test(cvv)) {
-            toastr.error('Məlumatlar səhvdir.');
-            return;
-        }
-
-        if (month > 12) {
-            toastr.error('Ay səhvdir.');
-            return;
-        }
-
-        if (convertedDate.getTime() < date.getTime()) {
-            toastr.error('Kartın son tarixi səhvdir.');
-            return;
-        }
-
-        console.log({ amount, cvv, cardno, cardholder, year, month });
-    })
-
-    //#endregion topup form submit
-
-    // -------------------------- topup page
 
     // -------------------------- 
 
