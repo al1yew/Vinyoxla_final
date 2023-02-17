@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -201,7 +202,7 @@ namespace Vinyoxla.Service.Implementations
             return PaginationList<AppUserToVincodeVM>.Create(query, page == 0 ? 1 : page, showcount == 0 ? 1 : showcount);
         }
 
-        public async Task<ReturnVM> Bank(string amount)
+        public async Task<string> Bank(string amount)
         {
             string url = $"https://3dsrv.kapitalbank.az:5443/Exec";
             //https://tstpg.kapitalbank.az:5443/Exec
@@ -226,9 +227,6 @@ namespace Vinyoxla.Service.Implementations
                         "</Order>" +
                     "</Request>" +
                 "</TKKPG>";
-
-            //https://vinyoxla.az/Account/UpdateBalance
-            //https://vinyoxla.az/Purchase/Error?errno=10
 
             #region crt zad
 
@@ -279,14 +277,25 @@ namespace Vinyoxla.Service.Implementations
                         + "?ORDERID=" + tkkpg.Response.Order.OrderID
                         + "&SESSIONID=" + tkkpg.Response.Order.SessionID;
 
-                    ReturnVM returnVM = new ReturnVM()
+                    TopUpVM topUpVM = new TopUpVM()
                     {
                         OrderId = tkkpg.Response.Order.OrderID,
                         SessionId = tkkpg.Response.Order.SessionID,
-                        Url = newUrl
+                        Amount = amount
                     };
 
-                    return returnVM;
+                    string topUp = _httpContextAccessor.HttpContext.Request.Cookies["topUp"];
+
+                    if (!string.IsNullOrWhiteSpace(topUp))
+                    {
+                        topUp = null;
+                    }
+
+                    topUp = JsonConvert.SerializeObject(topUpVM);
+
+                    _httpContextAccessor.HttpContext.Response.Cookies.Append("topUp", topUp);
+
+                    return newUrl;
                 }
             }
 

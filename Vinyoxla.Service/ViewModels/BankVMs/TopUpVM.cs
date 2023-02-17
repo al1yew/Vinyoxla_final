@@ -4,10 +4,10 @@ using System.Text;
 
 namespace Vinyoxla.Service.ViewModels.BankVMs
 {
-    public class ReturnVM
+    public class TopUpVM
     {
-        public string Url { get; set; }
         public string OrderId { get; set; }
         public string SessionId { get; set; }
+        public string Amount { get; set; }
     }
 }

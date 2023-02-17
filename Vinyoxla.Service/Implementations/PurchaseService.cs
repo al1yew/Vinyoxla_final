@@ -877,6 +877,8 @@ namespace Vinyoxla.Service.Implementations
 
                             #endregion
 
+                            transaction.PaymentIsSuccessful = false;
+
                             await _unitOfWork.TransactionRepository.AddAsync(transaction);
                             await _unitOfWork.CommitAsync();
 
@@ -1047,6 +1049,8 @@ namespace Vinyoxla.Service.Implementations
 
                         #endregion
 
+                        transaction.PaymentIsSuccessful = false;
+
                         await _unitOfWork.TransactionRepository.AddAsync(transaction);
                         await _unitOfWork.CommitAsync();
 
@@ -1215,6 +1219,8 @@ namespace Vinyoxla.Service.Implementations
 
                     #endregion
 
+                    transaction.PaymentIsSuccessful = false;
+
                     await _unitOfWork.TransactionRepository.AddAsync(transaction);
                     await _unitOfWork.CommitAsync();
 
@@ -1345,7 +1351,7 @@ namespace Vinyoxla.Service.Implementations
             await _userManager.UpdateAsync(appUser);
         }
 
-        public async Task<ReturnVM> Bank(string vin, string phoneno)
+        public async Task<string> Bank(string vin, string phoneno)
         {
             string url = $"https://3dsrv.kapitalbank.az:5443/Exec";
 
@@ -1362,18 +1368,15 @@ namespace Vinyoxla.Service.Implementations
                         "<Order>" +
                             "<OrderType>Purchase</OrderType>" +
                             "<Merchant>E1090050</Merchant>" +
-                            "<Amount>50</Amount>" +
+                            "<Amount>400</Amount>" +
                             "<Currency>944</Currency>" +
                             $"<Description>{vin} vin / +994{phoneno} user / 4 azn</Description>" +
-                            $"<ApproveURL>https://vinyoxla.az/Purchase/GetReport</ApproveURL>" +
+                            "<ApproveURL>https://vinyoxla.az/Purchase/GetReport</ApproveURL>" +
                             "<CancelURL>https://vinyoxla.az/Purchase/Error?errno=10</CancelURL>" +
                             "<DeclineURL>https://vinyoxla.az/Purchase/Error?errno=10</DeclineURL>" +
                         "</Order>" +
                     "</Request>" +
                 "</TKKPG>";
-
-            //https://vinyoxla.az/Purchase/GetReport?vin={vin}&phoneno={phoneno}
-            //https://vinyoxla.az/Purchase/Error?errno=10
 
             #region crt key
 
@@ -1423,14 +1426,26 @@ namespace Vinyoxla.Service.Implementations
                         + "?ORDERID=" + tkkpg.Response.Order.OrderID
                         + "&SESSIONID=" + tkkpg.Response.Order.SessionID;
 
-                    ReturnVM returnVM = new ReturnVM()
+                    CookieInfoVM cookieInfoVM = new CookieInfoVM()
                     {
                         OrderId = tkkpg.Response.Order.OrderID,
                         SessionId = tkkpg.Response.Order.SessionID,
-                        Url = newUrl
+                        VinCode = vin.Trim().ToUpperInvariant(),
+                        PhoneNumber = phoneno
                     };
 
-                    return returnVM;
+                    string cookieInfo = _httpContextAccessor.HttpContext.Request.Cookies["cookieInfo"];
+
+                    if (!string.IsNullOrWhiteSpace(cookieInfo))
+                    {
+                        cookieInfo = null;
+                    }
+
+                    cookieInfo = JsonConvert.SerializeObject(cookieInfoVM);
+
+                    _httpContextAccessor.HttpContext.Response.Cookies.Append("cookieInfo", cookieInfo);
+
+                    return newUrl;
                 }
             }
 

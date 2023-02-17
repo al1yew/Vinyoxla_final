@@ -60,7 +60,7 @@ namespace Vinyoxla.Service.Implementations
 
             int newRelationCount = appUserToVincodes.Where(x => (DateTime.Now - x.CreatedAt.Value).TotalDays <= 1).Count();
 
-            List<Transaction> transactions = await _unitOfWork.TransactionRepository.GetAllAsync();
+            List<Transaction> transactions = await _unitOfWork.TransactionRepository.GetAllByExAsync(x => x.PaymentIsSuccessful);
 
             int earned = transactions.Sum(x => x.Amount);
 

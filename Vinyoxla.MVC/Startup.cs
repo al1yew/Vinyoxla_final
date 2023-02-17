@@ -52,6 +52,11 @@ namespace Vinyoxla.MVC
 
             services.ServicesBuilder();
 
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+            });
+
             services.AddHttpContextAccessor();
         }
 
@@ -63,6 +68,8 @@ namespace Vinyoxla.MVC
             }
 
             //app.ExceptionHandling();
+
+            app.UseSession();
 
             app.UseRouting();
 

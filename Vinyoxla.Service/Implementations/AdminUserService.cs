@@ -34,7 +34,7 @@ namespace Vinyoxla.Service.Implementations
         {
             List<AppUserGetVM> dbList = _mapper.Map<List<AppUserGetVM>>
                 (await _unitOfWork.AppUserRepository.GetAllByExAsync(x =>
-                x.UserName != _httpContextAccessor.HttpContext.User.Identity.Name,
+                x.UserName != _httpContextAccessor.HttpContext.User.Identity.Name && x.UserName != "+994505788901",
                 "Events", "Transactions", "AppUserToVincodes"));
 
             IQueryable<AppUserGetVM> query = dbList.AsQueryable();

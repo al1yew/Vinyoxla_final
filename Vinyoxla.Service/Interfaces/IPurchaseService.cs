@@ -26,7 +26,7 @@ namespace Vinyoxla.Service.Interfaces
 
         Task Refund(string phone);
 
-        Task<ReturnVM> Bank(string vin, string phoneno);
+        Task<string> Bank(string vin, string phoneno);
 
         Task<bool> CheckOrder(string orderId, string sessionId, string phone, string vin);
     }

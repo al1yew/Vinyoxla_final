@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Vinyoxla.Core.Models;
 using Vinyoxla.Service.Interfaces;
@@ -77,15 +77,11 @@ namespace Vinyoxla.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> TopUp(string amount)
         {
-            ReturnVM returnVM = await _accountService.Bank(amount);
+            string url = await _accountService.Bank(amount);
 
-            if (returnVM != null && returnVM.OrderId != null)
+            if (url != null)
             {
-                TempData["orderId"] = returnVM.OrderId;
-                TempData["sessionId"] = returnVM.SessionId;
-                TempData["amount"] = amount;
-
-                return Redirect(returnVM.Url);
+                return Redirect(url);
             }
 
             return RedirectToAction("Error", new { errno = 3 });
@@ -93,47 +89,37 @@ namespace Vinyoxla.MVC.Controllers
 
         public async Task<IActionResult> UpdateBalance()
         {
-            string orderId = TempData["orderId"].ToString();
-            string sessionId = TempData["sessionId"].ToString();
-            string amount = TempData["amount"].ToString();
+            string topUp = HttpContext.Request.Cookies["topUp"];
 
-            if (amount.Length > 0)
+            TopUpVM topUpVM = new TopUpVM();
+
+            if (string.IsNullOrWhiteSpace(topUp))
             {
-                if (await _accountService.CheckOrder(amount, orderId, sessionId))
-                {
-                    await _accountService.UpdateBalance(amount, orderId, sessionId);
-
-                    TempData["amount"] = "";
-                    TempData["sessionId"] = "";
-                    TempData["orderId"] = "";
-
-                    return RedirectToAction("Profile");
-                }
-                else
-                {
-                    TempData["amount"] = "";
-                    TempData["sessionId"] = "";
-                    TempData["orderId"] = "";
-
-                    return RedirectToAction("Error", new { errno = 10 });
-                }
+                return RedirectToAction("Index", "Home");
             }
-            else
+
+            topUpVM = JsonConvert.DeserializeObject<TopUpVM>(topUp);
+
+            string orderId = topUpVM.OrderId;
+            string sessionId = topUpVM.SessionId;
+            string amount = topUpVM.Amount;
+
+            HttpContext.Response.Cookies.Delete("topUp");
+
+            if (await _accountService.CheckOrder(amount, orderId, sessionId))
             {
-                TempData["amount"] = "";
-                TempData["sessionId"] = "";
-                TempData["orderId"] = "";
+                await _accountService.UpdateBalance(amount, orderId, sessionId);
 
                 return RedirectToAction("Profile");
             }
+
+            return RedirectToAction("Error", new { errno = 10 });
         }
 
         public async Task<IActionResult> Error(int errno)
         {
             return View(errno);
         }
-
-
 
         #region Created Roles
 

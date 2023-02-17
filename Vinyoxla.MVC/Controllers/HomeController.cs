@@ -15,6 +15,8 @@ namespace Vinyoxla.MVC.Controllers
 
         public IActionResult Index()
         {
+            HttpContext.Response.Cookies.Delete("topUp");
+            HttpContext.Response.Cookies.Delete("cookieInfo");
             return View();
         }
 

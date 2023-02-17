@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Vinyoxla.Service.Interfaces;
 using Vinyoxla.Service.ViewModels.BankVMs;
@@ -80,40 +81,71 @@ namespace Vinyoxla.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Purchase(OrderVM orderVM)
         {
-            ReturnVM returnVM = await _purchaseService.Bank(orderVM.Vin, orderVM.PhoneNumber);
+            string url = await _purchaseService.Bank(orderVM.Vin, orderVM.PhoneNumber);
 
-            if (returnVM != null && returnVM.OrderId != null)
+            if (url != null)
             {
-                TempData["orderId"] = returnVM.OrderId;
-                TempData["sessionId"] = returnVM.SessionId;
-                TempData["vin"] = orderVM.Vin.Trim().ToUpperInvariant();
-                TempData["phone"] = orderVM.PhoneNumber;
-
-                return Redirect(returnVM.Url);
+                return Redirect(url);
             }
 
-            return RedirectToAction("Error", new { errno = 2 });
+            return RedirectToAction("Error", new { errno = 3 });
         }
 
         public async Task<IActionResult> GetReport()
         {
-            string orderId = TempData["orderId"].ToString();
-            string sessionId = TempData["sessionId"].ToString();
-            string phoneno = TempData["phone"].ToString();
-            string vin = TempData["vin"].ToString();
+            string cookieInfo = HttpContext.Request.Cookies["cookieInfo"];
 
-            if (orderId.Length > 0)
+            CookieInfoVM cookieInfoVM = new CookieInfoVM();
+
+            if (string.IsNullOrWhiteSpace(cookieInfo))
             {
-                if (await _purchaseService.CheckOrder(orderId, sessionId, phoneno, vin))
+                return RedirectToAction("Index", "Home");
+            }
+
+            cookieInfoVM = JsonConvert.DeserializeObject<CookieInfoVM>(cookieInfo);
+
+            string orderId = cookieInfoVM.OrderId;
+            string sessionId = cookieInfoVM.SessionId;
+            string phoneno = cookieInfoVM.PhoneNumber;
+            string vin = cookieInfoVM.VinCode;
+
+            HttpContext.Response.Cookies.Delete("cookieInfo");
+
+            if (await _purchaseService.CheckOrder(orderId, sessionId, phoneno, vin))
+            {
+                if (User.Identity.IsAuthenticated)
                 {
-                    if (User.Identity.IsAuthenticated)
+                    string fileName = await _purchaseService.GetReport(phoneno, vin, false, orderId, sessionId);
+
+                    if (fileName == null)
+                    {
+                        return RedirectToAction("Error", new { errno = 2 });
+                    }
+
+                    return RedirectToAction("Index", "Report", new { fileName });
+                }
+                else
+                {
+                    string result = await _purchaseService.CheckEverything(phoneno, vin, true);
+
+                    if (result == "0")
+                    {
+                        return RedirectToAction("Error", new { errno = 0 });
+                    }
+                    else if (result == "1")
+                    {
+                        string fileName = await _purchaseService.ReplaceOldReport(phoneno, vin, false, orderId, sessionId);
+
+                        if (fileName == null)
+                        {
+                            return RedirectToAction("Error", new { errno = 1 });
+                        }
+
+                        return RedirectToAction("Index", "Report", new { fileName });
+                    }
+                    else if (result == "2")
                     {
                         string fileName = await _purchaseService.GetReport(phoneno, vin, false, orderId, sessionId);
-
-                        TempData["orderId"] = "";
-                        TempData["sessionId"] = "";
-                        TempData["phone"] = "";
-                        TempData["vin"] = "";
 
                         if (fileName == null)
                         {
@@ -122,73 +154,13 @@ namespace Vinyoxla.MVC.Controllers
 
                         return RedirectToAction("Index", "Report", new { fileName });
                     }
-                    else
-                    {
-                        string result = await _purchaseService.CheckEverything(phoneno, vin, true);
 
-                        if (result == "0")
-                        {
-                            TempData["orderId"] = "";
-                            TempData["sessionId"] = "";
-                            TempData["phone"] = "";
-                            TempData["vin"] = "";
-
-                            return RedirectToAction("Error", new { errno = 0 });
-                        }
-                        else if (result == "1")
-                        {
-                            string fileName = await _purchaseService.ReplaceOldReport(phoneno, vin, false, orderId, sessionId);
-
-                            TempData["orderId"] = "";
-                            TempData["sessionId"] = "";
-                            TempData["phone"] = "";
-                            TempData["vin"] = "";
-
-                            if (fileName == null)
-                            {
-                                return RedirectToAction("Error", new { errno = 1 });
-                            }
-
-                            return RedirectToAction("Index", "Report", new { fileName });
-                        }
-                        else if (result == "2")
-                        {
-                            string fileName = await _purchaseService.GetReport(phoneno, vin, false, orderId, sessionId);
-
-                            TempData["orderId"] = "";
-                            TempData["sessionId"] = "";
-                            TempData["phone"] = "";
-                            TempData["vin"] = "";
-
-                            if (fileName == null)
-                            {
-                                return RedirectToAction("Error", new { errno = 2 });
-                            }
-
-                            return RedirectToAction("Index", "Report", new { fileName });
-                        }
-
-                        TempData["orderId"] = "";
-                        TempData["sessionId"] = "";
-                        TempData["phone"] = "";
-                        TempData["vin"] = "";
-
-                        return RedirectToAction("Index", "Report", new { fileName = result });
-                    }
-                }
-                else
-                {
-                    TempData["orderId"] = "";
-                    TempData["sessionId"] = "";
-                    TempData["phone"] = "";
-                    TempData["vin"] = "";
-
-                    return RedirectToAction("Error", new { errno = 10 });
+                    return RedirectToAction("Index", "Report", new { fileName = result });
                 }
             }
             else
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Error", new { errno = 10 });
             }
         }
 

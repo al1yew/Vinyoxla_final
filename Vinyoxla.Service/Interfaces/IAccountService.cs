@@ -21,7 +21,7 @@ namespace Vinyoxla.Service.Interfaces
 
         Task<PaginationList<AppUserToVincodeVM>> Sort(int page, string vin, int sortbydate, int showcount);
 
-        Task<ReturnVM> Bank(string amonut);
+        Task<string> Bank(string amonut);
 
         Task<bool> CheckOrder(string amount, string orderId, string sessionId);
 
