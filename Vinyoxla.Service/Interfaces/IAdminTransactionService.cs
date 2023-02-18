@@ -12,5 +12,7 @@ namespace Vinyoxla.Service.Interfaces
         Task<IQueryable<TransactionGetVM>> GetAllAsync(string phone, string orderId, string sessionId);
 
         Task<TransactionGetVM> GetById(int? id);
+
+        Task DeleteAsync(int? id);
     }
 }

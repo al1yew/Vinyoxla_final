@@ -52,7 +52,7 @@ namespace Vinyoxla.Service.Implementations
                 query = query.Where(x => x.AppUser.UserName.Contains(phone));
             }
 
-            return query;
+            return query.OrderByDescending(x => x.CreatedAt);
         }
 
         public async Task<AppUserToVincodeVM> GetById(int? id)
@@ -551,7 +551,7 @@ namespace Vinyoxla.Service.Implementations
         public async Task DeleteAsync(int? id)
         {
             if (id == null)
-                throw new NotFoundException($"Relation cannot be found by id = {id}");
+                throw new NotFoundException($"Id is null!");
 
             AppUserToVincode appUserToVincode = await _unitOfWork.AppUserToVincodeRepository.GetAsync(x => x.Id == id, "AppUser", "VinCode");
 

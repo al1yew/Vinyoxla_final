@@ -28,7 +28,7 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
 
             if (select <= 0)
             {
-                select = 5;
+                select = 10;
             }
 
             ViewBag.Select = select;
@@ -39,6 +39,22 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
             ViewBag.WhereWeAre = "Transactions";
 
             return View(PaginationList<TransactionGetVM>.Create(transactions, page, select));
+        }
+
+        public async Task<IActionResult> Delete(int? id, int select, string orderId, string sessionId, string phone, int page)
+        {
+            ViewBag.Select = select;
+            ViewBag.Page = page;
+            ViewBag.SessionId = sessionId;
+            ViewBag.OrderId = orderId;
+            ViewBag.Phone = phone;
+            ViewBag.WhereWeAre = "Transactions";
+
+            await _adminTransactionService.DeleteAsync(id);
+
+            IQueryable<TransactionGetVM> transactions = await _adminTransactionService.GetAllAsync(phone, orderId, sessionId);
+
+            return PartialView("_TransactionIndexPartial", PaginationList<TransactionGetVM>.Create(transactions, page, select));
         }
     }
 }

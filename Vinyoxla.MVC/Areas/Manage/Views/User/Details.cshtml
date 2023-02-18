@@ -85,8 +85,16 @@
                     <tr class="eventtr" id="eventtr" style="cursor: pointer;">
                         <td class="col-lg-1 col-1 text-wrap">@no</td>
                         <td class="col-lg-1 col-1 text-wrap">@eventik.Vin</td>
-                        <td class="col-lg-1 col-1 text-wrap">@eventik.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@eventik.UpdatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                        <td class="col-lg-1 col-1 text-wrap">
+                            @eventik.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                            <br />
+                            @eventik.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                        </td>
+                        <td class="col-lg-1 col-1 text-wrap">
+                            @eventik.UpdatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                            <br />
+                            @eventik.UpdatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                        </td>
                         <td class="col-lg-1 col-1 text-wrap">@(eventik.DidRefundToBalance ? "Yes" : "No")</td>
                         <td class="col-lg-1 col-1 text-wrap">@(eventik.ErrorWhileRenew ? "Yes" : "No")</td>
                         <td class="col-lg-1 col-1 text-wrap">@(eventik.ErrorWhileReplace ? "Yes" : "No")</td>
@@ -116,7 +124,11 @@
                                         noo++;
                                         <tr>
                                             <td class="col-lg-1 col-1 ">@noo</td>
-                                            <td class="col-lg-1 col-1">@messageGetVM.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                                            <td class="col-lg-1 col-1">
+                                                @messageGetVM.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                                                <br />
+                                                @messageGetVM.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                                            </td>
                                             <td class="col-lg-8 col-8 ">@messageGetVM.Message</td>
                                         </tr>
                                     }
@@ -150,7 +162,11 @@
                     no++;
                     <tr>
                         <td class="col-lg-1 col-1 text-wrap">@no</td>
-                        <td class="col-lg-1 col-1 text-wrap">@transaction.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                        <td class="col-lg-1 col-1 text-wrap">
+                            @transaction.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                            <br />
+                            @transaction.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                        </td>
                         <td class="col-lg-1 col-1 text-wrap">@transaction.Amount</td>
                         <td class="col-lg-1 col-1 text-wrap">@transaction.OrderId</td>
                         <td class="col-lg-1 col-1 text-wrap">@transaction.SessionId</td>

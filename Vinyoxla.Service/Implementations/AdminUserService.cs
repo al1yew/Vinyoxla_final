@@ -44,7 +44,7 @@ namespace Vinyoxla.Service.Implementations
                 query = query.Where(x => x.UserName.Contains(phone.Trim().ToUpperInvariant()));
             }
 
-            return query;
+            return query.OrderByDescending(x => x.CreatedAt);
         }
 
         public async Task<AppUserGetVM> GetById(string id)

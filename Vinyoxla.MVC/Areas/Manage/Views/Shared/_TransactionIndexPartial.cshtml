@@ -9,7 +9,8 @@
         letter-spacing: 1.2px;
         text-align: center;
         font-size: 14px;
-        padding: 4px !important;
+        padding: 3px !important;
+        vertical-align: middle !important;
     }
 
     th {
@@ -25,11 +26,12 @@
             <th class="col-lg-1 col-1 text-wrap">Created At</th>
             <th class="col-lg-1 col-1 text-wrap">Order Id</th>
             <th class="col-lg-1 col-1 text-wrap">Session Id</th>
-            <th class="col-lg-1 col-1 text-wrap">Successful?</th>
+            <th class="col-lg-1 col-1 text-wrap">Success?</th>
             <th class="col-lg-1 col-1 text-wrap">TopUp?</th>
             <th class="col-lg-1 col-1 text-wrap">FromBalance?</th>
             <th class="col-lg-1 col-1 text-wrap">Amount</th>
             <th class="col-lg-1 col-1 text-wrap">User Phone</th>
+            <th class="col-lg-1 col-1 text-wrap">Delete</th>
         </tr>
     </thead>
     <tbody>
@@ -38,14 +40,23 @@
             no++;
             <tr>
                 <td class="col-lg-1 col-1 text-wrap">@no</td>
-                <td class="col-lg-1 col-1 text-wrap">@transaction.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    @transaction.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                    <br />
+                    @transaction.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                </td>
                 <td class="col-lg-1 col-1 text-wrap">@transaction.OrderId</td>
                 <td class="col-lg-1 col-1 text-wrap">@transaction.SessionId</td>
-                <td class="col-lg-1 col-1 text-wrap">@(transaction.PaymentIsSuccessful ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(transaction.IsTopUp ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(transaction.IsFromBalance ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap @(transaction.PaymentIsSuccessful ? "text-success" : "text-danger")">@(transaction.PaymentIsSuccessful ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap  @(transaction.IsTopUp ? "text-success" : "text-danger")">@(transaction.IsTopUp ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap  @(transaction.IsFromBalance ? "text-success" : "text-danger")">@(transaction.IsFromBalance ? "Yes" : "No")</td>
                 <td class="col-lg-1 col-1 text-wrap">@transaction.Amount azn</td>
                 <td class="col-lg-1 col-1 text-wrap">@transaction.AppUser.PhoneNumber</td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    <a class="btn btn-danger deleteBtn p-1" asp-area="Manage" asp-controller="Transaction"
+                       asp-action="Delete" asp-route-id="@transaction.Id" asp-route-select="@ViewBag.Select" asp-route-sessionId="@ViewBag.SessionId"
+                       asp-route-orderId="@ViewBag.OrderId" asp-route-phone="@ViewBag.Phone" asp-route-page="@ViewBag.Page">Delete</a>
+                </td>
             </tr>
         }
     </tbody>

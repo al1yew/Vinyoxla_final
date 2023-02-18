@@ -7,7 +7,8 @@
 <style>
     th {
         text-align: center;
-        padding: 4px !important;
+        padding: 3px !important;
+        vertical-align: middle !important;
         font-size: 14px;
     }
 
@@ -49,17 +50,25 @@
             <tr class="eventtr" id="eventtr" style="cursor: pointer;">
                 <td class="col-lg-1 col-1 text-wrap">@no</td>
                 <td class="col-lg-1 col-1 text-wrap">@eventGetVM.Vin / @eventGetVM.AppUser.UserName</td>
-                <td class="col-lg-1 col-1 text-wrap">@eventGetVM.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
-                <td class="col-lg-1 col-1 text-wrap">@eventGetVM.UpdatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(eventGetVM.DidRefundToBalance ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(eventGetVM.ErrorWhileRenew ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(eventGetVM.ErrorWhileReplace ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(eventGetVM.FileExists ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(eventGetVM.IsApiError ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(eventGetVM.IsFromAdminArea ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(eventGetVM.IsFromApi ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(eventGetVM.IsRenewedDueToAbsence ? "Yes" : "No")</td>
-                <td class="col-lg-1 col-1 text-wrap">@(eventGetVM.IsRenewedDueToExpire ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    @eventGetVM.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                    <br />
+                    @eventGetVM.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                </td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    @eventGetVM.UpdatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                    <br />
+                    @eventGetVM.UpdatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                </td>
+                <td class="col-lg-1 col-1 text-wrap @(eventGetVM.DidRefundToBalance ? "text-success" : "text-danger")">@(eventGetVM.DidRefundToBalance ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap @(eventGetVM.ErrorWhileRenew ? "text-success" : "text-danger")">@(eventGetVM.ErrorWhileRenew ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap @(eventGetVM.ErrorWhileReplace ? "text-success" : "text-danger")">@(eventGetVM.ErrorWhileReplace ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap @(eventGetVM.FileExists ? "text-success" : "text-danger")">@(eventGetVM.FileExists ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap @(eventGetVM.IsApiError ? "text-success" : "text-danger")">@(eventGetVM.IsApiError ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap @(eventGetVM.IsFromAdminArea ? "text-success" : "text-danger")">@(eventGetVM.IsFromAdminArea ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap @(eventGetVM.IsFromApi ? "text-success" : "text-danger")">@(eventGetVM.IsFromApi ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap @(eventGetVM.IsRenewedDueToAbsence ? "text-success" : "text-danger")">@(eventGetVM.IsRenewedDueToAbsence ? "Yes" : "No")</td>
+                <td class="col-lg-1 col-1 text-wrap @(eventGetVM.IsRenewedDueToExpire ? "text-success" : "text-danger")">@(eventGetVM.IsRenewedDueToExpire ? "Yes" : "No")</td>
                 <td class="col-lg-1 col-1 text-wrap">
                     <a class="btn btn-danger deleteBtn" asp-area="Manage" asp-controller="Event"
                        asp-action="DeleteEvent" asp-route-id="@eventGetVM.Id" asp-route-select="@ViewBag.Select"
@@ -86,7 +95,11 @@
                                 noo++;
                                 <tr>
                                     <td class="col-lg-1 col-1 ">@noo</td>
-                                    <td class="col-lg-1 col-1">@messageGetVM.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                                    <td class="col-lg-1 col-1">
+                                    @messageGetVM.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                                        <br />
+                                    @messageGetVM.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                                    </td>
                                     <td class="col-lg-8 col-8 ">@messageGetVM.Message</td>
                                     <td class="col-lg-1 col-1 text-wrap">
                                         <a class="btn btn-danger deleteBtn" asp-area="Manage" asp-controller="Event"

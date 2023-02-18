@@ -25,7 +25,7 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
 
             if (select <= 0)
             {
-                select = 5;
+                select = 10;
             }
 
             ViewBag.Select = select;

@@ -8,6 +8,8 @@
     td {
         letter-spacing: 1.2px;
         text-align: center;
+        padding: 3px !important;
+        vertical-align: middle !important;
     }
 
     th {
@@ -34,7 +36,11 @@
                 <td class="col-lg-1 col-1 text-wrap">@no</td>
                 <td class="col-lg-1 col-1 text-wrap">@vinCode.Vin</td>
                 <td class="col-lg-1 col-1 text-wrap">@vinCode.PurchasedTimes</td>
-                <td class="col-lg-1 col-1 text-wrap">@vinCode.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    @vinCode.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                    <br />
+                    @vinCode.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                </td>
                 <td class="col-lg-1 col-1 text-wrap">
                     <a class="btn btn-warning" asp-area="Manage" asp-controller="Report"
                        asp-action="Index" asp-route-fileName="@vinCode.FileName">Open</a>

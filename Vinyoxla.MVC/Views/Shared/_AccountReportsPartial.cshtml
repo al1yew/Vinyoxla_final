@@ -19,7 +19,11 @@
             no++;
             <tr>
                 <td scope="row">@no</td>
-                <td>@item.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td>
+                    @item.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                    <br />
+                    @item.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                </td>
                 <td>@item.VinCode.Vin</td>
                 <td>
                     <a asp-controller="Report" asp-action="Index" asp-route-fileName="@item.VinCode.FileName">Baxmaq</a>

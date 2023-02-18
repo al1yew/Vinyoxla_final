@@ -37,7 +37,7 @@ namespace Vinyoxla.Service.Implementations
                 query = query.Where(x => x.AppUser.UserName.Contains(phone));
             }
 
-            return query;
+            return query.OrderByDescending(x => x.CreatedAt);
         }
 
         public async Task<EventGetVM> GetById(int? id)
@@ -70,7 +70,7 @@ namespace Vinyoxla.Service.Implementations
         public async Task DeleteMessageAsync(int? id)
         {
             if (id == null)
-                throw new NotFoundException($"Message cannot be found by id = {id}");
+                throw new NotFoundException($"Id is null!");
 
             EventMessage msg = await _unitOfWork.EventMessageRepository.GetAsync(x => x.Id == id);
 

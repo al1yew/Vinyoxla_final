@@ -8,6 +8,8 @@
     td {
         letter-spacing: 1.2px;
         text-align: center;
+        padding: 3px !important;
+        vertical-align: middle !important;
     }
 
     th {
@@ -33,10 +35,15 @@
                 <td class="col-lg-1 col-1 text-wrap">@no</td>
                 <td class="col-lg-1 col-1 text-wrap">@appUserToVincode.AppUser.PhoneNumber</td>
                 <td class="col-lg-1 col-1 text-wrap">@appUserToVincode.VinCode.Vin</td>
-                <td class="col-lg-1 col-1 text-wrap">@appUserToVincode.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    @appUserToVincode.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                    <br />
+                    @appUserToVincode.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                </td>
                 <td class="col-lg-1 col-1 text-wrap">
                     <a class="btn btn-danger deleteBtn" asp-area="Manage" asp-controller="Relation"
-                       asp-action="Delete" asp-route-id="@appUserToVincode.Id" asp-route-select="@ViewBag.Select" asp-route-vin="@ViewBag.Vin" asp-route-phone="@ViewBag.Phone" asp-route-page="@ViewBag.Page">Delete</a>
+                       asp-action="Delete" asp-route-id="@appUserToVincode.Id" asp-route-select="@ViewBag.Select" 
+                       asp-route-vin="@ViewBag.Vin" asp-route-phone="@ViewBag.Phone" asp-route-page="@ViewBag.Page">Delete</a>
                 </td>
             </tr>
         }

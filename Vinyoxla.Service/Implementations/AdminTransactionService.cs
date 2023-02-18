@@ -42,7 +42,7 @@ namespace Vinyoxla.Service.Implementations
                 query = query.Where(x => x.AppUser.UserName.Contains(phone));
             }
 
-            return query;
+            return query.OrderByDescending(x => x.CreatedAt);
         }
 
         public async Task<TransactionGetVM> GetById(int? id)
@@ -56,6 +56,21 @@ namespace Vinyoxla.Service.Implementations
                 throw new NotFoundException($"Transaction cannot be found by id = {id}");
 
             return _mapper.Map<TransactionGetVM>(transaction);
+        }
+
+        public async Task DeleteAsync(int? id)
+        {
+            if (id == null)
+                throw new NotFoundException($"Id is null!");
+
+            Transaction dbTransaction = await _unitOfWork.TransactionRepository.GetAsync(x => x.Id == id);
+
+            if (dbTransaction == null)
+                throw new NotFoundException($"Transaction cannot be found by id = {id}");
+
+            _unitOfWork.TransactionRepository.Remove(dbTransaction);
+
+            await _unitOfWork.CommitAsync();
         }
     }
 }

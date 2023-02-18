@@ -1669,26 +1669,8 @@ input::-webkit-inner-spin-button {
   background-color: grey;
 }
 
-#myaccountmain .all table td:last-child {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
-#myaccountmain .all table td:last-child .slash {
-  font-size: 25px;
-  font-family: var(--montmedium);
-  margin: 0 5px;
-}
-
 #myaccountmain .all table td a {
-  padding: 5px;
+  padding: 10px;
   font-size: 14px;
   background-color: #042268;
   color: white;
@@ -1785,11 +1767,6 @@ input::-webkit-inner-spin-button {
     padding: 5px 0 !important;
     font-size: 12px !important;
   }
-  #myaccountmain .all table td:last-child .slash {
-    font-size: 20px !important;
-    font-family: var(--montlight) !important;
-    margin: 0 3px !important;
-  }
   #myaccountmain .all table td a {
     font-size: 12px !important;
     padding: 8px 3px !important;
@@ -1861,10 +1838,6 @@ input::-webkit-inner-spin-button {
   }
   #myaccountmain .all table td {
     padding: 7px 0 !important;
-  }
-  #myaccountmain .all table td:last-child .slash {
-    font-size: 20px !important;
-    font-family: var(--montlight) !important;
   }
 }
 
@@ -1962,10 +1935,6 @@ input::-webkit-inner-spin-button {
   }
   #myaccountmain .all table td {
     padding: 7px 0 !important;
-  }
-  #myaccountmain .all table td:last-child .slash {
-    font-size: 20px !important;
-    font-family: var(--montlight) !important;
   }
 }
 

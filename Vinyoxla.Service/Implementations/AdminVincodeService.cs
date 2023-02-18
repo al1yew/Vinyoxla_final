@@ -37,13 +37,13 @@ namespace Vinyoxla.Service.Implementations
                 query = query.Where(x => x.Vin.Contains(vin.Trim().ToUpperInvariant()));
             }
 
-            return query;
+            return query.OrderByDescending(x => x.CreatedAt);
         }
 
         public async Task DeleteAsync(int? id)
         {
             if (id == null)
-                throw new NotFoundException($"Vincode cannot be found by id = {id}");
+                throw new NotFoundException($"Id is null!");
 
             VinCode dbVin = await _unitOfWork.VinCodeRepository.GetAsync(x => x.Id == id);
 

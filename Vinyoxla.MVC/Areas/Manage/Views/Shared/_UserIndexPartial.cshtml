@@ -8,6 +8,8 @@
     td {
         letter-spacing: 1.2px;
         text-align: center;
+        padding: 3px !important;
+        vertical-align: middle !important;
     }
 
     th {
@@ -19,7 +21,7 @@
     <thead>
         <tr>
             <th class="col-lg-1 col-1 text-wrap">№</th>
-            <th class="col-lg-1 col-1 text-wrap">Username (phone)</th>
+            <th class="col-lg-1 col-1 text-wrap">Phone</th>
             <th class="col-lg-1 col-1 text-wrap">Balance</th>
             <th class="col-lg-1 col-1 text-wrap">Relations</th>
             <th class="col-lg-1 col-1 text-wrap">Transactions</th>
@@ -45,7 +47,11 @@
                 <td class="col-lg-1 col-1 text-wrap">@user.AppUserToVincodes.Count</td>
                 <td class="col-lg-1 col-1 text-wrap">@user.Transactions.Count</td>
                 <td class="col-lg-1 col-1 text-wrap">@user.Events.Count</td>
-                <td class="col-lg-1 col-1 text-wrap">@user.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")</td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    @user.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                    <br />
+                    @user.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                </td>
                 <td class="col-lg-1 col-1 text-wrap @(user.IsAdmin ? "text-success" : "text-danger")">@(user.IsAdmin ? "Yes" : "No")</td>
                 <td class="col-lg-1 col-1 text-wrap">
                     <a class="btn btn-warning" asp-area="Manage" asp-controller="User" asp-action="Update"
