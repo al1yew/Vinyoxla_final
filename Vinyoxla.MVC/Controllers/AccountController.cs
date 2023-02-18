@@ -81,7 +81,7 @@ namespace Vinyoxla.MVC.Controllers
 
             if (url != null)
             {
-                return Redirect(url);
+                return RedirectPermanent(url);
             }
 
             return RedirectToAction("Error", new { errno = 3 });

@@ -32,6 +32,7 @@
 
 @{
     int no = 0;
+    int nooo = 0;
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-baseline col-lg-12 col-12 p-3">
@@ -159,9 +160,9 @@
             <tbody>
                 @foreach (TransactionGetVM transaction in Model.Transactions)
                 {
-                    no++;
+                    nooo++;
                     <tr>
-                        <td class="col-lg-1 col-1 text-wrap">@no</td>
+                        <td class="col-lg-1 col-1 text-wrap">@nooo</td>
                         <td class="col-lg-1 col-1 text-wrap">
                             @transaction.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
                             <br />
