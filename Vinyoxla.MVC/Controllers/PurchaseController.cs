@@ -35,7 +35,7 @@ namespace Vinyoxla.MVC.Controllers
                     {
                         await _purchaseService.SubstractFromBalance();
 
-                        string fileName = await _purchaseService.ReplaceOldReport(phone, selectedReportVM.Vin, true, "balance", "nalbalanceance");
+                        string fileName = await _purchaseService.ReplaceOldReport(phone, selectedReportVM.Vin, true, "balance", "balance");
 
                         if (fileName == null)
                         {

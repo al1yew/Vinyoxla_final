@@ -54,7 +54,7 @@ namespace Vinyoxla.MVC.Controllers
                 return View();
             }
 
-            return RedirectToAction("Profile");
+            return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> Profile()
