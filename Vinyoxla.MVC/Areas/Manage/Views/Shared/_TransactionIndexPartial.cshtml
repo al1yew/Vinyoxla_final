@@ -27,11 +27,12 @@
             <th class="col-lg-1 col-1 text-wrap">Order Id</th>
             <th class="col-lg-1 col-1 text-wrap">Session Id</th>
             <th class="col-lg-1 col-1 text-wrap">Success?</th>
-            <th class="col-lg-1 col-1 text-wrap">TopUp?</th>
-            <th class="col-lg-1 col-1 text-wrap">FromBalance?</th>
+            <th class="col-lg-1 col-1 text-wrap">Top Up?</th>
+            <th class="col-lg-1 col-1 text-wrap">From <br /> Balance?</th>
             <th class="col-lg-1 col-1 text-wrap">Amount</th>
-            <th class="col-lg-1 col-1 text-wrap">User Phone</th>
+            <th class="col-lg-1 col-1 text-wrap">Phone</th>
             <th class="col-lg-1 col-1 text-wrap">Delete</th>
+            <th class="col-lg-1 col-1 text-wrap">Refund</th>
         </tr>
     </thead>
     <tbody>
@@ -56,6 +57,11 @@
                     <a class="btn btn-danger deleteBtn p-1" asp-area="Manage" asp-controller="Transaction"
                        asp-action="Delete" asp-route-id="@transaction.Id" asp-route-select="@ViewBag.Select" asp-route-sessionId="@ViewBag.SessionId"
                        asp-route-orderId="@ViewBag.OrderId" asp-route-phone="@ViewBag.Phone" asp-route-page="@ViewBag.Page">Delete</a>
+                </td>
+                <td class="col-lg-1 col-1 text-wrap">
+                    <a class="btn btn-warning deleteBtn p-1" asp-area="Manage" asp-controller="Transaction"
+                       asp-action="Refund" asp-route-id="@transaction.Id" asp-route-select="@ViewBag.Select" asp-route-sessionId="@ViewBag.SessionId"
+                       asp-route-orderId="@ViewBag.OrderId" asp-route-phone="@ViewBag.Phone" asp-route-page="@ViewBag.Page">Refund</a>
                 </td>
             </tr>
         }

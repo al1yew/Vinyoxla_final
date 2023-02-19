@@ -112,7 +112,9 @@ namespace Vinyoxla.Service.Implementations
                 AbsentCount = 0,
                 AbsentVincodes = new List<VinCodeGetVM>(),
                 OldCount = 0,
-                OldVincodes = new List<VinCodeGetVM>()
+                OldVincodes = new List<VinCodeGetVM>(),
+                Dublicates = 0,
+                DublicateVincodes = new List<string>()
             };
 
             foreach (VinCodeGetVM dbVin in dbVincodes)
@@ -129,6 +131,9 @@ namespace Vinyoxla.Service.Implementations
                     checkVM.AbsentVincodes.Add(dbVin);
                 }
             }
+
+            checkVM.DublicateVincodes.AddRange(dbVincodes.GroupBy(x => x.Vin).Where(x => x.Count() > 1).Select(x => x.Key));
+            checkVM.Dublicates = checkVM.DublicateVincodes.Count;
 
             return checkVM;
         }

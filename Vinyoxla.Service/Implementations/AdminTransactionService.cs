@@ -72,5 +72,27 @@ namespace Vinyoxla.Service.Implementations
 
             await _unitOfWork.CommitAsync();
         }
+
+        public async Task RefundAsync(int? id)
+        {
+            if (id == null)
+                throw new NotFoundException($"Id is null!");
+
+            Transaction dbTransaction = await _unitOfWork.TransactionRepository.GetAsync(x => x.Id == id, "AppUser");
+
+            if (dbTransaction == null)
+                throw new NotFoundException($"Transaction cannot be found by id = {id}");
+
+            AppUser appUser = await _unitOfWork.AppUserRepository.GetAsync(x => x.UserName == dbTransaction.AppUser.UserName);
+
+            if (appUser == null)
+                throw new NotFoundException($"AppUser cannot be found by Number = {appUser.UserName}");
+
+            appUser.Balance += 4;
+
+            _unitOfWork.TransactionRepository.Remove(dbTransaction);
+
+            await _unitOfWork.CommitAsync();
+        }
     }
 }

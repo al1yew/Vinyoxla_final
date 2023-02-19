@@ -14,5 +14,7 @@ namespace Vinyoxla.Service.Interfaces
         Task<TransactionGetVM> GetById(int? id);
 
         Task DeleteAsync(int? id);
+
+        Task RefundAsync(int? id);
     }
 }
