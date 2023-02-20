@@ -62,7 +62,8 @@ namespace Vinyoxla.Service.Implementations
 
             List<Transaction> transactions = await _unitOfWork.TransactionRepository.GetAllByExAsync(x => x.PaymentIsSuccessful);
 
-            int earned = transactions.Sum(x => x.Amount);
+            int bankearned = transactions.Where(x => x.OrderId != "balance").Sum(x => x.Amount);
+            int balanceearned = transactions.Where(x => x.OrderId == "balance").Sum(x => x.Amount);
 
             List<VinCode> vinCodes = await _unitOfWork.VinCodeRepository.GetAllAsync();
 
@@ -76,7 +77,8 @@ namespace Vinyoxla.Service.Implementations
                 UserCount = appUsers.Count,
                 TodayUsersCount = newUsersCount,
                 TodayRelations = newRelationCount,
-                Earned = earned,
+                EarnedFromBalance = balanceearned,
+                EarnedFromBank = bankearned,
                 VinCount = vinCount
             };
 
