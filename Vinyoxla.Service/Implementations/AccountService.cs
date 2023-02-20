@@ -77,7 +77,7 @@ namespace Vinyoxla.Service.Implementations
             Random random = new Random();
             int generatedcode = random.Next(1000, 9999);
 
-            string url = $"http://api.msm.az/sendsms?user={Configuration.GetSection("MSM:Username").Value}&password={Configuration.GetSection("MSM:Apikey").Value}&gsm={phone}&from={Configuration.GetSection("MSM:From").Value}&text={generatedcode}";
+            string url = $"http://api.msm.az/sendsms?user={Configuration.GetSection("MSM:Username").Value}&password={Configuration.GetSection("MSM:Apikey").Value}&gsm={phone}&from={Configuration.GetSection("MSM:From").Value}&text=Code: {generatedcode}\nXoş gəldiniz!";
 
             HttpResponseMessage response = null;
 
