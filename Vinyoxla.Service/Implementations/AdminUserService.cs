@@ -106,11 +106,26 @@ namespace Vinyoxla.Service.Implementations
             dbAppUser.PhoneNumber = "+994" + appUserUpdateVM.PhoneNumber;
             dbAppUser.UserName = "+994" + appUserUpdateVM.PhoneNumber;
             dbAppUser.Balance = appUserUpdateVM.Balance;
+            dbAppUser.IsAdmin = appUserUpdateVM.IsAdmin;
 
             IdentityResult result = await _userManager.UpdateAsync(dbAppUser);
 
             if (!result.Succeeded)
                 throw new BadRequestException("Can't update user!");
+
+            if (appUserUpdateVM.IsAdmin && !dbAppUser.IsAdmin)
+            {
+                result = await _userManager.RemoveFromRoleAsync(dbAppUser, "Member");
+                result = await _userManager.AddToRoleAsync(dbAppUser, "Admin");
+            }
+            else if (!appUserUpdateVM.IsAdmin && dbAppUser.IsAdmin)
+            {
+                result = await _userManager.RemoveFromRoleAsync(dbAppUser, "Admin");
+                result = await _userManager.AddToRoleAsync(dbAppUser, "Member");
+            }
+
+            if (!result.Succeeded)
+                throw new BadRequestException("Can't change role!");
 
             if (appUserUpdateVM.Password != null)
             {

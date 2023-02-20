@@ -22,6 +22,7 @@
 
     <!-- Custom styles for this template-->
     <link href="~/manage/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="~/manage/customCSS/custom.css" asp-append-version="true" rel="stylesheet">
 
 </head>
 
@@ -99,13 +100,13 @@
                         <i class="fa fa-bars"></i>
                     </button>
 
-                    <h3 class="m-0 p-0">@ViewBag.WhereWeAre</h3>
+                    <h3 class="m-0 p-0 wherewearep">@ViewBag.WhereWeAre</h3>
 
-                    <a class="ml-auto" asp-area="Manage" asp-controller="User" asp-action="ChangeMyInfo">Update My Account</a>
+                    <a class="ml-auto changemyinfoa" asp-area="Manage" asp-controller="User" asp-action="ChangeMyInfo">Update My Account</a>
 
                     <ul class="navbar-nav ml-auto d-flex justify-content-between" style="margin-left: 0">
                         <li class="nav-item dropdown no-arrow">
-                            <a class="dropdown-item" asp-area="Manage" asp-controller="Account" asp-action="Logout">
+                            <a class="dropdown-item padingiolan" asp-area="Manage" asp-controller="Account" asp-action="Logout">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
                             </a>

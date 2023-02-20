@@ -1,6 +1,6 @@
 ﻿@model CheckVM
 
-<div class="col-lg-4 col-4">
+<div class="col-lg-4 col-12 mt-4">
     <p>Old: @Model.OldCount pcs.</p>
     <ul class="col-lg-12 col-12">
         @foreach (var old in Model.OldVincodes)
@@ -9,7 +9,7 @@
         }
     </ul>
 </div>
-<div class="col-lg-4 col-4">
+<div class="col-lg-4 col-12 mt-4">
     <p>Absent: @Model.AbsentCount pcs.</p>
     <ul class="col-lg-12 col-12">
         @foreach (var absent in Model.AbsentVincodes)
@@ -18,7 +18,7 @@
         }
     </ul>
 </div>
-<div class="col-lg-4 col-4">
+<div class="col-lg-4 col-12 mt-4">
     <p>Dublicates: @Model.Dublicates pcs.</p>
     <ul class="col-lg-12 col-12">
         @foreach (var dbl in Model.DublicateVincodes)

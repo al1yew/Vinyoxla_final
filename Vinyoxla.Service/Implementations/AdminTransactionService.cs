@@ -29,7 +29,7 @@ namespace Vinyoxla.Service.Implementations
 
             if (orderId != null)
             {
-                query = query.Where(x => x.OrderId.Contains(orderId.Trim().ToUpperInvariant()));
+                query = query.Where(x => x.OrderId.Contains(orderId));
             }
 
             if (sessionId != null)

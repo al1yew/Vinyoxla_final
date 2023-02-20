@@ -43,10 +43,10 @@
 <div class="main-panel ">
     <div class="content-wrapper pt-0 pb-2">
         <div class="container">
-            <div class="row d-flex flex-wrap justify-content-between align-items-center mb-2">
-                <div class="col-lg-10 col-12">
-                    <form class="row justify-content-between align-items-center col-lg-12 col-12">
-                        <div class="col-lg-2 col-2 align-items-center py-1 d-flex justify-content-between">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+                <div class="col-lg-10 col-12 p-0">
+                    <form class="d-flex p-0 telefonpadding flex-wrap justify-content-between align-items-center col-12">
+                        <div class="col-lg-2 p-0 pr-2 col-12 align-items-center telefonpadding py-1 d-flex justify-content-between">
                             <label class="form-label p-0 m-0 pr-2">Show:</label>
                             <select id="select" name="select" class="form-select form-control">
                                 <option value="10">10</option>
@@ -65,36 +65,34 @@
                                 selectoption.value = selectvalue
                             </script>
                         </div>
-                        <div class="col-lg-8 col-3 align-items-center py-1">
+                        <div class="col-lg-8 col-12 telefonpadding telefonup col-12 align-items-center py-1">
                             <input autocomplete="off" maxlength="17" type="text" name="vin"
                                    class="form-control" id="findvin" value="@ViewBag.Vin"
                                    placeholder="Enter vin code">
                         </div>
-                        <div class="col-lg-1 col-3">
-                            <button class="btn btn-primary" type="submit">Filter</button>
+                        <div class="col-lg-1 telefonpadding telefonup col-5-5">
+                            <button class="btn btn-primary telefonw100" type="submit">Filter</button>
                         </div>
-                        <div class="col-lg-1 col-3">
-                            <button class="btn btn-danger" id="clearform" type="reset">Clear</button>
+                        <div class="col-lg-1 telefonpadding telefonup col-5-5">
+                            <button class="btn btn-danger telefonw100" id="clearform" type="reset">Clear</button>
                         </div>
                     </form>
                 </div>
-                <div class="col-lg-1 col-1">
-                    <a class="btn btn-warning" id="clickforcheck" asp-area="Manage" asp-controller="Vincode" asp-action="Check">Check</a>
+                <div class="col-lg-1 col-5-5 telefonpadding telefonup">
+                    <a class="btn btn-warning telefonw100" id="clickforcheck" asp-area="Manage" asp-controller="Vincode" asp-action="Check">Check</a>
                 </div>
-                <div class="col-lg-1 col-2">
-                    <a class="btn btn-success" asp-area="Manage" asp-controller="Relation"
+                <div class="col-lg-1 col-5-5 telefonpadding telefonup">
+                    <a class="btn btn-success telefonw100" asp-area="Manage" asp-controller="Relation"
                        asp-action="Create">Create</a>
                 </div>
-                <div class="col-lg-12 col-12 forcheck" id="forcheck">
+                <div class="col-lg-12 col-12 forcheck telefonup" id="forcheck">
                     <div class="col-lg-12 col-12 forcheckinichi d-flex justify-content-between align-items-baseline flex-wrap" id="forcheckinichi">
 
                     </div>
                 </div>
             </div>
-            <div class="container">
-                <div class="row">
-                    @await Html.PartialAsync("_VincodeIndexPartial", Model)
-                </div>
+            <div class="tabledata">
+                @await Html.PartialAsync("_VincodeIndexPartial", Model)
             </div>
         </div>
     </div>
