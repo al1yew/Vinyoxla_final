@@ -1,29 +1,36 @@
 ﻿@model CheckVM
 
-<div class="col-lg-4 col-12 mt-4">
-    <p>Old: @Model.OldCount pcs.</p>
-    <ul class="col-lg-12 col-12">
-        @foreach (var old in Model.OldVincodes)
-        {
-            <li>@old.Vin</li>
+    <style>
+        .saxlayan {
+            max-height: 200px;
+            overflow-y: scroll;
         }
-    </ul>
-</div>
-<div class="col-lg-4 col-12 mt-4">
-    <p>Absent: @Model.AbsentCount pcs.</p>
-    <ul class="col-lg-12 col-12">
-        @foreach (var absent in Model.AbsentVincodes)
-        {
-            <li>@absent.Vin</li>
-        }
-    </ul>
-</div>
-<div class="col-lg-4 col-12 mt-4">
-    <p>Dublicates: @Model.Dublicates pcs.</p>
-    <ul class="col-lg-12 col-12">
-        @foreach (var dbl in Model.DublicateVincodes)
-        {
-            <li>@dbl</li>
-        }
-    </ul>
-</div>
+    </style>
+
+    <div class="col-lg-4 col-12 mt-4 saxlayan">
+        <p>Old: @Model.OldCount pcs.</p>
+        <ul class="col-lg-12 col-12">
+            @foreach (var old in Model.OldVincodes)
+            {
+                <li>@old.Vin</li>
+            }
+        </ul>
+    </div>
+    <div class="col-lg-4 col-12 mt-4 saxlayan">
+        <p>Absent: @Model.AbsentCount pcs.</p>
+        <ul class="col-lg-12 col-12">
+            @foreach (var absent in Model.AbsentVincodes)
+            {
+                <li>@absent.Vin</li>
+            }
+        </ul>
+    </div>
+    <div class="col-lg-4 col-12 mt-4 saxlayan">
+        <p>Dublicates: @Model.Dublicates pcs.</p>
+        <ul class="col-lg-12 col-12">
+            @foreach (var dbl in Model.DublicateVincodes)
+            {
+                <li>@dbl</li>
+            }
+        </ul>
+    </div>

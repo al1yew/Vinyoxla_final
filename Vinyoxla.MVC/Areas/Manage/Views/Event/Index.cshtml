@@ -79,7 +79,7 @@
     </div>
 
     <div class="row justify-content-center w-100 align-items-center d-flex mt-2">
-        <ul class="pagination d-flex justify-content-center align-content-center">
+        <ul class="pagination flex-wrap d-flex justify-content-center align-content-center p-3">
             @if (Model.HasPrev)
             {
                 <li class="page-item"><a class="page-link" asp-area="Manage" asp-controller="Event" asp-action="Index" asp-route-select="@ViewBag.Select" asp-route-vin="@ViewBag.Vin" asp-route-phone="@ViewBag.Phone" asp-route-page="1">@("<<")</a></li>

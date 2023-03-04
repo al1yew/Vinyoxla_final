@@ -30,6 +30,11 @@
         max-height: 500px;
         overflow-y: scroll;
     }
+
+    .ulsaxlayan {
+        max-height: 500px;
+        overflow-y: scroll;
+    }
 </style>
 
 @{
@@ -51,18 +56,18 @@
         </ul>
     </div>
 
-    <div class="col-lg-6 col-12 mb-3 p-2">
+    <div class="col-lg-6 col-12 mb-3 p-2 ulsaxlayan">
         <span class="col-lg-12 col-12 text-danger" style="font-size: 20px">User's Vincodes:</span>
         <ul class="col-lg-12 col-12 m-0 p-0">
             @foreach (AppUserToVincodeVM relation in Model.AppUserToVincodes)
             {
-                <li>VIN: <span class="text-success">@relation.VinCode.Vin</span></li>
+            <li>VIN: <span class="text-success">@relation.VinCode.Vin</span></li>
             }
         </ul>
     </div>
 
+    <span class="col-lg-12 col-12 text-danger" style="font-size: 20px; margin-top: 40px">User's Events:</span>
     <div class="col-lg-12 col-12 saxlayan">
-        <span class="col-lg-12 col-12 text-danger" style="font-size: 20px">User's Events:</span>
         <table class="table table-bordered table-striped tblContent">
             <thead>
                 <tr>
@@ -85,67 +90,67 @@
                 @foreach (EventGetVM eventik in Model.Events)
                 {
                     no++;
-                    <tr class="eventtr" id="eventtr" style="cursor: pointer;">
-                        <td class="col-lg-1 col-1 text-wrap">@no</td>
-                        <td class="col-lg-1 col-1 text-wrap">@eventik.Vin</td>
-                        <td class="col-lg-1 col-1 text-wrap">
-                            @eventik.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
-                            <br />
-                            @eventik.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
-                        </td>
-                        <td class="col-lg-1 col-1 text-wrap">
-                            @eventik.UpdatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
-                            <br />
-                            @eventik.UpdatedAt.GetValueOrDefault().ToString("HH:mm:ss")
-                        </td>
-                        <td class="col-lg-1 col-1 text-wrap">@(eventik.DidRefundToBalance ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(eventik.ErrorWhileRenew ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(eventik.ErrorWhileReplace ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(eventik.FileExists ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(eventik.IsApiError ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(eventik.IsFromAdminArea ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(eventik.IsFromApi ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(eventik.IsRenewedDueToAbsence ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(eventik.IsRenewedDueToExpire ? "Yes" : "No")</td>
-                    </tr>
-                    <tr class="col-lg-12 col-12">
-                        <td class="col-lg-12 col-12" colspan="14">
-                            <table class=" eventmsgs col-lg-12 col-12 table table-bordered table-striped tblContent" style="display: none;">
-                                <thead>
-                                    <tr>
-                                        <th class="col-lg-1 col-1 text-wrap">№</th>
-                                        <th class="col-lg-1 col-1 text-wrap">Created at</th>
-                                        <th class="col-lg-1 col-1 text-wrap">Message:</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @{
+                <tr class="eventtr" id="eventtr" style="cursor: pointer;">
+                    <td class="col-lg-1 col-1 text-wrap">@no</td>
+                    <td class="col-lg-1 col-1 text-wrap">@eventik.Vin</td>
+                    <td class="col-lg-1 col-1 text-wrap">
+                        @eventik.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                        <br />
+                        @eventik.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                    </td>
+                    <td class="col-lg-1 col-1 text-wrap">
+                        @eventik.UpdatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                        <br />
+                        @eventik.UpdatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                    </td>
+                    <td class="col-lg-1 col-1 text-wrap">@(eventik.DidRefundToBalance ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(eventik.ErrorWhileRenew ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(eventik.ErrorWhileReplace ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(eventik.FileExists ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(eventik.IsApiError ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(eventik.IsFromAdminArea ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(eventik.IsFromApi ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(eventik.IsRenewedDueToAbsence ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(eventik.IsRenewedDueToExpire ? "Yes" : "No")</td>
+                </tr>
+                <tr class="col-lg-12 col-12">
+                    <td class="col-lg-12 col-12" colspan="14">
+                        <table class=" eventmsgs col-lg-12 col-12 table table-bordered table-striped tblContent" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th class="col-lg-1 col-1 text-wrap">№</th>
+                                    <th class="col-lg-1 col-1 text-wrap">Created at</th>
+                                    <th class="col-lg-1 col-1 text-wrap">Message:</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
                                         int noo = 0;
-                                    }
-                                    @foreach (EventMessageGetVM messageGetVM in eventik.EventMessages)
+                                }
+                                @foreach (EventMessageGetVM messageGetVM in eventik.EventMessages)
                                     {
                                         noo++;
-                                        <tr>
-                                            <td class="col-lg-1 col-1 ">@noo</td>
-                                            <td class="col-lg-1 col-1">
-                                                @messageGetVM.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
-                                                <br />
-                                                @messageGetVM.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
-                                            </td>
-                                            <td class="col-lg-8 col-8 ">@messageGetVM.Message</td>
-                                        </tr>
+                                <tr>
+                                    <td class="col-lg-1 col-1 ">@noo</td>
+                                    <td class="col-lg-1 col-1">
+                                        @messageGetVM.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                                        <br />
+                                        @messageGetVM.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                                    </td>
+                                    <td class="col-lg-8 col-8 ">@messageGetVM.Message</td>
+                                </tr>
                                     }
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>
     </div>
 
-    <div class="col-lg-12 col-12 saxlayan mt-3">
-        <span class="col-lg-12 col-12 text-danger" style="font-size: 20px; ">User's Transactions:</span>
+    <span class="col-lg-12 col-12 text-danger " style="font-size: 20px; margin-top: 40px">User's Transactions:</span>
+    <div class="col-lg-12 col-12 saxlayan">
         <table class="table table-bordered table-striped tblContent">
             <thead>
                 <tr>
@@ -163,20 +168,20 @@
                 @foreach (TransactionGetVM transaction in Model.Transactions)
                 {
                     nooo++;
-                    <tr>
-                        <td class="col-lg-1 col-1 text-wrap">@nooo</td>
-                        <td class="col-lg-1 col-1 text-wrap">
-                            @transaction.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
-                            <br />
-                            @transaction.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
-                        </td>
-                        <td class="col-lg-1 col-1 text-wrap">@transaction.Amount</td>
-                        <td class="col-lg-1 col-1 text-wrap">@transaction.OrderId</td>
-                        <td class="col-lg-1 col-1 text-wrap">@transaction.SessionId</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(transaction.IsFromBalance ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(transaction.IsTopUp ? "Yes" : "No")</td>
-                        <td class="col-lg-1 col-1 text-wrap">@(transaction.PaymentIsSuccessful ? "Yes" : "No")</td>
-                    </tr>
+                <tr>
+                    <td class="col-lg-1 col-1 text-wrap">@nooo</td>
+                    <td class="col-lg-1 col-1 text-wrap">
+                        @transaction.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
+                        <br />
+                        @transaction.CreatedAt.GetValueOrDefault().ToString("HH:mm:ss")
+                    </td>
+                    <td class="col-lg-1 col-1 text-wrap">@transaction.Amount</td>
+                    <td class="col-lg-1 col-1 text-wrap">@transaction.OrderId</td>
+                    <td class="col-lg-1 col-1 text-wrap">@transaction.SessionId</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(transaction.IsFromBalance ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(transaction.IsTopUp ? "Yes" : "No")</td>
+                    <td class="col-lg-1 col-1 text-wrap">@(transaction.PaymentIsSuccessful ? "Yes" : "No")</td>
+                </tr>
                 }
             </tbody>
         </table>
