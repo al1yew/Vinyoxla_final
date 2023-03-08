@@ -23,9 +23,9 @@ namespace Vinyoxla.Service.Interfaces
 
         Task<string> Bank(string amonut);
 
-        Task<bool> CheckOrder(string amount, string orderId, string sessionId);
+        Task<bool> CheckOrder(string amount, string orderId, string sessionId, string phone);
 
-        Task UpdateBalance(string amount, string orderId, string sessionId);
+        Task UpdateBalance(string amount, string orderId, string sessionId, string phone);
 
     }
 }

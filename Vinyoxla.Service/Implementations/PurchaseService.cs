@@ -1493,6 +1493,8 @@ namespace Vinyoxla.Service.Implementations
             StringContent content = new StringContent(xml);
             content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml");
 
+            #endregion
+
             HttpResponseMessage response = null;
 
             TKKPG tkkpg = new TKKPG();
@@ -1501,8 +1503,6 @@ namespace Vinyoxla.Service.Implementations
             {
                 response = await client.PostAsync(url, content);
             }
-
-            #endregion
 
             if (response.IsSuccessStatusCode)
             {

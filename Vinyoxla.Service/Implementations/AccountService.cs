@@ -248,7 +248,6 @@ namespace Vinyoxla.Service.Implementations
             StringContent content = new StringContent(xml);
             content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/xml");
 
-
             #endregion
 
             HttpResponseMessage response = null;
@@ -281,7 +280,8 @@ namespace Vinyoxla.Service.Implementations
                     {
                         OrderId = tkkpg.Response.Order.OrderID,
                         SessionId = tkkpg.Response.Order.SessionID,
-                        Amount = amount
+                        Amount = amount,
+                        Phone = _httpContextAccessor.HttpContext.User.Identity.Name
                     };
 
                     string topUp = _httpContextAccessor.HttpContext.Request.Cookies["topUp"];
@@ -302,7 +302,7 @@ namespace Vinyoxla.Service.Implementations
             return null;
         }
 
-        public async Task<bool> CheckOrder(string amount, string orderid, string sessionId)
+        public async Task<bool> CheckOrder(string amount, string orderid, string sessionId, string phone)
         {
             string url = $"https://3dsrv.kapitalbank.az:5443/Exec";
             //https://tstpg.kapitalbank.az:5443/Exec
@@ -371,7 +371,7 @@ namespace Vinyoxla.Service.Implementations
                 }
                 else
                 {
-                    AppUser appUser = await _userManager.FindByNameAsync(_httpContextAccessor.HttpContext.User.Identity.Name);
+                    AppUser appUser = await _userManager.FindByNameAsync(phone);
 
                     #region Event handle
 
@@ -411,9 +411,9 @@ namespace Vinyoxla.Service.Implementations
             return false;
         }
 
-        public async Task UpdateBalance(string amount, string orderId, string sessionId)
+        public async Task UpdateBalance(string amount, string orderId, string sessionId, string phone)
         {
-            AppUser appUser = await _userManager.FindByNameAsync(_httpContextAccessor.HttpContext.User.Identity.Name);
+            AppUser appUser = await _userManager.FindByNameAsync(phone);
 
             appUser.Balance += int.Parse(amount);
 

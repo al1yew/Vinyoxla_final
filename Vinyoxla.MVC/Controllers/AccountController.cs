@@ -103,12 +103,13 @@ namespace Vinyoxla.MVC.Controllers
             string orderId = topUpVM.OrderId;
             string sessionId = topUpVM.SessionId;
             string amount = topUpVM.Amount;
+            string phone = topUpVM.Phone;
 
             HttpContext.Response.Cookies.Delete("topUp");
 
-            if (await _accountService.CheckOrder(amount, orderId, sessionId))
+            if (await _accountService.CheckOrder(amount, orderId, sessionId, phone))
             {
-                await _accountService.UpdateBalance(amount, orderId, sessionId);
+                await _accountService.UpdateBalance(amount, orderId, sessionId, phone);
 
                 return RedirectToAction("Profile");
             }
