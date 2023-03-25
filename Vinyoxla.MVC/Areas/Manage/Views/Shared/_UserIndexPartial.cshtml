@@ -1,4 +1,4 @@
-﻿@model PaginationList<AppUserGetVM>
+﻿@model PaginationList<AppUserListVM>
 
 @{
     int no = Model.ItemsCount * (Model.Page - 1);
@@ -23,9 +23,6 @@
             <th class="col-lg-1 col-1 text-wrap">№</th>
             <th class="col-lg-1 col-1 text-wrap">Phone</th>
             <th class="col-lg-1 col-1 text-wrap">Balance</th>
-            <th class="col-lg-1 col-1 text-wrap">Relations</th>
-            <th class="col-lg-1 col-1 text-wrap">Transactions</th>
-            <th class="col-lg-1 col-1 text-wrap">Events</th>
             <th class="col-lg-1 col-1 text-wrap">Created At</th>
             <th class="col-lg-1 col-1 text-wrap">Is Admin?</th>
             <th class="col-lg-1 col-1 text-wrap">Update</th>
@@ -33,7 +30,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (AppUserGetVM user in Model)
+        @foreach (AppUserListVM user in Model)
         {
             no++;
             <tr>
@@ -44,9 +41,6 @@
                     </a>
                 </td>
                 <td class="col-lg-1 col-1 text-wrap">@user.Balance</td>
-                <td class="col-lg-1 col-1 text-wrap">@user.AppUserToVincodes.Count</td>
-                <td class="col-lg-1 col-1 text-wrap">@user.Transactions.Count</td>
-                <td class="col-lg-1 col-1 text-wrap">@user.Events.Count</td>
                 <td class="col-lg-1 col-1 text-wrap">
                     @user.CreatedAt.GetValueOrDefault().ToString("dd/MM/yyyy")
                     <br />

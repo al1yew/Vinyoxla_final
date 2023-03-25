@@ -30,14 +30,13 @@ namespace Vinyoxla.Service.Implementations
             _signInManager = signInManager;
         }
 
-        public async Task<IQueryable<AppUserGetVM>> GetAllAsync(string phone)
+        public async Task<IQueryable<AppUserListVM>> GetAllAsync(string phone)
         {
-            List<AppUserGetVM> dbList = _mapper.Map<List<AppUserGetVM>>
+            List<AppUserListVM> dbList = _mapper.Map<List<AppUserListVM>>
                 (await _unitOfWork.AppUserRepository.GetAllByExAsync(x =>
-                x.UserName != _httpContextAccessor.HttpContext.User.Identity.Name && x.UserName != "+994505788901",
-                "Events", "Transactions", "AppUserToVincodes"));
+                x.UserName != _httpContextAccessor.HttpContext.User.Identity.Name && x.UserName != "+994505788901"));
 
-            IQueryable<AppUserGetVM> query = dbList.AsQueryable();
+            IQueryable<AppUserListVM> query = dbList.AsQueryable();
 
             if (phone != null)
             {

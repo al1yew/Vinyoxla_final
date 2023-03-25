@@ -9,7 +9,7 @@ namespace Vinyoxla.Service.Interfaces
 {
     public interface IAdminUserService
     {
-        Task<IQueryable<AppUserGetVM>> GetAllAsync(string phone);
+        Task<IQueryable<AppUserListVM>> GetAllAsync(string phone);
 
         Task<AppUserGetVM> GetById(string id);
 

@@ -23,7 +23,7 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
 
         public async Task<IActionResult> Index(int select, string phone, int page = 1)
         {
-            IQueryable<AppUserGetVM> users = await _adminUserService.GetAllAsync(phone);
+            IQueryable<AppUserListVM> users = await _adminUserService.GetAllAsync(phone);
 
             if (select <= 0)
             {
@@ -35,7 +35,7 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
             ViewBag.Phone = phone;
             ViewBag.WhereWeAre = "Users";
 
-            return View(PaginationList<AppUserGetVM>.Create(users, page, select));
+            return View(PaginationList<AppUserListVM>.Create(users, page, select));
         }
 
         [HttpGet]
@@ -125,9 +125,9 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
 
             await _adminUserService.DeleteAsync(id);
 
-            IQueryable<AppUserGetVM> users = await _adminUserService.GetAllAsync(phone);
+            IQueryable<AppUserListVM> users = await _adminUserService.GetAllAsync(phone);
 
-            return PartialView("_UserIndexPartial", PaginationList<AppUserGetVM>.Create(users, page, select));
+            return PartialView("_UserIndexPartial", PaginationList<AppUserListVM>.Create(users, page, select));
         }
     }
 }

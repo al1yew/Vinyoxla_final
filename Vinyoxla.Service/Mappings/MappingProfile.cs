@@ -15,6 +15,8 @@ namespace Vinyoxla.Service.Mappings
         {
             #region AppUser
 
+            CreateMap<AppUser, AppUserListVM>();
+
             CreateMap<AppUser, AppUserGetVM>()
                 .ForPath(des => des.AppUserToVincodes, src => src.MapFrom(x => x.AppUserToVincodes))
                 .ForPath(des => des.Events, src => src.MapFrom(x => x.Events))

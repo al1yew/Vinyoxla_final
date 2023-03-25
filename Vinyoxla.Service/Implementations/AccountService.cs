@@ -162,7 +162,12 @@ namespace Vinyoxla.Service.Implementations
 
         public async Task<AccountVM> Profile()
         {
-            AppUserGetVM appUser = _mapper.Map<AppUserGetVM>(await _userManager.Users.Include(x => x.AppUserToVincodes).ThenInclude(x => x.VinCode).FirstOrDefaultAsync(x => x.UserName == _httpContextAccessor.HttpContext.User.Identity.Name));
+            AppUserGetVM appUser = _mapper.Map<AppUserGetVM>(
+                await _userManager.Users
+                .Include(x => x.AppUserToVincodes)
+                .ThenInclude(x => x.VinCode)
+                .FirstOrDefaultAsync(x =>
+                x.UserName == _httpContextAccessor.HttpContext.User.Identity.Name));
 
             List<AppUserToVincodeVM> appUserToVincodes = _mapper.Map<List<AppUserToVincodeVM>>(await _unitOfWork.AppUserToVincodeRepository.GetAllByExAsync(x =>
             x.AppUserId == appUser.Id, "AppUser", "VinCode"));
