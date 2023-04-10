@@ -59,6 +59,10 @@ namespace Vinyoxla.Data.Repositories
 
         public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> ex, params string[] includes)
         {
+            _context.Database.OpenConnection();
+
+            await _context.Database.ExecuteSqlRawAsync("SET QUERY_GOVERNOR_COST_LIMIT 15000");
+
             IQueryable<TEntity> query = _context.Set<TEntity>().Where(ex);
 
             if (includes != null && includes.Length > 0)
