@@ -3,13 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.33130.400
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vinyoxla.MVC", "Vinyoxla.MVC\Vinyoxla.MVC.csproj", "{923A9878-AB56-4499-80AA-24C7017121BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vinyoxla.MVC", "Vinyoxla.MVC\Vinyoxla.MVC.csproj", "{923A9878-AB56-4499-80AA-24C7017121BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vinyoxla.Data", "Vinyoxla.Data\Vinyoxla.Data.csproj", "{D35965D1-2B78-472C-8DAA-0BD8FE9811F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vinyoxla.Data", "Vinyoxla.Data\Vinyoxla.Data.csproj", "{D35965D1-2B78-472C-8DAA-0BD8FE9811F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vinyoxla.Core", "Vinyoxla.Core\Vinyoxla.Core.csproj", "{EB90EFC9-0E3C-4F1A-9DD4-3E4172067C04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vinyoxla.Core", "Vinyoxla.Core\Vinyoxla.Core.csproj", "{EB90EFC9-0E3C-4F1A-9DD4-3E4172067C04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vinyoxla.Service", "Vinyoxla.Service\Vinyoxla.Service.csproj", "{0A0F92F6-7B7C-4871-8D8A-82BB3E08D31A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vinyoxla.Service", "Vinyoxla.Service\Vinyoxla.Service.csproj", "{0A0F92F6-7B7C-4871-8D8A-82BB3E08D31A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A832E2BA-A1C6-4F1F-B10C-3918D6C6DC06}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

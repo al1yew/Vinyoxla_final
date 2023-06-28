@@ -637,7 +637,9 @@ namespace Vinyoxla.Service.Implementations
 
             #region pokupka
 
-            string url = $"https://api.allreports.tools/wp-json/v1/get_report_by_wholesaler/{vin}/{Configuration.GetSection("Api_Key:MyKey").Value}/carfax/en";
+            string url = $"https://api.allreports.tools/wp-json/v1/get_report_by_wholesaler/{vin}/{Environment.GetEnvironmentVariable("MyKey")}/carfax/en";
+
+            //string url = $"https://api.allreports.tools/wp-json/v1/get_report_by_wholesaler/{vin}/{Configuration.GetSection("Api_Key:MyKey").Value}/carfax/en";
 
             HttpResponseMessage response = null;
 

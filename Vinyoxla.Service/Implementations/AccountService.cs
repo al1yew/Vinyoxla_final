@@ -77,7 +77,8 @@ namespace Vinyoxla.Service.Implementations
             Random random = new Random();
             int generatedcode = random.Next(1000, 9999);
 
-            string url = $"http://api.msm.az/sendsms?user={Configuration.GetSection("MSM:Username").Value}&password={Configuration.GetSection("MSM:Apikey").Value}&gsm={phone}&from={Configuration.GetSection("MSM:From").Value}&text=Code: {generatedcode}\nXoş gəldiniz!";
+            string url = $"http://api.msm.az/sendsms?user={Environment.GetEnvironmentVariable("Username")}&password={Environment.GetEnvironmentVariable("Apikey")}&gsm={phone}&from={Environment.GetEnvironmentVariable("From")}&text=Code: {generatedcode}\nXoş gəldiniz!";
+            //string url = $"http://api.msm.az/sendsms?user={Configuration.GetSection("MSM:Username").Value}&password={Configuration.GetSection("MSM:Apikey").Value}&gsm={phone}&from={Configuration.GetSection("MSM:From").Value}&text=Code: {generatedcode}\nXoş gəldiniz!";
 
             HttpResponseMessage response = null;
 
@@ -235,8 +236,12 @@ namespace Vinyoxla.Service.Implementations
 
             #region crt zad
 
-            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
-            byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
+            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Environment.GetEnvironmentVariable("CRT"));
+            byte[] PrivateKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("KEY"));
+
+            //byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
+            //byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
+
 
             using RSA rsa = RSA.Create();
             rsa.ImportPkcs8PrivateKey(PrivateKey, out _);
@@ -330,8 +335,11 @@ namespace Vinyoxla.Service.Implementations
 
             #region crt zad
 
-            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
-            byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
+            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Environment.GetEnvironmentVariable("CRT"));
+            byte[] PrivateKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("KEY"));
+
+            //byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
+            //byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
 
             using RSA rsa = RSA.Create();
             rsa.ImportPkcs8PrivateKey(PrivateKey, out _);
