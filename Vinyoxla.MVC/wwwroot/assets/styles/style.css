@@ -137,16 +137,13 @@ input::-webkit-inner-spin-button {
     }
 
         #header .all div:nth-child(2) a {
-            margin: 0 15px !important;
+            margin: 0 !important;
+            margin-left: 15px !important;
         }
 
             #header .all div:nth-child(2) a:hover::before {
                 content: '';
                 width: 0 !important;
-            }
-
-            #header .all div:nth-child(2) a:last-child {
-                margin: 0 !important;
             }
 
     #main {

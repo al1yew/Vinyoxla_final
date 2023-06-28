@@ -13,17 +13,14 @@
 
                 &:nth-child(2) {
                     a {
-                        margin: 0 15px !important;
+                        margin: 0;
+                        margin-left: 15px !important;
 
                         &:hover {
                             &::before {
                                 content: '';
                                 width: 0 !important;
                             }
-                        }
-
-                        &:last-child {
-                            margin: 0 !important;
                         }
                     }
                 }
