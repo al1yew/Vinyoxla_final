@@ -30,9 +30,8 @@ namespace Vinyoxla.Service.Implementations
         {
             #region Balance
 
-            string url = $"https://api.allreports.tools/wp-json/v1/get_client_payment_balance/{Environment.GetEnvironmentVariable("MyKey")}";
-
-            //string url = $"https://api.allreports.tools/wp-json/v1/get_client_payment_balance/{Configuration.GetSection("Api_Key:MyKey").Value}";
+            //string url = $"https://api.allreports.tools/wp-json/v1/get_client_payment_balance/{Environment.GetEnvironmentVariable("MyKey")}";
+            string url = $"https://api.allreports.tools/wp-json/v1/get_client_payment_balance/{Configuration.GetSection("Api_Key:MyKey").Value}";
 
             HttpResponseMessage response = null;
 

@@ -1251,8 +1251,8 @@ namespace Vinyoxla.Service.Implementations
 
             #region pokupka
 
-            string url = $"https://api.allreports.tools/wp-json/v1/get_report_by_wholesaler/{vin}/{Environment.GetEnvironmentVariable("MyKey")}/carfax/en";
-            //string url = $"https://api.allreports.tools/wp-json/v1/get_report_by_wholesaler/{vin}/{Configuration.GetSection("Api_Key:MyKey").Value}/carfax/en";
+            //string url = $"https://api.allreports.tools/wp-json/v1/get_report_by_wholesaler/{vin}/{Environment.GetEnvironmentVariable("MyKey")}/carfax/en";
+            string url = $"https://api.allreports.tools/wp-json/v1/get_report_by_wholesaler/{vin}/{Configuration.GetSection("Api_Key:MyKey").Value}/carfax/en";
 
             HttpResponseMessage response = null;
 
@@ -1381,11 +1381,11 @@ namespace Vinyoxla.Service.Implementations
 
             #region crt key
 
-            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Environment.GetEnvironmentVariable("CRT"));
-            byte[] PrivateKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("KEY"));
+            //byte[] PublicCertificate = Encoding.Unicode.GetBytes(Environment.GetEnvironmentVariable("CRT"));
+            //byte[] PrivateKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("KEY"));
 
-            //byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
-            //byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
+            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
+            byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
 
             using RSA rsa = RSA.Create();
             rsa.ImportPkcs8PrivateKey(PrivateKey, out _);
@@ -1479,11 +1479,11 @@ namespace Vinyoxla.Service.Implementations
 
             #region crt key
 
-            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Environment.GetEnvironmentVariable("CRT"));
-            byte[] PrivateKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("KEY"));
+            //byte[] PublicCertificate = Encoding.Unicode.GetBytes(Environment.GetEnvironmentVariable("CRT"));
+            //byte[] PrivateKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("KEY"));
 
-            //byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
-            //byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
+            byte[] PublicCertificate = Encoding.Unicode.GetBytes(Configuration.GetSection("SSL:CRT").Value);
+            byte[] PrivateKey = Convert.FromBase64String(Configuration.GetSection("SSL:KEY").Value);
 
             using RSA rsa = RSA.Create();
             rsa.ImportPkcs8PrivateKey(PrivateKey, out _);

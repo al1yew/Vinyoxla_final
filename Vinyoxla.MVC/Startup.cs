@@ -30,15 +30,15 @@ namespace Vinyoxla.MVC
 
             services.IdentityBuilder();
 
-            services.AddDbContext<AppDbContext>(options =>
-            {
-                options.UseSqlServer(Environment.GetEnvironmentVariable("Default"));
-            });
-
             //services.AddDbContext<AppDbContext>(options =>
             //{
-            //    options.UseSqlServer(Configuration.GetConnectionString("Default"));
+            //    options.UseSqlServer(Environment.GetEnvironmentVariable("Default"));
             //});
+
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("Default"));
+            });
 
             services.AddAutoMapper(options =>
             {
