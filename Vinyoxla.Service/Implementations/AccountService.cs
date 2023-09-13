@@ -175,7 +175,7 @@ namespace Vinyoxla.Service.Implementations
 
             IQueryable<AppUserToVincodeVM> query = appUserToVincodes.AsQueryable();
 
-            query = query.OrderBy(x => x.CreatedAt);
+            query = query.OrderByDescending(x => x.CreatedAt);
 
             AccountVM accountVM = new AccountVM()
             {
