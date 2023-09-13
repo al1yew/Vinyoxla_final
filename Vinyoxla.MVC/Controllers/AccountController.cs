@@ -71,7 +71,7 @@ namespace Vinyoxla.MVC.Controllers
 
         public async Task<IActionResult> Sort([FromQuery] string vin, int page, int sortbydate, int showcount)
         {
-            return PartialView("_AccountReportsPartial", await _accountService.Sort(page, vin, sortbydate, showcount));
+            return PartialView("_AccountReportsPartial", await _accountService.Sort(vin, page, sortbydate, showcount));
         }
 
         [HttpPost]

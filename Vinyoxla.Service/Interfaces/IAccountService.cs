@@ -19,7 +19,7 @@ namespace Vinyoxla.Service.Interfaces
 
         Task<AccountVM> Profile();
 
-        Task<PaginationList<AppUserToVincodeVM>> Sort(int page, string vin, int sortbydate, int showcount);
+        Task<PaginationList<AppUserToVincodeVM>> Sort(string vin, int page = 1, int sortbydate = 1, int showcount = 10);
 
         Task<string> Bank(string amonut);
 

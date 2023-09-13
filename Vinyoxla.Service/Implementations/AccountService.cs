@@ -186,7 +186,7 @@ namespace Vinyoxla.Service.Implementations
             return accountVM;
         }
 
-        public async Task<PaginationList<AppUserToVincodeVM>> Sort(int page, string vin, int sortbydate, int showcount)
+        public async Task<PaginationList<AppUserToVincodeVM>> Sort(string vin, int page = 1, int sortbydate = 1, int showcount = 10)
         {
             AppUser appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == _httpContextAccessor.HttpContext.User.Identity.Name);
 
@@ -197,15 +197,19 @@ namespace Vinyoxla.Service.Implementations
 
             if (vin != null)
             {
-                query = query.Where(x => x.VinCode.Vin.Contains(vin.Trim().ToUpperInvariant())).OrderBy(x => x.CreatedAt);
+                query = query.Where(x => x.VinCode.Vin.Contains(vin.Trim().ToUpperInvariant()));
             }
 
-            if (sortbydate == 2)
+            if (sortbydate == 1)
             {
                 query = query.OrderByDescending(x => x.CreatedAt);
             }
+            else if (sortbydate == 2)
+            {
+                query = query.OrderBy(x => x.CreatedAt);
+            }
 
-            return PaginationList<AppUserToVincodeVM>.Create(query, page == 0 ? 1 : page, showcount == 0 ? 1 : showcount);
+            return PaginationList<AppUserToVincodeVM>.Create(query, page, showcount);
         }
 
         public async Task<string> Bank(string amount)
