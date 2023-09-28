@@ -13,6 +13,8 @@ namespace Vinyoxla.Service.Interfaces
 
         Task<AppUserGetVM> GetById(string id);
 
+        Task<AppUserGetVM> GetByIdForUpdate(string id);
+
         Task CreateAsync(AppUserCreateVM appUserCreateVM);
 
         Task<AppUserGetVM> GetCurrentUser();

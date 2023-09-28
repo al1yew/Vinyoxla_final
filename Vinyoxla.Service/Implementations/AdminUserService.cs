@@ -60,6 +60,21 @@ namespace Vinyoxla.Service.Implementations
 
             return appUser;
         }
+
+        public async Task<AppUserGetVM> GetByIdForUpdate(string id)
+        {
+            if (id == null)
+                throw new BadRequestException("Id is null!");
+
+            AppUserGetVM appUser = _mapper.Map<AppUserGetVM>
+                (await _unitOfWork.AppUserRepository.GetAsync(x => x.Id == id));
+
+            if (appUser == null)
+                throw new NotFoundException("User cannot be found!");
+
+            return appUser;
+        }
+
         public async Task<AppUserGetVM> GetCurrentUser()
         {
             return _mapper.Map<AppUserGetVM>

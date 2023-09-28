@@ -75,7 +75,7 @@ namespace Vinyoxla.MVC.Areas.Manage.Controllers
         {
             ViewBag.WhereWeAre = "Update User";
 
-            return View(_mapper.Map<AppUserUpdateVM>(await _adminUserService.GetById(id)));
+            return View(_mapper.Map<AppUserUpdateVM>(await _adminUserService.GetByIdForUpdate(id)));
         }
 
         [HttpPost]
